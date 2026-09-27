@@ -1,0 +1,336 @@
+# Ogre Ergo (68 keys) — hand-written ergogen config (ergogen 4.1+).
+# Changes from the as-built 70-key board: 2.25U Shifts are now 1.25U, and the
+# 1.25U + 1U keys at the outer end of the bottom row are removed, and the 1.5U
+# thumb keys are now 1.25U with a new 1U key above each. The far and outer
+# columns (Esc, + =, Tab, Caps Lock, Ctrl) sit 0.25U lower than the pinky column,
+# and the innermost column (~ `, } ], PgDn) sits 0.25U lower than the T/G/B column.
+# In the thumb cluster, the Shift/Alt/Home block is staggered 0.25U up from Cmd,
+# and the Alt/Home column another 0.25U up from Shift.
+# Source of truth: switch positions on the as-built KiCad PCB
+# (ctrlShiftBryan/ogre-v1, ogre-v1.kicad_pcb, branch sent-to-allpcb).
+# `npm run verify` checks the kept keys against the PCB and lists the intended changes.
+# Below the points: board outline and PCB (custom footprints in footprints/;
+# build with `npm run build`, check with `npm run check`).
+# Ergogen y points up; KLE/KiCad y points down.
+
+meta:
+  engine: 4.1.0
+  name: ogre-ergo
+
+units:
+  # MX spacing
+  $default_spread: U
+  $default_padding: U
+  $default_width: U-1
+  $default_height: U-1
+
+points:
+  zones:
+    # `legend` is what's printed on a standard keycap set (not the firmware keymap).
+    # `mirror.legend` is the matching key on the right half.
+    # Two-part legends are "shifted base", e.g. '! 1'.
+    matrix:
+      columns:
+        far:            # lone key left of the number row
+          key.skip: true
+          key.stagger: -0.25U   # far + outer columns sit 0.25U below the pinky (same step as 1 -> 2)
+          key.col_net: col6
+          rows:
+            num: { skip: false, row_net: row3, mirror.row_net: row8, legend: 'Esc', mirror.legend: 'Del' }   # wired as on the as-built board
+        outer:          # wide caps right-aligned to the pinky column
+          key.col_net: col0
+          rows:
+            mod.skip: true
+            bottom: { width: 1.25U-1, adjust.shift: [-0.125U, 0], legend: 'Ctrl',      mirror.legend: 'Ctrl' }
+            home:   { width: 1.75U-1, adjust.shift: [-0.375U, 0], legend: 'Caps Lock', mirror.legend: 'Ctrl' }
+            top:    { width: 1.5U-1,  adjust.shift: [-0.25U, 0],  legend: 'Tab',       mirror.legend: '| \' }
+            num:    { legend: '+ =', mirror.legend: '_ -' }
+        pinky:
+          key.stagger: 0.25U    # back up to the original pinky height
+          key.col_net: col1
+          rows:
+            mod.skip: true
+            bottom: { legend: 'Z',   mirror.legend: '? /' }
+            home:   { legend: 'A',   mirror.legend: ': ;' }
+            top:    { legend: 'Q',   mirror.legend: 'P' }
+            num:    { legend: '! 1', mirror.legend: ') 0' }
+        ring:
+          key.stagger: 0.25U
+          key.col_net: col2
+          rows:
+            mod:    { legend: '←',   mirror.legend: '↑' }
+            bottom: { legend: 'X',   mirror.legend: '> .' }
+            home:   { legend: 'S',   mirror.legend: 'L' }
+            top:    { legend: 'W',   mirror.legend: 'O' }
+            num:    { legend: '@ 2', mirror.legend: '( 9' }
+        middle:
+          key.stagger: 0.125U
+          key.col_net: col3
+          rows:
+            mod:    { legend: '→',   mirror.legend: '↓' }
+            bottom: { legend: 'C',   mirror.legend: '< ,' }
+            home:   { legend: 'D',   mirror.legend: 'K' }
+            top:    { legend: 'E',   mirror.legend: 'I' }
+            num:    { legend: '# 3', mirror.legend: '* 8' }
+        index:
+          key.stagger: -0.125U
+          key.col_net: col4
+          rows:
+            mod.skip: true
+            bottom: { legend: 'V',   mirror.legend: 'M' }
+            home:   { legend: 'F',   mirror.legend: 'J' }
+            top:    { legend: 'R',   mirror.legend: 'U' }
+            num:    { legend: '$ 4', mirror.legend: '& 7' }
+        inner:
+          key.stagger: -0.125U
+          key.col_net: col5
+          rows:
+            mod.skip: true
+            bottom: { legend: 'B',   mirror.legend: 'N' }
+            home:   { legend: 'G',   mirror.legend: 'H' }
+            top:    { legend: 'T',   mirror.legend: 'Y' }
+            num:    { legend: '% 5', mirror.legend: '^ 6' }
+        extra:          # inner 1u column (num, top, home only)
+          key.stagger: -0.25U   # 0.25U below the inner (T/G/B) column
+          key.col_net: col6
+          rows:
+            mod.skip: true
+            bottom.skip: true
+            home:   { legend: 'PgDn', mirror.legend: "\" '" }
+            top:    { legend: '} ]',  mirror.legend: '{ [' }
+            num:    { legend: '~ `',  mirror.legend: 'PgUp' }
+      rows:
+        mod:    { row_net: row4, mirror.row_net: row9 }
+        bottom: { row_net: row3, mirror.row_net: row8 }
+        home:   { row_net: row2, mirror.row_net: row7 }
+        top:    { row_net: row1, mirror.row_net: row6 }
+        num:    { row_net: row0, mirror.row_net: row5 }
+
+    thumb:              # 1.25u, 2.25u, then a 1.25u + 1u stack, fanned 30°
+      anchor:
+        ref: matrix_middle_mod
+        shift: [23.98, -10.48]
+        rotate: -30
+      columns:
+        near:
+          key.width: 1.25U-1
+          key.col_net: col4
+          rows:
+            cluster: { legend: 'Cmd', mirror.legend: 'Fn' }
+            upper.skip: true
+        home:
+          key.spread: 24.73
+          key.stagger: 0.875U   # 0.625U as built + 0.25U: Shift/Alt/Home block sits 0.25U up from Cmd
+          key.width: 2.25U-1
+          key.adjust.rotate: 90   # a wide cap turned 90°, so switch and stabilizer footprints face the right way
+          key.col_net: col5
+          rows:
+            cluster: { legend: 'Shift', mirror.legend: 'Enter' }
+            upper.skip: true
+        far:            # 1.25u Alt with a 1u Home above it, staggered 0.25U up from the 2.25u
+          key.stagger: -0.25U
+          key.col_net: col6
+          rows:
+            cluster:
+              width: 1.25U-1
+              adjust.rotate: 90
+              padding: 1.125U
+              legend: 'Alt'
+              mirror.legend: 'Alt'
+            upper:
+              adjust.rotate: 90   # turned 90° like the 1.25u/2.25u thumb caps (mirror flips it to -90)
+              col_net: col1       # free matrix spot left by the removed bottom-row keys
+              legend: 'Home'
+              mirror.legend: 'End'
+      rows:
+        cluster: { row_net: row4, mirror.row_net: row9 }
+        upper:   { row_net: row4, mirror.row_net: row9 }
+
+  mirror:               # halves are symmetric; axis is 2.125U right of the extra column
+    ref: matrix_extra_num
+    distance: 4.25U     # was 3U as built; widened so the new, staggered thumb keys keep the original 12 mm gap between halves
+
+# ---------------------------------------------------------------------------
+# Board outline. One PCB that builds as a single keyboard, or snaps along two
+# break lines into left half, center piece and right half (the Ogre's trick).
+# Break-line geometry (cuts, slots, bridges) is copied from the as-built board,
+# measured from each half's `extra` column (~ ` key); it is mirrored for the
+# right side. All numbers below are mm, ergogen y up.
+# ---------------------------------------------------------------------------
+outlines:
+  _webs:                # convex webs joining the thumb cluster to the matrix: no pockets, no thin
+                        # prongs. Convex hulls of mirrored keys are mirror images, so the halves match.
+    web_l:
+      what: hull
+      concavity: 1000
+      points: [ ref: matrix_middle_mod, ref: matrix_inner_bottom, ref: matrix_extra_home, ref: thumb_near_cluster, ref: thumb_home_cluster, ref: thumb_far_cluster, ref: thumb_far_upper ]
+    web_r:
+      what: hull
+      concavity: 1000
+      points: [ ref: mirror_matrix_middle_mod, ref: mirror_matrix_inner_bottom, ref: mirror_matrix_extra_home, ref: mirror_thumb_near_cluster, ref: mirror_thumb_home_cluster, ref: mirror_thumb_far_cluster, ref: mirror_thumb_far_upper ]
+    web_arrows_l:       # carries the edge from the left arrow key to Cmd
+      what: hull
+      concavity: 1000
+      points: [ ref: matrix_ring_mod, ref: matrix_middle_mod, ref: thumb_near_cluster ]
+    web_arrows_r:
+      what: hull
+      concavity: 1000
+      points: [ ref: mirror_matrix_ring_mod, ref: mirror_matrix_middle_mod, ref: mirror_thumb_near_cluster ]
+      expand: 0.5       # hulls use the 18 mm cap size; grow them to the 19.05 mm key pitch
+  _caps:                # every keycap at its real size, both halves
+    ones:   { what: rectangle, where: '-/outer_(top|home|bottom)|thumb_(near|home|far)_cluster/', size: [U, U] }
+    tab:    { what: rectangle, where: /outer_top/,          size: [1.5U, U] }
+    caps:   { what: rectangle, where: /outer_home/,         size: [1.75U, U] }
+    ctrl:   { what: rectangle, where: /outer_bottom/,       size: [1.25U, U] }
+    cmd:    { what: rectangle, where: /thumb_near_cluster/, size: [1.25U, U] }
+    shift:  { what: rectangle, where: /thumb_home_cluster/, size: [2.25U, U] }
+    alt:    { what: rectangle, where: /thumb_far_cluster/,  size: [1.25U, U] }
+    webs:   { what: outline, name: _webs }
+  _halves:              # keycap edges with 1 mm rounded corners, like the as-built board
+    - { what: outline, name: _caps, fillet: 1 }
+  board:
+    halves: { what: outline, name: _halves }
+    keepout:            # nothing from the halves inside the center zone, except the thumbs below it
+      operation: subtract
+      what: rectangle
+      asym: both
+      where: { ref: matrix_extra_num, shift: [(9.44 + 2.125U) / 2, 0] }
+      size: [2.125U - 9.44, 102]    # from the break line to the mirror axis, down to 2 mm below the center piece
+    center:             # center piece: holds MCU3 (single-board controller) and its reset switch
+      what: rectangle
+      where: { ref: matrix_extra_num, shift: [2.125U, -19.69] }   # centered on the mirror axis
+      size: [4.25U - 2 * 9.4, 58.62]
+    jack_tab:           # raises the top edge over the extra column so each half's TRRS jack sits at the edge
+      what: rectangle
+      asym: both
+      where: { ref: matrix_extra_num, shift: [1.8375, 0.375U] }   # from 2 mm into the inner column (covers its corner) to x = 15.2
+      size: [26.725, 0.75U]
+    cut_a:              # break line: slot down beside the jack tab ...
+      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [16.185, 12.66] }, size: [1.97, 24.68] }
+    cut_b:              # ... across under the jack ...
+      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [13.305, 1.065] }, size: [7.73, 1.49] }
+    cut_c:              # ... and down to the first bridge
+      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.47, -6.235] }, size: [2.06, 16.09], corner: 0.5 }
+    slot_1:             # routed slots between the four ~2 mm bridges
+      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.475, -20.255] }, size: [1.71, 8.05], corner: 0.85 }
+    slot_2:
+      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.475, -30.44] }, size: [1.71, 8.05], corner: 0.85 }
+    slot_3:
+      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.475, -40.62] }, size: [1.71, 8.05], corner: 0.85 }
+    notch:              # bottom notch up to the last bridge
+      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.525, -49.05] }, size: [1.95, 4.9], corner: 0.5 }
+
+# ---------------------------------------------------------------------------
+# PCB. 10x7 matrix, COL2ROW diodes, one switch + one diode per key.
+# MCU1/MCU2 (left/right half) and MCU3 (center, single-board build) all sit on
+# the same row/column nets; solder MCU3 alone, or MCU1 + MCU2. Pro Micro pad map
+# is the as-built board's U1/U2/U0 (see footprints/ogre_promicro.js).
+# ---------------------------------------------------------------------------
+pcbs:
+  ogre:
+    template: kicad8
+    outlines:
+      edge: { outline: board }
+    footprints:
+      switch:
+        what: ogre_mx
+        where: '-/thumb_home_cluster/'
+        params: { from: '{{col_net}}', to: '{{name}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}' }
+      switch_2u:        # 2.25U thumb keys get stabilizer holes
+        what: ogre_mx
+        where: /thumb_home_cluster/
+        params: { from: '{{col_net}}', to: '{{name}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}', stab: true }
+      diode:            # in the gap below its switch, as on the as-built board
+        what: ogre_diode
+        where: '-/far_num|middle_num/'
+        adjust.shift: [0, -8]
+        params: { from: '{{name}}', to: '{{row_net}}' }
+      diode_mcu:        # the 3/8 key sits over a Pro Micro, so (as built) its diode moves down, below E/I's diode
+        what: ogre_diode
+        where: /middle_num/
+        adjust.shift: [0, -(U + 10.5)]
+        params: { from: '{{name}}', to: '{{row_net}}' }
+      diode_esc:        # Esc/Del overhang the Tab row, so their diode stands in the gap beside them
+        what: ogre_diode
+        where: /far_num/
+        adjust: { shift: [0.5U, 0], rotate: 90 }
+        params: { from: '{{name}}', to: '{{row_net}}' }
+
+      mcu_left:         # MCU1: under the middle column, USB at the top edge
+        what: ogre_promicro
+        where: { ref: matrix_middle_num, shift: [0, -7.57], rotate: 270 }
+        params: &half_mcu
+          pad1: SCL1
+          pad2: SDA1
+          pad3: GND
+          pad4: GND
+          pad8: row0
+          pad9: row1
+          pad10: row2
+          pad11: row3
+          pad12: row4
+          pad14: col6
+          pad15: col5
+          pad16: col4
+          pad17: col3
+          pad18: col2
+          pad19: col1
+          pad20: col0
+          pad21: VCC
+          pad22: RESET1
+          pad23: GND
+      mcu_right:        # MCU2: same part, same orientation (not mirrored)
+        what: ogre_promicro
+        where: { ref: mirror_matrix_middle_num, shift: [0, -7.57], rotate: 270, resist: true }
+        params:
+          <<: *half_mcu
+          pad1: SCL2
+          pad2: SDA2
+          pad8: row5
+          pad9: row6
+          pad10: row7
+          pad11: row8
+          pad12: row9
+          pad22: RESET2
+      mcu_center:       # MCU3: single-board build, all ten rows
+        what: ogre_promicro
+        where: { ref: matrix_extra_num, shift: [2.125U, -8.31], rotate: 270 }
+        params:
+          pad1: row0
+          pad2: row1
+          pad3: GND
+          pad4: GND
+          pad5: row2
+          pad6: row3
+          pad7: row4
+          pad8: row5
+          pad9: row6
+          pad10: row7
+          pad11: row8
+          pad12: row9
+          pad14: col6
+          pad15: col5
+          pad16: col4
+          pad17: col3
+          pad18: col2
+          pad19: col1
+          pad20: col0
+          pad21: VCC
+          pad22: RESET0
+          pad23: GND
+
+      reset_halves:     # SW1/SW2: on the back, between Tab and Q
+        what: ogre_reset
+        asym: both
+        where: { ref: matrix_pinky_top, shift: [-12.02, 0] }
+        params: { from: GND, to: RESET1, mirror.to: RESET2 }
+      reset_center:     # SW3: below MCU3
+        what: ogre_reset
+        where: { ref: matrix_extra_num, shift: [2.125U, -34.65] }
+        params: { from: GND, to: RESET0 }
+
+      trrs:             # TRRS1/TRRS2: in the jack tab, plug from the top, wired to its own half only
+        what: ogre_trrs
+        asym: both
+        where: { ref: matrix_extra_num, shift: [11.4, 14.7575], rotate: 180 }
+        params: { sleeve: GND, tip: VCC, ring1: SDA1, ring2: SCL1, mirror: { ring1: SDA2, ring2: SCL2 } }

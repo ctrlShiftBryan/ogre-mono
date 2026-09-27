@@ -1,10 +1,8 @@
-// Checks ogre-ergo.yaml (68-key redesign) against the switch positions on the
+// Checks config.yaml (68-key redesign) against the switch positions on the
 // as-built 70-key PCB (ctrlShiftBryan/ogre-v1, ogre-v1.kicad_pcb).
 // Keys the redesign keeps must still match the PCB; the intended changes are
 // listed as expected differences. Usage: npm run verify
-const fs = require('fs')
-const path = require('path')
-const ergogen = require('ergogen')
+const { run } = require('./build')
 
 const U = 19.05
 
@@ -80,8 +78,7 @@ const ORIGIN = { pcb: 'MX54', point: 'matrix_middle_mod' } // left key below C
 const TOL = 0.02 // mm; KiCad positions are rounded to 0.01
 
 ;(async () => {
-  const yaml = fs.readFileSync(path.join(__dirname, 'ogre-ergo.yaml'), 'utf8')
-  const { points } = await ergogen.process(yaml, { debug: true })
+  const { points } = await run()
   const o = points[ORIGIN.point], po = PCB[ORIGIN.pcb]
   const pcbXY = p => [po[1] + (p.x - o.x), po[2] - (p.y - o.y)]
   const size = p => (Math.max(p.meta.width, p.meta.height) + 1) / U

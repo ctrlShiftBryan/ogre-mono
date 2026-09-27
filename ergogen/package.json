@@ -2,8 +2,9 @@
   "name": "ogre-ergogen",
   "private": true,
   "scripts": {
-    "build": "ergogen ogre-ergo.yaml -o output --clean -d --svg && cp output/points/demo.svg ogre-ergo.demo.svg",
-    "keycaps": "ergogen ogre-ergo.yaml -o output --clean -d --svg && python3 render_keycaps.py output/points/points.yaml ogre-ergo.keycaps.svg \"Ogre Ergo\"",
+    "build": "node build.js && cp output/points/demo.svg ogre-ergo.demo.svg && cp output/outlines/board.svg ogre-ergo.board.svg && cp output/pcbs/ogre.kicad_pcb ogre-ergo.kicad_pcb",
+    "keycaps": "npm run build && python3 render_keycaps.py output/points/points.yaml ogre-ergo.keycaps.svg \"Ogre Ergo\"",
+    "check": "node check-pcb.js",
     "verify": "node verify.js"
   },
   "devDependencies": {

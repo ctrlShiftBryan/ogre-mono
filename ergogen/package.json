@@ -1,0 +1,11 @@
+{
+  "name": "ogre-ergogen",
+  "private": true,
+  "scripts": {
+    "build": "ergogen ogre-ergo.yaml -o output --clean -d --svg",
+    "verify": "node verify.js"
+  },
+  "devDependencies": {
+    "ergogen": "4.2.1"
+  }
+}

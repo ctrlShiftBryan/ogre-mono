@@ -1,0 +1,73 @@
+# Ogre Ergo (70 keys) — hand-written ergogen config (ergogen 4.1+).
+# Source of truth: switch positions on the as-built KiCad PCB
+# (ctrlShiftBryan/ogre-v1, ogre-v1.kicad_pcb). Main grid is identical to the
+# KLE design (layout/ogre-ergo.kle.json); thumbs follow the PCB (~1 mm off KLE).
+# `npm run verify` checks every key against the PCB.
+# Ergogen y points up; KLE/KiCad y points down.
+
+meta:
+  engine: 4.1.0
+  name: ogre-ergo
+
+units:
+  # MX spacing
+  $default_spread: U
+  $default_padding: U
+  $default_width: U-1
+  $default_height: U-1
+
+points:
+  zones:
+    matrix:
+      columns:
+        far:            # lone key left of the number row
+          key.skip: true
+          rows.num.skip: false
+        outer:          # Tab / Caps / Shift / Ctrl; wide caps right-aligned to the pinky column
+          rows:
+            mod:    { width: 1.25U-1, adjust.shift: [-0.125U, 0] }
+            bottom: { width: 2.25U-1, adjust.shift: [-0.625U, 0] }
+            home:   { width: 1.75U-1, adjust.shift: [-0.375U, 0] }
+            top:    { width: 1.5U-1,  adjust.shift: [-0.25U, 0] }
+        pinky:
+        ring:
+          key.stagger: 0.25U
+        middle:
+          key.stagger: 0.125U
+        index:
+          key.stagger: -0.125U
+          rows.mod.skip: true
+        inner:
+          key.stagger: -0.125U
+          rows.mod.skip: true
+        extra:          # inner 1u column (num, top, home only)
+          rows.mod.skip: true
+          rows.bottom.skip: true
+      rows:
+        mod:
+        bottom:
+        home:
+        top:
+        num:
+
+    thumb:              # 1.25u, 2.25u, 1.5u fanned 30°
+      anchor:
+        ref: matrix_middle_mod
+        shift: [23.98, -10.48]
+        rotate: -30
+      columns:
+        near:
+          key.width: 1.25U-1
+        home:
+          key.spread: 24.73
+          key.stagger: 0.625U
+          key.height: 2.25U-1
+        far:
+          key.stagger: -0.375U
+          key.height: 1.5U-1
+      rows:
+        cluster:
+
+  mirror:               # halves are symmetric; axis is 1.5U right of the extra column
+    ref: matrix_extra_num
+    distance: 3U

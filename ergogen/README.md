@@ -1,13 +1,24 @@
 # Ogre Ergo redesign (68 keys) in ergogen
 
-`ogre-ergo.yaml` is a 68-key redesign of the Ogre Ergo, written by hand for
-[ergogen](https://ergogen.xyz) as the starting point for a new PCB. Paste it
-into ergogen.xyz or build it locally (needs ergogen 4.1+).
+`config.yaml` is a 68-key redesign of the Ogre Ergo, written by hand for
+[ergogen](https://ergogen.xyz): key layout, board outline and an unrouted
+KiCad PCB. It needs ergogen 4.1+ and the custom footprints in `footprints/`.
+On ergogen.xyz, load it from GitHub with the repo URL (it finds
+`ergogen/config.yaml` and `ergogen/footprints/` itself); pasting the YAML alone
+won't work, because the footprints wouldn't load.
 
 It starts from the as-built 70-key board: the switch positions of the PCB in
-`ctrlShiftBryan/ogre-v1` (`ogre-v1.kicad_pcb`), which match the KLE design
-(`../layout/ogre-ergo.kle.json`) except for the thumbs, which sit about 1 mm
-off the KLE.
+`ctrlShiftBryan/ogre-v1` (`ogre-v1.kicad_pcb`, branch `sent-to-allpcb`), which
+match the KLE design (`../layout/ogre-ergo.kle.json`) except for the thumbs,
+which sit about 1 mm off the KLE.
+
+| File | What it is |
+|---|---|
+| `config.yaml` | Layout, outline and PCB |
+| `footprints/` | Switch, diode, Pro Micro, reset switch and TRRS jack, copied from the as-built board's footprints |
+| `ogre-ergo.kicad_pcb` | Generated PCB, unrouted |
+| `ogre-ergo.board.svg` | Board outline |
+| `ogre-ergo.demo.svg`, `ogre-ergo.keycaps.svg` | Key previews |
 
 ## Changes from the as-built board (70 → 68 keys)
 
@@ -17,7 +28,7 @@ off the KLE.
   the bottom row are gone on both halves (`matrix_outer_mod`,
   `matrix_pinky_mod`).
 - **Far thumb keys** are 1.25U instead of 1.5U, with a new 1U key above each
-  (`thumb_far_upper`), turned 90° to match the other thumb caps.
+  (`thumb_far_upper`).
 - **Outer columns 0.25U lower.** The far and outer columns (Esc, `+ =`, Tab,
   Caps Lock, Ctrl) sit 0.25U below the pinky column, the same step as 1 → 2.
 - **Innermost column 0.25U lower.** `~ \``, `} ]`, PgDn sit 0.25U below the
@@ -28,26 +39,79 @@ off the KLE.
 - **Halves 1.25U (23.81 mm) further apart.** The mirror distance went from 3U
   to 4.25U so the staggered thumb keys keep the original 12.1 mm gap between
   halves. Every right-half key moves out by that amount.
+- **Thumb keys are wide keys turned 90°** (`width` + `adjust.rotate: 90`)
+  rather than tall keys, so switch and stabilizer footprints face the right
+  way. Positions and outlines are unchanged.
 - **Legends** on every key (see below).
 
 ## Legends
 
 Each key has a `legend`: what's printed on a standard keycap set, not the
 firmware keymap. `mirror.legend` is the legend of the matching key on the
-right half, since ergogen builds the right half by mirroring the left.
+right half, since ergogen builds the right half by mirroring the left. The PCB
+prints each legend on both silkscreens, under its switch (readable from the
+back once the switches are in).
 
 Two-part legends are written shifted character first, then base, separated by
 a space: `'! 1'` is the key with `!` over `1`. Anything else (`Esc`,
 `Caps Lock`, `←`) is a single legend.
 
+## The PCB
+
+One board that builds either as a single keyboard or, snapped along two break
+lines, as a split with a spare center piece. That is the as-built Ogre's
+design, kept as is:
+
+- **One 10×7 matrix, one diode per key** (through-hole 1N4148, COL2ROW).
+  Rows 0–4 are the left half, rows 5–9 the right; columns 0–6 run across both,
+  numbered from the outer edge inward on each half. Every key keeps its
+  as-built row and column; the new Home/End keys take row4/col1 and
+  row9/col1, freed by the removed bottom-row keys. row4/col0 and row9/col0 stay
+  unused.
+- **Three Pro Micro footprints on the same nets.** Solder MCU3 alone for the
+  single board, or MCU1 + MCU2 for the split. Pads are the as-built board's
+  (MCU1/2/3 were U1/U2/U0):
+  - MCU3 (center): pads 1, 2, 5–12 = row0–row9; pads 20→14 = col0–col6; 22 = RESET0.
+  - MCU1 (left): pads 8–12 = row0–row4; 20→14 = col0–col6; 1/2 = SCL1/SDA1; 22 = RESET1.
+  - MCU2 (right): pads 8–12 = row5–row9; same columns; 1/2 = SCL2/SDA2; 22 = RESET2.
+  - The SCL/SDA names are historical: pads 1/2 are D3/D2, which QMK used for
+    split serial.
+- **Break lines** beside each half's innermost column: a cut down from the
+  top edge (jogging around the TRRS jack), three 1.7 × 8 mm slots and a
+  bottom notch, leaving four ~2 mm bridges. Every row and column net, plus VCC
+  and GND, has to cross at those bridges. Sizes and spacing are the as-built
+  board's, measured from the innermost column.
+- **Center piece:** MCU3 with its USB at the top edge, and reset switch SW3.
+- **Each half:** its Pro Micro under the middle column (USB at the top edge),
+  a 6 mm reset switch on the back between Tab and Q, and a PJ-320A TRRS jack
+  in a tab at the top of its inner edge, wired only to its own Pro Micro.
+- **Outline:** keycap edges with 1 mm corners, plus convex webs that join the
+  thumb cluster to the matrix. Nothing from the halves enters the center zone
+  above the thumbs, leaving a 2 mm gap under the center piece.
+- **Not carried over:** underglow LEDs (and `RGB`/`RGB2`), alternate-size
+  switch footprints, the old Edge.Cuts art, and mounting holes (see below).
+
+Diodes sit 8 mm below their switch, as on the as-built board, except two
+spots that don't have room: the Esc/Del diode stands in the gap beside its
+key, and the 3/8 key's diode (it sits over a Pro Micro) moves down below the
+E/I key's diode.
+
+Routing is left for KiCad. Route in a copy of `ogre-ergo.kicad_pcb`, since
+`npm run build` regenerates it.
+
 ## Commands
 
 ```sh
 npm install
-npm run build    # write output/ and refresh ogre-ergo.demo.svg (key outlines)
+npm run build    # write output/ and refresh the committed .svg and .kicad_pcb files
 npm run keycaps  # build, then render ogre-ergo.keycaps.svg with legends
-npm run verify   # compare to the as-built PCB
+npm run verify   # compare key positions to the as-built PCB
+npm run check    # check the generated PCB's parts, nets and KiCad DRC
 ```
+
+`build.js` runs ergogen with the footprints in `footprints/`. The ergogen CLI
+only loads custom footprints from a folder, and this folder also holds
+`node_modules`.
 
 `npm run keycaps` runs `render_keycaps.py`, which needs Python 3 and PyYAML
 (`pip install pyyaml`). It reads the `output/points/points.yaml` that ergogen
@@ -61,9 +125,35 @@ four removed keys, the resized row-4 outer and far thumb keys, the keys moved
 by the new staggers (outer, far and innermost columns, Shift/Enter thumbs), the
 two new 1U keys, and the right-half shift. Anything else that moves fails.
 
-## Open question before PCB footprints
+`npm run check` reads the generated PCB and fails unless every key has one
+switch and one diode wired column → switch → diode → row, no two keys share a
+matrix position, every Pro Micro pad carries the net listed above, and the
+reset switches and jacks are wired to their own half. If `kicad-cli` is
+installed it also runs KiCad's DRC (overlapping parts, hole and edge
+clearances) and fails on any violation other than the unrouted connections.
 
-The 2.25U and 1.25U thumb keys are written as tall keys (`height`); only the
-new 1U keys use `adjust.rotate: 90`. Before generating PCB footprints, the
-tall keys should probably become wide keys with `adjust.rotate: 90` so the
-switch and stabilizer footprints face the right way.
+## Firmware notes
+
+Compared with the ZMK `ogre_ergo` shield in `ctrlShiftBryan/zmk-config2`
+(`boards/shields/ogre_ergo/`), nothing changes in the wiring: the same GPIOs,
+the same diode direction and the same `col-offset = <5>` for the right half.
+In ZMK terms, `RC(r, c)` is PCB column `r`, PCB row `c`.
+
+- **Removed:** `RC(0,4)` and `RC(0,9)`. Drop them from the matrix transform
+  and their bindings (`&mt LCTRL GRAVE` and `&kp RCTRL` today).
+- **Reused for the new thumb keys:** `RC(1,4)` is now the left Home key and
+  `RC(1,9)` the right End key. They used to be the bottom-row keys bound to
+  `&kp LALT` and `&kp LBKT`. Move them into the thumb group of the transform
+  and give them new bindings.
+- **Everything else** keeps its matrix position, including the resized and
+  moved keys. The transform goes from 70 to 68 entries.
+
+The single-board build (MCU3) matches QMK's `ogre/ergo_single` pins, and the
+halves match `ogre/ergo_split`.
+
+## Not done yet
+
+- **Mounting holes.** The as-built board had ten M2 holes at key corners.
+  They depend on the case, and the new staggers move most of those corners,
+  so they're left out until the case is redesigned.
+- **Routing**, in KiCad.

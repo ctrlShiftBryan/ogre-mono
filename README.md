@@ -91,9 +91,11 @@ that matter, verified against the QMK readme photos and the KiCad footprints:
 | [OGRE 2025](https://gist.github.com/ctrlShiftBryan/924e0f9423bcae3f99e5aeea24a7db68) | 2025-09-01 | New 62-key design, uniform 1u with 1×1.5u thumbs. | `ogre-2025.kle.json` |
 
 **Ogre Ergo redesign.** `ergogen/` now holds a 68-key redesign of the as-built
-Ogre Ergo (proto 2), written for [ergogen](https://ergogen.xyz) ahead of a new
-PCB: 1.25u Shifts, no outer bottom-row keys, 1.25u + 1u far thumb keys. It is
-unrelated to the 68-key 2019 tkl above. See `ergogen/README.md`.
+Ogre Ergo (proto 2), written for [ergogen](https://ergogen.xyz): 1.25u Shifts,
+no outer bottom-row keys, 1.25u + 1u far thumb keys, restaggered outer and
+inner columns. `ergogen/config.yaml` also generates its PCB (unrouted), which
+keeps the as-built board's snap-apart single/split design. It is unrelated to
+the 68-key 2019 tkl above. See `ergogen/README.md`.
 
 Each `.kle.json` has a matching `.svg`/`.png` render. `layout/kle.py` is a
 small deserializer that follows KLE's own rules (the npm `kle-serial` build

@@ -65,9 +65,15 @@ const KEYS = {
 }
 
 // Intended differences from the as-built board.
-const RIGHT_SHIFT = 0.75 * U // mirror distance 3U -> 3.75U moves the right half out
+const RIGHT_SHIFT = 1.25 * U // mirror distance 3U -> 4.25U moves the right half out
 const REMOVED = ['matrix_outer_mod', 'matrix_pinky_mod']
-const CHANGED = ['matrix_outer_bottom', 'thumb_far_cluster']
+const CHANGED = [
+  'matrix_outer_bottom', 'thumb_far_cluster', // resized
+  // 0.25U lower: far + outer columns (vs pinky) and the innermost column (vs T/G/B)
+  'matrix_far_num', 'matrix_outer_num', 'matrix_outer_top', 'matrix_outer_home',
+  'matrix_extra_num', 'matrix_extra_top', 'matrix_extra_home',
+  'thumb_home_cluster', // thumb block staggered 0.25U up from Cmd
+]
 const ADDED = ['thumb_far_upper']
 
 const ORIGIN = { pcb: 'MX54', point: 'matrix_middle_mod' } // left key below C
@@ -121,7 +127,7 @@ const TOL = 0.02 // mm; KiCad positions are rounded to 0.01
   console.log(`${Object.keys(points).length} keys; ${matched} match the as-built PCB ` +
     `(right half shifted ${fmt(RIGHT_SHIFT)} mm), worst error ${worst.toFixed(3)} mm`)
   console.log('\nExpected differences:')
-  console.log(`  right half: every key ${fmt(RIGHT_SHIFT)} mm further out (mirror distance 3U -> 3.75U)`)
+  console.log(`  right half: every key ${fmt(RIGHT_SHIFT)} mm further out (mirror distance 3U -> 4.25U)`)
   console.log(`  removed: ${REMOVED.flatMap(n => [n, `mirror_${n}`]).join(', ')}`)
   for (const line of changed) console.log(`  changed: ${line}`)
   for (const line of added) console.log(`  new: ${line}`)

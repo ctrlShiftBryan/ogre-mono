@@ -1,7 +1,11 @@
 # Ogre Ergo (68 keys) — hand-written ergogen config (ergogen 4.1+).
 # Changes from the as-built 70-key board: 2.25U Shifts are now 1.25U, and the
 # 1.25U + 1U keys at the outer end of the bottom row are removed, and the 1.5U
-# thumb keys are now 1.25U with a new 1U key above each.
+# thumb keys are now 1.25U with a new 1U key above each. The far and outer
+# columns (Esc, + =, Tab, Caps Lock, Ctrl) sit 0.25U lower than the pinky column,
+# and the innermost column (~ `, } ], PgDn) sits 0.25U lower than the T/G/B column.
+# In the thumb cluster, the Shift/Alt/Home block is staggered 0.25U up from Cmd,
+# and the Alt/Home column another 0.25U up from Shift.
 # Source of truth: switch positions on the as-built KiCad PCB
 # (ctrlShiftBryan/ogre-v1, ogre-v1.kicad_pcb). Main grid is identical to the
 # KLE design (layout/ogre-ergo.kle.json); thumbs follow the PCB (~1 mm off KLE).
@@ -28,6 +32,7 @@ points:
       columns:
         far:            # lone key left of the number row
           key.skip: true
+          key.stagger: -0.25U   # far + outer columns sit 0.25U below the pinky (same step as 1 -> 2)
           rows:
             num: { skip: false, legend: 'Esc', mirror.legend: 'Del' }
         outer:          # wide caps right-aligned to the pinky column
@@ -38,6 +43,7 @@ points:
             top:    { width: 1.5U-1,  adjust.shift: [-0.25U, 0],  legend: 'Tab',       mirror.legend: '| \' }
             num:    { legend: '+ =', mirror.legend: '_ -' }
         pinky:
+          key.stagger: 0.25U    # back up to the original pinky height
           rows:
             mod.skip: true
             bottom: { legend: 'Z',   mirror.legend: '? /' }
@@ -77,6 +83,7 @@ points:
             top:    { legend: 'T',   mirror.legend: 'Y' }
             num:    { legend: '% 5', mirror.legend: '^ 6' }
         extra:          # inner 1u column (num, top, home only)
+          key.stagger: -0.25U   # 0.25U below the inner (T/G/B) column
           rows:
             mod.skip: true
             bottom.skip: true
@@ -103,13 +110,13 @@ points:
             upper.skip: true
         home:
           key.spread: 24.73
-          key.stagger: 0.625U
+          key.stagger: 0.875U   # 0.625U as built + 0.25U: Shift/Alt/Home block sits 0.25U up from Cmd
           key.height: 2.25U-1
           rows:
             cluster: { legend: 'Shift', mirror.legend: 'Enter' }
             upper.skip: true
-        far:            # 1.25u (bottom-aligned with the 2.25u) with a 1u above it; together they span 2.25u
-          key.stagger: -0.5U
+        far:            # 1.25u Alt with a 1u Home above it, staggered 0.25U up from the 2.25u
+          key.stagger: -0.25U
           rows:
             cluster:
               height: 1.25U-1
@@ -124,6 +131,6 @@ points:
         cluster:
         upper:
 
-  mirror:               # halves are symmetric; axis is 1.875U right of the extra column
+  mirror:               # halves are symmetric; axis is 2.125U right of the extra column
     ref: matrix_extra_num
-    distance: 3.75U     # was 3U; widened so the new 1U thumb keys keep the original 12 mm gap between halves
+    distance: 4.25U     # was 3U as built; widened so the new, staggered thumb keys keep the original 12 mm gap between halves

@@ -16,12 +16,18 @@ off the KLE.
 - **Bottom-row outer keys removed.** The 1.25U + 1U keys at the outer end of
   the bottom row are gone on both halves (`matrix_outer_mod`,
   `matrix_pinky_mod`).
-- **Far thumb keys** are 1.25U instead of 1.5U, bottom-aligned with the 2.25U
-  thumb key, with a new 1U key above each (`thumb_far_upper`), turned 90° to
-  match the other thumb caps.
-- **Halves 0.75U (14.29 mm) further apart.** The mirror distance went from 3U
-  to 3.75U so the new 1U keys keep the original 12.1 mm gap between halves.
-  Every right-half key moves out by that amount.
+- **Far thumb keys** are 1.25U instead of 1.5U, with a new 1U key above each
+  (`thumb_far_upper`), turned 90° to match the other thumb caps.
+- **Outer columns 0.25U lower.** The far and outer columns (Esc, `+ =`, Tab,
+  Caps Lock, Ctrl) sit 0.25U below the pinky column, the same step as 1 → 2.
+- **Innermost column 0.25U lower.** `~ \``, `} ]`, PgDn sit 0.25U below the
+  T/G/B column.
+- **Thumb cluster staggered.** Cmd/Fn stay put; the Shift/Alt/Home block is
+  0.25U up from Cmd (`home` stagger 0.625U → 0.875U), and the Alt/Home column
+  another 0.25U up from Shift (`far` stagger −0.5U → −0.25U).
+- **Halves 1.25U (23.81 mm) further apart.** The mirror distance went from 3U
+  to 4.25U so the staggered thumb keys keep the original 12.1 mm gap between
+  halves. Every right-half key moves out by that amount.
 - **Legends** on every key (see below).
 
 ## Legends
@@ -50,9 +56,10 @@ in cream, modifiers and arrows in grey, Esc and Enter in red.
 
 `npm run verify` checks every key the redesign keeps against the 70-key PCB
 (within 0.01 mm, KiCad's rounding), with the right half offset by the
-14.29 mm shift. It lists the intended changes as expected differences: the
-four removed keys, the two row-4 outer keys, the two resized far thumb keys, the two
-new 1U keys, and the right-half shift. Anything else that moves fails.
+23.81 mm shift. It lists the intended changes as expected differences: the
+four removed keys, the resized row-4 outer and far thumb keys, the keys moved
+by the new staggers (outer, far and innermost columns, Shift/Enter thumbs), the
+two new 1U keys, and the right-half shift. Anything else that moves fails.
 
 ## Open question before PCB footprints
 

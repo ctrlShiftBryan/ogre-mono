@@ -2,7 +2,8 @@
   "name": "ogre-ergogen",
   "private": true,
   "scripts": {
-    "build": "ergogen ogre-ergo.yaml -o output --clean -d --svg",
+    "build": "ergogen ogre-ergo.yaml -o output --clean -d --svg && cp output/points/demo.svg ogre-ergo.demo.svg",
+    "keycaps": "ergogen ogre-ergo.yaml -o output --clean -d --svg && python3 render_keycaps.py output/points/points.yaml ogre-ergo.keycaps.svg \"Ogre Ergo\"",
     "verify": "node verify.js"
   },
   "devDependencies": {

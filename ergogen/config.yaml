@@ -256,10 +256,11 @@ outlines:
       { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.525, -49.05] }, size: [1.95, 4.9], corner: 0.5 }
 
 # ---------------------------------------------------------------------------
-# PCB. 10x7 matrix, COL2ROW diodes, one switch + one diode per key.
-# MCU1/MCU2 (left/right half) and MCU3 (center, single-board build) all sit on
-# the same row/column nets; solder MCU3 alone, or MCU1 + MCU2. Pro Micro pad map
-# in footprints/ogre_promicro.js.
+# PCB. 10x7 matrix, COL2ROW diodes, one hotswap switch per key with its diode
+# built into the footprint.
+# Wireless only: nice!nanos on the back, no TRRS. MCU1/MCU2 (left/right half) and
+# MCU3 (center, single-board build) all sit on the same row/column nets; solder
+# MCU3 alone, or MCU1 + MCU2. Pad map in footprints/ogre_nicenano.js.
 # ---------------------------------------------------------------------------
 pcbs:
   ogre:
@@ -268,35 +269,20 @@ pcbs:
       edge: { outline: board }
     footprints:
       switch:
-        what: ogre_mx
+        what: ogre_hotswap_diode
         where: '-/thumb_home_cluster/'
-        params: { from: '{{col_net}}', to: '{{name}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}' }
+        params: { from: '{{col_net}}', to: '{{row_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}' }
       switch_2u:        # 2.25U thumb keys get stabilizer holes
-        what: ogre_mx
+        what: ogre_hotswap_diode
         where: /thumb_home_cluster/
-        params: { from: '{{col_net}}', to: '{{name}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}', stab: true }
-      diode:            # in the gap below its switch
-        what: ogre_diode
-        where: '-/far_num|middle_num/'
-        adjust.shift: [0, -8]
-        params: { from: '{{name}}', to: '{{row_net}}' }
-      diode_mcu:        # the 3/8 key sits over a Pro Micro, so its diode moves down, below E/I's diode
-        what: ogre_diode
-        where: /middle_num/
-        adjust.shift: [0, -(U + 10.5)]
-        params: { from: '{{name}}', to: '{{row_net}}' }
-      diode_esc:        # Esc/Del overhang the Tab row, so their diode stands in the gap beside them
-        what: ogre_diode
-        where: /far_num/
-        adjust: { shift: [0.5U, 0], rotate: 90 }
-        params: { from: '{{name}}', to: '{{row_net}}' }
+        params: { from: '{{col_net}}', to: '{{row_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}', stab: true }
 
-      mcu_left:         # MCU1: under the middle column, USB at the top edge
-        what: ogre_promicro
-        where: { ref: matrix_middle_num, shift: [0, -7.57], rotate: 270 }
+      mcu_left:         # MCU1: lying across the back of Esc and +=, USB flush with the outer edge;
+                        # its pad rows run just above and below the keys' sockets and diodes
+        what: ogre_nicenano
+        where: { ref: matrix_far_num, shift: [8.775, 0.38], rotate: 90 }
         params: &half_mcu
-          pad1: SCL1
-          pad2: SDA1
+          side: back
           pad3: GND
           pad4: GND
           pad8: row0
@@ -314,13 +300,11 @@ pcbs:
           pad21: VCC
           pad22: RESET1
           pad23: GND
-      mcu_right:        # MCU2: same part, same orientation (not mirrored)
-        what: ogre_promicro
-        where: { ref: mirror_matrix_middle_num, shift: [0, -7.57], rotate: 270, resist: true }
+      mcu_right:        # MCU2: across Del and - _, turned so its USB also faces the outer edge
+        what: ogre_nicenano
+        where: { ref: mirror_matrix_far_num, shift: [-8.775, 0.38], rotate: 270, resist: true }
         params:
           <<: *half_mcu
-          pad1: SCL2
-          pad2: SDA2
           pad8: row5
           pad9: row6
           pad10: row7
@@ -328,9 +312,10 @@ pcbs:
           pad12: row9
           pad22: RESET2
       mcu_center:       # MCU3: single-board build, all ten rows
-        what: ogre_promicro
-        where: { ref: matrix_extra_num, shift: [2.125U, -8.31], rotate: 270 }
+        what: ogre_nicenano
+        where: { ref: matrix_extra_num, shift: [2.125U, -8.818] }   # USB flush with the top edge
         params:
+          side: back
           pad1: row0
           pad2: row1
           pad3: GND
@@ -354,18 +339,12 @@ pcbs:
           pad22: RESET0
           pad23: GND
 
-      reset_halves:     # SW1/SW2: on the back, between Tab and Q
+      reset_halves:     # SW1/SW2: on the back, below Tab, clear of Tab's diode and Caps Lock's socket
         what: ogre_reset
         asym: both
-        where: { ref: matrix_pinky_top, shift: [-12.02, 0] }
+        where: { ref: matrix_outer_top, shift: [0, -8.5] }
         params: { from: GND, to: RESET1, mirror.to: RESET2 }
       reset_center:     # SW3: below MCU3
         what: ogre_reset
         where: { ref: matrix_extra_num, shift: [2.125U, -34.65] }
         params: { from: GND, to: RESET0 }
-
-      trrs:             # TRRS1/TRRS2: in the jack tab, plug from the top, wired to its own half only
-        what: ogre_trrs
-        asym: both
-        where: { ref: matrix_extra_num, shift: [11.4, 14.7575], rotate: 180 }
-        params: { sleeve: GND, tip: VCC, ring1: SDA1, ring2: SCL1, mirror: { ring1: SDA2, ring2: SCL2 } }

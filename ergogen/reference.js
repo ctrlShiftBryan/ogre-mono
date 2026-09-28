@@ -1,8 +1,8 @@
 // Writes output/reference.dxf: the board as it builds now, to draw a new
 // outline over in Illustrator or any other vector editor.
 // Layers: Edge.Cuts (board edge, break line), User.Drawings (every keycap at its
-// real size), F.Courtyard / B.Courtyard (switches, diodes, Pro Micros, TRRS
-// jacks, reset switches). Units are mm and the coordinates are ergogen's own,
+// real size), F.Courtyard / B.Courtyard (switches, reset switches; the nice!nano
+// footprint has none). Units are mm and the coordinates are ergogen's own,
 // y up, so a drawing that keeps them lines up with the config.
 // Usage: npm run reference   (needs kicad-cli)
 const fs = require('fs')

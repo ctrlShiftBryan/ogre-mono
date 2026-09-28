@@ -13,7 +13,7 @@ use `npm run serve` below.
 | File | What it is |
 |---|---|
 | `config.yaml` | Layout, outline and PCB |
-| `footprints/` | Switch, diode, Pro Micro, reset switch and TRRS jack; hotswap switch with built-in diode, nice!nano and JST PH battery connector from the 2024 library (available, not yet placed) |
+| `footprints/` | Hotswap switch with built-in diode, nice!nano and reset switch on the board; the 2019 PCB-mount switch, diode, Pro Micro and TRRS jack, and a JST PH battery connector, available but not placed |
 | `serve.js` | Live viewer: watches the config, rebuilds and shows every view |
 | `bundle.js` | Packs the config and footprints into an archive the web UI can open |
 | `points.snapshot.json` | Baseline geometry for `npm run snapshot` |
@@ -55,30 +55,35 @@ a space: `'! 1'` is the key with `!` over `1`. Anything else (`Esc`,
 ## The PCB
 
 One board that builds either as a single keyboard or, snapped along two break
-lines, as a split with a spare center piece. The matrix, the Pro Micro pad map,
-the break-line dimensions and the footprints come from the 2019 Ogre Ergo,
-where they were fabricated and worked:
+lines, as a split with a spare center piece. Wireless only: nice!nano
+controllers, no TRRS. The matrix, the controller pad map and the break-line
+dimensions come from the 2019 Ogre Ergo, where they were fabricated and worked;
+the switch and nice!nano footprints come from the 2024 rework (`ogre.2024.pretty`):
 
-- **One 10×7 matrix, one diode per key** (through-hole 1N4148, COL2ROW).
+- **One 10×7 matrix, one hotswap switch per key** (Kailh MX socket on the back),
+  each with its own diode built into the footprint beside the socket (SOD-123
+  or through-hole, COL2ROW). The 2.25U thumb keys add stabilizer holes.
   Rows 0–4 are the left half, rows 5–9 the right; columns 0–6 run across both,
   numbered from the outer edge inward on each half. The thumb Home/End keys
   take row4/col1 and row9/col1; row4/col0 and row9/col0 stay unused.
-- **Three Pro Micro footprints on the same nets.** Solder MCU3 alone for the
-  single board, or MCU1 + MCU2 for the split:
+- **Three nice!nano footprints on the same nets**, all on the back on Mill-Max
+  sockets. Solder MCU3 alone for the single board, or MCU1 + MCU2 for the split:
   - MCU3 (center): pads 1, 2, 5–12 = row0–row9; pads 20→14 = col0–col6; 22 = RESET0.
-  - MCU1 (left): pads 8–12 = row0–row4; 20→14 = col0–col6; 1/2 = SCL1/SDA1; 22 = RESET1.
-  - MCU2 (right): pads 8–12 = row5–row9; same columns; 1/2 = SCL2/SDA2; 22 = RESET2.
-  - SCL/SDA name pads 1/2, which are D3/D2 — the pins QMK used for split
-    serial.
+  - MCU1 (left): pads 8–12 = row0–row4; 20→14 = col0–col6; 22 = RESET1.
+  - MCU2 (right): pads 8–12 = row5–row9; same columns; 22 = RESET2.
+  - Pad 24 (RAW) is the nice!nano's B+. No battery connector or power switch
+    is placed yet.
 - **Break lines** beside each half's innermost column: a cut down from the
-  top edge (jogging around the TRRS jack), three 1.7 × 8 mm slots and a
+  top edge (jogging around the tab where the TRRS jack was), three 1.7 × 8 mm slots and a
   bottom notch, leaving four ~2 mm bridges. Every row and column net, plus VCC
   and GND, has to cross at those bridges. Sizes and spacing are measured from
   the innermost column.
 - **Center piece:** MCU3 with its USB at the top edge, and reset switch SW3.
-- **Each half:** its Pro Micro under the middle column (USB at the top edge),
-  a 6 mm reset switch on the back between Tab and Q, and a PJ-320A TRRS jack
-  in a tab at the top of its inner edge, wired only to its own Pro Micro.
+- **Each half:** its nice!nano lying across the back of Esc and `+ =` (Del and
+  `_ -` on the right), USB-C flush with the outer edge. Its two pad rows run
+  just above and just below those keys' sockets and diodes, so the controller
+  stands over them on its sockets. A 6 mm reset switch sits on the back below
+  Tab (`| \` on the right).
 - **Outline:** keycap edges with 1 mm corners, thumbs included. The thumb
   cluster joins the matrix by filling only the gaps between neighboring keys
   (`thumb_web`), and one pocket per half is cut out over Cmd, as on the 2019
@@ -86,10 +91,6 @@ where they were fabricated and worked:
   leaving a 2 mm gap under the center piece.
 - **No underglow LEDs**, no alternate-size switch footprints, and no mounting
   holes yet (see below).
-
-Diodes sit 8 mm below their switch, except two spots that don't have room: the Esc/Del diode stands in the gap beside its
-key, and the 3/8 key's diode (it sits over a Pro Micro) moves down below the
-E/I key's diode.
 
 Routing is left for KiCad. The PCB is build output, not a committed file:
 `npm run build` writes it to `output/pcbs/ogre.kicad_pcb`, with an
@@ -119,7 +120,7 @@ Revert** in the PCB editor loads the new board.
 
 `npm run reference` plots the built PCB to a DXF for a vector editor: board
 edge on `Edge.Cuts`, keycaps on `User.Drawings`, and the courtyards of the
-switches, diodes, Pro Micros, TRRS jacks and reset switches on `F.Courtyard`
+switches and reset switches on `F.Courtyard`
 and `B.Courtyard`. Units are mm and the coordinates are ergogen's own, y up, so
 a drawing that keeps them lines up with the config. It needs `kicad-cli`.
 
@@ -158,9 +159,9 @@ made in the web editor don't come back to these files, so re-run `npm run
 bundle` after changing the config.
 
 `npm run check` reads the generated PCB and fails unless every key has one
-switch and one diode wired column → switch → diode → row, no two keys share a
-matrix position, every Pro Micro pad carries the net listed above, and the
-reset switches and jacks are wired to their own half. If `kicad-cli` is
+hotswap switch whose diode is wired column → switch → diode → row, no two keys
+share a matrix position, every nice!nano pad carries the net listed above, and
+the reset switches are wired to their own half. If `kicad-cli` is
 installed it also runs KiCad's DRC (overlapping parts, hole and edge
 clearances) and fails on any violation other than the unrouted connections.
 

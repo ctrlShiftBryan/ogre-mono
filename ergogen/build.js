@@ -9,11 +9,21 @@ const yaml = require('js-yaml')
 const ergogen = require('ergogen')
 
 const here = __dirname
-for (const f of fs.readdirSync(path.join(here, 'footprints'))) {
-  if (f.endsWith('.js')) ergogen.inject('footprint', f.slice(0, -3), require(path.join(here, 'footprints', f)))
+
+// re-read on every run, so a watcher (serve.js) picks up edited footprints
+const inject = () => {
+  for (const f of fs.readdirSync(path.join(here, 'footprints'))) {
+    if (!f.endsWith('.js')) continue
+    const abs = path.join(here, 'footprints', f)
+    delete require.cache[require.resolve(abs)]
+    ergogen.inject('footprint', f.slice(0, -3), require(abs))
+  }
 }
 
-const run = () => ergogen.process(fs.readFileSync(path.join(here, 'config.yaml'), 'utf8'), { debug: true, svg: true })
+const run = () => {
+  inject()
+  return ergogen.process(fs.readFileSync(path.join(here, 'config.yaml'), 'utf8'), { debug: true, svg: true })
+}
 
 const write = (results, out) => {
   fs.rmSync(out, { recursive: true, force: true })
@@ -32,7 +42,7 @@ const write = (results, out) => {
   for (const [name, pcb] of Object.entries(results.pcbs)) put(`pcbs/${name}.kicad_pcb`, pcb)
 }
 
-module.exports = { run }
+module.exports = { run, write, OUT: path.join(here, 'output') }
 
 if (require.main === module) {
   run().then(results => {

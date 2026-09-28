@@ -3,9 +3,12 @@
 `config.yaml` is a 68-key redesign of the Ogre Ergo, written by hand for
 [ergogen](https://ergogen.xyz): key layout, board outline and an unrouted
 KiCad PCB. It needs ergogen 4.1+ and the custom footprints in `footprints/`.
-On ergogen.xyz, load it from GitHub with the repo URL (it finds
-`ergogen/config.yaml` and `ergogen/footprints/` itself); pasting the YAML alone
-won't work, because the footprints wouldn't load.
+On ergogen.xyz (or a local clone of `ergogen/ergogen-gui`), load it from GitHub
+with the repo URL (it finds `ergogen/config.yaml` and `ergogen/footprints/`
+itself); pasting the YAML alone won't work, because the footprints wouldn't
+load. That web UI reads the pushed repo, not the working tree, and its local
+file picker is a one-shot upload that brings no footprints; for local work
+use `npm run serve` below.
 
 It starts from the as-built 70-key board: the switch positions of the PCB in
 `ctrlShiftBryan/ogre-v1` (`ogre-v1.kicad_pcb`, branch `sent-to-allpcb`), which
@@ -17,6 +20,7 @@ which sit about 1 mm off the KLE.
 | `config.yaml` | Layout, outline and PCB |
 | `footprints/` | Switch, diode, Pro Micro, reset switch and TRRS jack, copied from the as-built board's footprints |
 | `ogre-ergo.kicad_pcb` | Generated PCB, unrouted |
+| `serve.js` | Live viewer: watches the config, rebuilds and shows every view |
 | `ogre-ergo.board.svg` | Board outline |
 | `ogre-ergo.demo.svg`, `ogre-ergo.keycaps.svg` | Key previews |
 
@@ -107,6 +111,7 @@ npm run build    # write output/ and refresh the committed .svg and .kicad_pcb f
 npm run keycaps  # build, then render ogre-ergo.keycaps.svg with legends
 npm run verify   # compare key positions to the as-built PCB
 npm run check    # check the generated PCB's parts, nets and KiCad DRC
+npm run serve    # live viewer on http://localhost:5174
 ```
 
 `build.js` runs ergogen with the footprints in `footprints/`. The ergogen CLI
@@ -124,6 +129,16 @@ in cream, modifiers and arrows in grey, Esc and Enter in red.
 four removed keys, the resized row-4 outer and far thumb keys, the keys moved
 by the new staggers (outer, far and innermost columns, Shift/Enter thumbs), the
 two new 1U keys, and the right-half shift. Anything else that moves fails.
+
+`npm run serve` starts a viewer that watches `config.yaml` and `footprints/`,
+rebuilds on save (about 0.4 s) and refreshes the browser by itself, so the
+files in this folder stay the single source of truth. Tabs: **Keycaps** (the
+`render_keycaps.py` render), **Points** (ergogen's demo), **Outline** (any
+outline in `output/outlines/`) and **PCB** (rendered by `kicad-cli`, with a
+layer picker). Drag to pan, wheel to zoom about the pointer, double click (or
+**fit**) to fit the pane. The `verify` and `check` buttons run those scripts
+and print their output. A YAML or footprint error shows in a red bar and the last good
+render stays up until the next good build. Nothing leaves the machine.
 
 `npm run check` reads the generated PCB and fails unless every key has one
 switch and one diode wired column → switch → diode → row, no two keys share a

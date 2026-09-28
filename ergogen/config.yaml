@@ -18,11 +18,42 @@ meta:
   name: ogre-ergo
 
 units:
-  # MX spacing
+  # MX spacing: 19.05 mm pitch, caps 1 mm smaller than the pitch.
   $default_spread: U
   $default_padding: U
   $default_width: U-1
   $default_height: U-1
+
+  # ---- The design ----------------------------------------------------------
+  # Every number below shapes the Ogre 68. Change one here, not in the zones,
+  # and watch it in `npm run serve`.
+
+  # Column stagger. Each value moves its column against the column before it,
+  # so together they draw the profile across the hand. Running total, in U,
+  # from the far column: far -0.25, outer -0.25, pinky 0, ring +0.25,
+  # middle +0.375, index +0.25, inner +0.125, extra -0.125. The peak is the
+  # middle column, the longest finger; the profile falls away on both sides.
+  stagger_far: -0.25U      # Esc column, a step below the pinky
+  stagger_pinky: 0.25U     # back up from the far and outer columns
+  stagger_ring: 0.25U      # ring reaches higher than the pinky
+  stagger_middle: 0.125U   # the top of the profile
+  stagger_index: -0.125U   # index sits lower than middle
+  stagger_inner: -0.125U   # the stretch column, lower again
+  stagger_extra: -0.25U    # inner 1u column, lowest of the matrix
+
+  # Thumb cluster: a fan of three columns hung off the bottom of the middle
+  # column. The offsets place its near corner, the splay turns the whole fan.
+  thumb_offset_x: 23.98
+  thumb_offset_y: -10.48
+  thumb_splay: -30         # degrees the cluster fans away from the matrix
+  thumb_spread: 24.73      # centre to centre, the 1.25u Cmd to the 2.25u Shift
+  thumb_stagger_home: 0.875U   # Shift/Alt/Home block, up from Cmd
+  thumb_stagger_far: -0.25U    # Alt/Home column, up again from Shift
+  thumb_upper_pitch: 1.125U    # Alt to the 1u Home above it
+
+  # Half separation. The mirror axis sits this far right of the extra column,
+  # so the gap between the two halves is a result of this number.
+  half_spread: 4.25U
 
 points:
   zones:
@@ -33,7 +64,7 @@ points:
       columns:
         far:            # lone key left of the number row
           key.skip: true
-          key.stagger: -0.25U   # far + outer columns sit 0.25U below the pinky (same step as 1 -> 2)
+          key.stagger: stagger_far
           key.col_net: col6
           rows:
             num: { skip: false, row_net: row3, mirror.row_net: row8, legend: 'Esc', mirror.legend: 'Del' }   # wired as on the as-built board
@@ -46,7 +77,7 @@ points:
             top:    { width: 1.5U-1,  adjust.shift: [-0.25U, 0],  legend: 'Tab',       mirror.legend: '| \' }
             num:    { legend: '+ =', mirror.legend: '_ -' }
         pinky:
-          key.stagger: 0.25U    # back up to the original pinky height
+          key.stagger: stagger_pinky
           key.col_net: col1
           rows:
             mod.skip: true
@@ -55,7 +86,7 @@ points:
             top:    { legend: 'Q',   mirror.legend: 'P' }
             num:    { legend: '! 1', mirror.legend: ') 0' }
         ring:
-          key.stagger: 0.25U
+          key.stagger: stagger_ring
           key.col_net: col2
           rows:
             mod:    { legend: '←',   mirror.legend: '↑' }
@@ -64,7 +95,7 @@ points:
             top:    { legend: 'W',   mirror.legend: 'O' }
             num:    { legend: '@ 2', mirror.legend: '( 9' }
         middle:
-          key.stagger: 0.125U
+          key.stagger: stagger_middle
           key.col_net: col3
           rows:
             mod:    { legend: '→',   mirror.legend: '↓' }
@@ -73,7 +104,7 @@ points:
             top:    { legend: 'E',   mirror.legend: 'I' }
             num:    { legend: '# 3', mirror.legend: '* 8' }
         index:
-          key.stagger: -0.125U
+          key.stagger: stagger_index
           key.col_net: col4
           rows:
             mod.skip: true
@@ -82,7 +113,7 @@ points:
             top:    { legend: 'R',   mirror.legend: 'U' }
             num:    { legend: '$ 4', mirror.legend: '& 7' }
         inner:
-          key.stagger: -0.125U
+          key.stagger: stagger_inner
           key.col_net: col5
           rows:
             mod.skip: true
@@ -91,7 +122,7 @@ points:
             top:    { legend: 'T',   mirror.legend: 'Y' }
             num:    { legend: '% 5', mirror.legend: '^ 6' }
         extra:          # inner 1u column (num, top, home only)
-          key.stagger: -0.25U   # 0.25U below the inner (T/G/B) column
+          key.stagger: stagger_extra
           key.col_net: col6
           rows:
             mod.skip: true
@@ -109,8 +140,8 @@ points:
     thumb:              # 1.25u, 2.25u, then a 1.25u + 1u stack, fanned 30°
       anchor:
         ref: matrix_middle_mod
-        shift: [23.98, -10.48]
-        rotate: -30
+        shift: [thumb_offset_x, thumb_offset_y]
+        rotate: thumb_splay
       columns:
         near:
           key.width: 1.25U-1
@@ -119,22 +150,22 @@ points:
             cluster: { legend: 'Cmd', mirror.legend: 'Fn' }
             upper.skip: true
         home:
-          key.spread: 24.73
-          key.stagger: 0.875U   # 0.625U as built + 0.25U: Shift/Alt/Home block sits 0.25U up from Cmd
+          key.spread: thumb_spread
+          key.stagger: thumb_stagger_home
           key.width: 2.25U-1
           key.adjust.rotate: 90   # a wide cap turned 90°, so switch and stabilizer footprints face the right way
           key.col_net: col5
           rows:
             cluster: { legend: 'Shift', mirror.legend: 'Enter' }
             upper.skip: true
-        far:            # 1.25u Alt with a 1u Home above it, staggered 0.25U up from the 2.25u
-          key.stagger: -0.25U
+        far:            # 1.25u Alt with a 1u Home above it
+          key.stagger: thumb_stagger_far
           key.col_net: col6
           rows:
             cluster:
               width: 1.25U-1
               adjust.rotate: 90
-              padding: 1.125U
+              padding: thumb_upper_pitch
               legend: 'Alt'
               mirror.legend: 'Alt'
             upper:
@@ -148,7 +179,7 @@ points:
 
   mirror:               # halves are symmetric; axis is 2.125U right of the extra column
     ref: matrix_extra_num
-    distance: 4.25U     # was 3U as built; widened so the new, staggered thumb keys keep the original 12 mm gap between halves
+    distance: half_spread
 
 # ---------------------------------------------------------------------------
 # Board outline. One PCB that builds as a single keyboard, or snaps along two

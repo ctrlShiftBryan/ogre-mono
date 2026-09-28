@@ -79,9 +79,11 @@ where they were fabricated and worked:
 - **Each half:** its Pro Micro under the middle column (USB at the top edge),
   a 6 mm reset switch on the back between Tab and Q, and a PJ-320A TRRS jack
   in a tab at the top of its inner edge, wired only to its own Pro Micro.
-- **Outline:** keycap edges with 1 mm corners, plus convex webs that join the
-  thumb cluster to the matrix. Nothing from the halves enters the center zone
-  above the thumbs, leaving a 2 mm gap under the center piece.
+- **Outline:** keycap edges with 1 mm corners, thumbs included. The thumb
+  cluster joins the matrix by filling only the gaps between neighboring keys
+  (`thumb_web`), and one pocket per half is cut out over Cmd, as on the 2019
+  board. Nothing from the halves enters the center zone above the thumbs,
+  leaving a 2 mm gap under the center piece.
 - **No underglow LEDs**, no alternate-size switch footprints, and no mounting
   holes yet (see below).
 

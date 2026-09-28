@@ -128,7 +128,7 @@ rebuilds on save (about 0.4 s) and refreshes the browser by itself, so the
 files in this folder stay the single source of truth. Tabs: **Keycaps** (the
 `render_keycaps.py` render), **Points** (ergogen's demo), **Outline** (any
 outline in `output/outlines/`) and **PCB** (rendered by `kicad-cli`, with a
-layer picker). Drag to pan, wheel to zoom about the pointer, double click (or
+layer picker; **edge + keycaps** lays every keycap over the board outline). Drag to pan, wheel to zoom about the pointer, double click (or
 **fit**) to fit the pane. The `snapshot` and `check` buttons run those scripts
 and print their output. A YAML or footprint error shows in a red bar and the last good
 render stays up until the next good build. Nothing leaves the machine.

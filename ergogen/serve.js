@@ -15,7 +15,8 @@ const LAYERS = {
   all: 'Edge.Cuts,F.Cu,B.Cu,F.SilkS,B.SilkS',
   front: 'Edge.Cuts,F.Cu,F.SilkS',
   back: 'Edge.Cuts,B.Cu,B.SilkS',
-  outline: 'Edge.Cuts,F.SilkS'
+  outline: 'Edge.Cuts,F.SilkS',
+  keycaps: 'Edge.Cuts,Dwgs.User'
 }
 const kicad = ['kicad-cli', '/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli']
   .find(c => { try { execFileSync(c, ['version'], { stdio: 'ignore' }); return true } catch { return false } })
@@ -163,7 +164,7 @@ TABS.forEach(function (t) {
   tabs.appendChild(b);
 });
 function options() {
-  if (view === 'pcb') return Promise.resolve([['all','all layers'],['front','front'],['back','back'],['outline','edge + silk']]);
+  if (view === 'pcb') return Promise.resolve([['all','all layers'],['front','front'],['back','back'],['outline','edge + silk'],['keycaps','edge + keycaps']]);
   if (view === 'outline') return fetch('/outlines').then(function (r) { return r.json(); })
     .then(function (ns) { return ns.map(function (n) { return [n, n]; }); });
   return Promise.resolve([]);

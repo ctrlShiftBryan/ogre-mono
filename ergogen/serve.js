@@ -6,7 +6,10 @@ const fs = require('fs')
 const path = require('path')
 const http = require('http')
 const { execFile, execFileSync } = require('child_process')
-const { run, write, OUT } = require('./build')
+// build.js is re-read on every rebuild (below), so an edit to it takes effect without
+// restarting the viewer; a stale copy would keep writing the board the old way
+const builder = () => { delete require.cache[require.resolve('./build')]; return require('./build') }
+const { OUT } = require('./build')
 
 const here = __dirname
 const PORT = +(process.env.PORT || 5174)
@@ -33,6 +36,7 @@ const build = async () => {
   state = { ...state, building: true }; broadcast()
   const t = Date.now()
   try {
+    const { run, write } = builder()
     const results = await run()
     write(results, OUT)
     cache.clear()

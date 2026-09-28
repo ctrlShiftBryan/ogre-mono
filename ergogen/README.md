@@ -111,8 +111,10 @@ snapshot, the reference DXF) stay where they were.
 
 Routing is left for KiCad. The PCB is build output, not a committed file:
 `npm run build` writes it to `output/pcbs/ogre.kicad_pcb`, with an
-`ogre.kicad_pro` beside it so KiCad opens it as a project, and overwrites both
-every time, so route in a copy. The project has no schematic; the board and its
+`ogre.kicad_pro` beside it so KiCad opens it as a project. Every build rewrites
+the board in place (never deleting it, so KiCad can keep it open) and leaves the
+project file and KiCad's other files alone; anything done to the board in KiCad
+is replaced, so route in a copy. The project has no schematic; the board and its
 nets are the whole design.
 
 ## Commands
@@ -130,9 +132,9 @@ npm run kicad    # build, then open the KiCad project
 ```
 
 `npm run kicad` opens `output/pcbs/ogre.kicad_pro` in KiCad, to look the board
-over, run DRC or try things out. Nothing done there comes back: parts change in
-`footprints/` and the design in `config.yaml`, and the next build overwrites the
-project. After a rebuild (`npm run serve` rebuilds on every save), **File >
+over, run DRC or place parts. Placements made there come back by hand into
+`config.yaml` (see `AGENTS.md`); everything else on the board is replaced by the
+next build. After a rebuild (`npm run serve` rebuilds on every save), **File >
 Revert** in the PCB editor loads the new board.
 
 `npm run reference` plots the built PCB to a DXF for a vector editor: board

@@ -68,12 +68,22 @@ const place = (pcb, [dx, dy]) => {
   return res + pcb.slice(last)
 }
 
+// Writes output/ in place. KiCad keeps output/pcbs/ogre.kicad_pcb open while the
+// user places parts, so nothing here deletes the folder or the board: each file is
+// written beside itself and renamed over the old one, so it's never missing and
+// KiCad sees a changed file. KiCad's own files in pcbs/ (settings, history, locks)
+// are left alone, and the project file is written only when there is none, so
+// settings saved in KiCad survive. Stale ergogen output (an outline that's gone)
+// is removed from points/ and outlines/, which hold nothing else.
 const write = (results, out) => {
-  fs.rmSync(out, { recursive: true, force: true })
+  const written = new Set()
   const put = (rel, data) => {
     const abs = path.join(out, rel)
     fs.mkdirSync(path.dirname(abs), { recursive: true })
-    fs.writeFileSync(abs, rel.endsWith('.yaml') ? yaml.dump(data, { indent: 4, noRefs: true }) : data)
+    const tmp = path.join(path.dirname(abs), `.${path.basename(abs)}.tmp`)
+    fs.writeFileSync(tmp, rel.endsWith('.yaml') ? yaml.dump(data, { indent: 4, noRefs: true }) : data)
+    fs.renameSync(tmp, abs)
+    written.add(rel)
   }
   const twodee = (rel, data) => {
     for (const ext of ['yaml', 'svg', 'dxf']) if (data && data[ext]) put(`${rel}.${ext}`, data[ext])
@@ -82,6 +92,11 @@ const write = (results, out) => {
   put('points/units.yaml', results.units)
   twodee('points/demo', results.demo)
   for (const [name, o] of Object.entries(results.outlines)) twodee(`outlines/${name}`, o)
+  for (const dir of ['points', 'outlines']) {
+    for (const f of fs.readdirSync(path.join(out, dir))) {
+      if (!written.has(`${dir}/${f}`)) fs.rmSync(path.join(out, dir, f), { force: true })
+    }
+  }
   // ergogen stamps today's date into the title block (templates/kicad8.js); blank it
   // so rebuilding an unchanged config gives a byte-identical PCB
   for (const [name, pcb] of Object.entries(results.pcbs)) {
@@ -90,7 +105,8 @@ const write = (results, out) => {
     put(`pcbs/${name}.kicad_pcb`, at ? place(board, at) : board)
     // a project file beside the board, so KiCad opens it as a project; KiCad
     // fills in every setting left out. There is no schematic: the board is it.
-    put(`pcbs/${name}.kicad_pro`, JSON.stringify({ meta: { filename: `${name}.kicad_pro`, version: 1 } }, null, 2) + '\n')
+    if (!fs.existsSync(path.join(out, `pcbs/${name}.kicad_pro`)))
+      put(`pcbs/${name}.kicad_pro`, JSON.stringify({ meta: { filename: `${name}.kicad_pro`, version: 1 } }, null, 2) + '\n')
   }
 }
 

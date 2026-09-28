@@ -1,7 +1,7 @@
-// Builds, then opens output/pcbs/ogre.kicad_pro in KiCad, to look around and
-// validate. The project is build output like the rest of output/: the next
-// build overwrites it, so changes belong in config.yaml and footprints/, not
-// in KiCad. After a rebuild, File > Revert in the PCB editor reloads the board.
+// Builds, then opens output/pcbs/ogre.kicad_pro in KiCad, to look around,
+// validate and place parts. The board is build output: each build rewrites it in
+// place, so placements come back by hand into config.yaml (see AGENTS.md). After
+// a rebuild, File > Revert in the PCB editor reloads the board.
 // Usage: npm run kicad
 const path = require('path')
 const { spawn } = require('child_process')

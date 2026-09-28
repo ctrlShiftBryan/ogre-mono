@@ -105,7 +105,14 @@ npm run snapshot # fail on geometry that changed since the last baseline
 npm run check    # check the generated PCB's parts, nets and KiCad DRC
 npm run serve    # live viewer on http://localhost:5174
 npm run bundle   # pack config + footprints into output/ogre-ergo.ekb for the web UI
+npm run reference # output/reference.dxf, the board to draw a new outline over
 ```
+
+`npm run reference` plots the built PCB to a DXF for a vector editor: board
+edge on `Edge.Cuts`, keycaps on `User.Drawings`, and the courtyards of the
+switches, diodes, Pro Micros, TRRS jacks and reset switches on `F.Courtyard`
+and `B.Courtyard`. Units are mm and the coordinates are ergogen's own, y up, so
+a drawing that keeps them lines up with the config. It needs `kicad-cli`.
 
 `build.js` runs ergogen with the footprints in `footprints/`. The ergogen CLI
 only loads custom footprints from a folder, and this folder also holds

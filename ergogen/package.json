@@ -7,6 +7,7 @@
     "check": "node check-pcb.js",
     "snapshot": "node snapshot.js",
     "snapshot:update": "node snapshot.js --update",
+    "reference": "node reference.js",
     "serve": "node serve.js",
     "bundle": "node bundle.js"
   },

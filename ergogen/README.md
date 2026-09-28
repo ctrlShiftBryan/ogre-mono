@@ -60,9 +60,15 @@ controllers, no TRRS. The matrix, the controller pad map and the break-line
 dimensions come from the 2019 Ogre Ergo, where they were fabricated and worked;
 the switch and nice!nano footprints come from the 2024 rework (`ogre.2024.pretty`):
 
+- **Key numbers.** Key *n* is switch MX*n* and diode D*n*, numbered in points
+  order: up each column from the outer edge inward, then the thumbs, left half
+  (1–34) before the right (35–68). The keycap render (`ogre-ergo.keycaps.svg`,
+  and the viewer's Keycaps tab) prints each key's number, and `npm run check`
+  fails if a switch or diode is numbered out of step with its key.
 - **One 10×7 matrix, one hotswap switch and one diode per key** (Kailh MX
   socket and SOD-123 or through-hole diode, both on the back, COL2ROW). The
-  2.25U thumb keys add stabilizer holes. The 2024 footprint had the diode built
+  2.25U thumb keys add stabilizer holes (a key's `stab`), and a key's `turn`
+  turns its switch (the four under the controllers). The 2024 footprint had the diode built
   in; here it's a part of its own (`ogre_socket_diode`) so it can be moved
   clear of traces. A key's `diode: [x, y, r]` in the zones places its diode
   (mm from the key, in its frame, y up; `mirror.diode` for the right half);

@@ -1,4 +1,5 @@
-"""Render an ergogen build as keycaps, using each key's `legend` from the config.
+"""Render an ergogen build as keycaps, using each key's `legend` from the config,
+and its number (points order, which is its switch MXn and diode Dn on the PCB).
 Usage: python3 render_keycaps.py output/points/points.yaml keycaps.svg "Title"
 (ergogen must be run with -d so points.yaml is written.)"""
 import sys, yaml
@@ -16,7 +17,7 @@ pad=32; minx,maxx,miny,maxy=min(xs)-pad,max(xs)+pad,min(ys)-pad,max(ys)+pad
 W,H=maxx-minx,maxy-miny
 esc=lambda t:t.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
 o=[f'<svg xmlns="http://www.w3.org/2000/svg" width="1800" viewBox="0 0 {W:.1f} {H+14:.1f}" font-family="Helvetica, Arial, sans-serif"><rect width="{W:.1f}" height="{H+14:.1f}" fill="#2b2d31"/>']
-for n,p in pts.items():
+for num,(n,p) in enumerate(pts.items(),1):
     w=p['meta']['width']+1; h=p['meta']['height']+1; lg=leg[n]
     rr=p['r']
     if h>w+1:  # tall key = a normal wide keycap turned 90°: draw it wide and rotate the whole cap
@@ -31,6 +32,7 @@ for n,p in pts.items():
     for i,l in enumerate(ls[:2]):
         o.append(f'<text x="{-w/2+4:.2f}" y="{-h/2+6.2+i*5.6:.2f}" font-size="{fs}" fill="{ink}">{esc(l)}</text>')
     sz=f'{w/U:.2f}'.rstrip('0').rstrip('.')+'U'
+    o.append(f'<text x="{-w/2+3.4:.2f}" y="{h/2-2.2:.2f}" font-size="2.2" fill="{ink}" opacity=".6">{num}</text>')
     if w>U+1 or h>U+1: o.append(f'<text x="{w/2-3.4:.2f}" y="{h/2-2.2:.2f}" font-size="2.2" text-anchor="end" fill="{ink}" opacity=".6">{sz}</text>')
     o.append('</g>')
 o.append(f'<text x="8" y="{H+8:.1f}" font-size="4" fill="#c9cbd1">{esc(title)} · {len(pts)} keys</text></svg>')

@@ -7,7 +7,9 @@
 //    to: socket pad 2, to the diode's anode (defaults to the key's name)
 // Params
 //    legend: printed on both silkscreens (key's `legend` via '{{legend}}')
-//    stab: add Cherry/Costar PCB-mount stabilizer holes (2U and up)
+//    stab: add Cherry/Costar PCB-mount stabilizer holes (2U and up; key's `stab` via '{{stab}}')
+//    turn: degrees the switch turns on its key (key's `turn` via '{{turn}}'), so one
+//      footprint entry serves every key and designators stay in key order
 //    cap_w, cap_h: keycap size in mm, drawn on Dwgs.User
 
 const esc = s => String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')
@@ -20,10 +22,11 @@ module.exports = {
     legend: '',
     stab: false,
     cap_w: 18.05,
-    cap_h: 18.05
+    cap_h: 18.05,
+    turn: ''
   },
   body: p => {
-    const r = p.r
+    const r = p.r + Number(p.turn || 0)
     const w = p.cap_w / 2, h = p.cap_h / 2
     const legend = p.legend ? `
       (fp_text user "${esc(p.legend)}" (at 0 4.6 ${r}) (layer F.SilkS) (effects (font (size 1 1) (thickness 0.15))))
@@ -35,7 +38,7 @@ module.exports = {
       (pad "" np_thru_hole circle (at 11.938 8.255 ${r}) (size 3.9878 3.9878) (drill 3.9878) (layers *.Cu *.Mask))` : ''
     return `
     (module ogre:CherryMX_Hotswap (layer F.Cu) (tedit 5DD4F656)
-      ${p.at}
+      (at ${p.x} ${p.y} ${r})
       (fp_text reference "${p.ref}" (at 7.1 8.2 ${r}) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1 1) (thickness 0.15))))
       (fp_text value "" (at -4.8 8.3 ${r}) (layer F.Fab) hide (effects (font (size 1 1) (thickness 0.15))))
       ${legend}

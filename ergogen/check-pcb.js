@@ -1,5 +1,6 @@
 // Checks the generated PCB (output/pcbs/ogre.kicad_pcb; run `npm run build` first):
-//   - one hotswap switch and one diode per key, wired col -> switch -> diode -> row
+//   - one hotswap switch and one diode per key, wired col -> switch -> diode -> row,
+//     and key n (in points order, numbered on the keycap render) is MXn and Dn
 //   - the 10x7 matrix has no duplicate positions
 //   - every nice!nano pad carries its net (MCU1/MCU2 halves, MCU3 center)
 //   - reset switches
@@ -55,20 +56,27 @@ const EXPECTED_MCU = {
   if (switches.length !== keys.length) errors.push(`${switches.length} switches for ${keys.length} keys`)
   if (diodes.length !== keys.length) errors.push(`${diodes.length} diodes for ${keys.length} keys`)
   const seen = {}
-  for (const p of keys) {
+  keys.forEach((p, i) => {
     const { name, row_net: row, col_net: col } = p.meta
     const sw = switches.filter(f => net(f, '2') === name)
     const d = diodes.filter(f => net(f, '2') === name)
+    // key n (points order, as numbered on the keycap render) is MXn and Dn
     if (sw.length !== 1) errors.push(`${name}: ${sw.length} switches`)
-    else if (net(sw[0], '1') !== col) errors.push(`${name}: switch pad 1 on ${net(sw[0], '1')}, expected ${col}`)
+    else {
+      if (net(sw[0], '1') !== col) errors.push(`${name}: switch pad 1 on ${net(sw[0], '1')}, expected ${col}`)
+      if (sw[0].ref !== `MX${i + 1}`) errors.push(`${name}: switch is ${sw[0].ref}, expected MX${i + 1} (key ${i + 1})`)
+    }
     if (d.length !== 1) errors.push(`${name}: ${d.length} diodes`)
-    else if (net(d[0], '1') !== row) errors.push(`${name}: diode cathode on ${net(d[0], '1')}, expected ${row}`)
+    else {
+      if (net(d[0], '1') !== row) errors.push(`${name}: diode cathode on ${net(d[0], '1')}, expected ${row}`)
+      if (d[0].ref !== `D${i + 1}`) errors.push(`${name}: diode is ${d[0].ref}, expected D${i + 1} (key ${i + 1})`)
+    }
     const rc = `${row}/${col}`
     if (seen[rc]) errors.push(`${name} and ${seen[rc]} share ${rc}`)
     seen[rc] = name
     const r = +row.slice(3)
     if (p.meta.mirrored ? r < 5 : r > 4) errors.push(`${name}: ${row} is on the wrong half`)
-  }
+  })
 
   // controllers: U1 left of U3, U2 right of it
   for (const [ref, want] of Object.entries(EXPECTED_MCU)) {

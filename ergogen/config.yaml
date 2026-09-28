@@ -126,10 +126,11 @@ points:
             mod.skip: true
             bottom.skip: true
             home:   { legend: 'PgDn', mirror.legend: "\" '" }
-            # the switches here turn 90° (-90° on the right), so their diodes do too;
-            # } ], ~ and PgUp were then placed in KiCad, clear of the controller's traces
-            top:    { legend: '} ]',  mirror.legend: '{ [',  diode: [-0.575, -10.26875, -90], mirror.diode: [-0.63, -8.15, -90] }
-            num:    { legend: '~ `',  mirror.legend: 'PgUp', diode: [-0.35, 12.68125, -90],   mirror.diode: [0.1875, 12.68125, -90] }
+            # the switches here turn 90° (-90° on the right) so their sockets stand in a
+            # strip up the column and the controller's pad rows pass either side; their
+            # diodes turn too, and } ], ~ and PgUp's were placed in KiCad
+            top:    { legend: '} ]',  mirror.legend: '{ [',  turn: 90, mirror.turn: -90, diode: [-0.575, -10.26875, -90], mirror.diode: [-0.63, -8.15, -90] }
+            num:    { legend: '~ `',  mirror.legend: 'PgUp', turn: 90, mirror.turn: -90, diode: [-0.35, 12.68125, -90],   mirror.diode: [0.1875, 12.68125, -90] }
       rows:
         mod:    { row_net: row4, mirror.row_net: row9 }
         bottom: { row_net: row3, mirror.row_net: row8 }
@@ -154,6 +155,7 @@ points:
           key.stagger: thumb_stagger_home
           key.width: 2.25U-1
           key.adjust.rotate: 90   # a wide cap turned 90°, so switch and stabilizer footprints face the right way
+          key.stab: true          # 2.25U: stabilizer holes
           key.col_net: col5
           rows:
             cluster: { legend: 'Shift', mirror.legend: 'Enter' }
@@ -269,20 +271,10 @@ pcbs:
     outlines:
       edge: { outline: board }
     footprints:
-      switch:
+      switch:           # one per key; a key's `stab` adds stabilizer holes, its `turn` turns the switch
         what: ogre_hotswap
-        where: '-/thumb_home_cluster|extra_(num|top)/'
-        params: { from: '{{col_net}}', to: '{{name}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}' }
-      switch_2u:        # 2.25U thumb keys get stabilizer holes
-        what: ogre_hotswap
-        where: /thumb_home_cluster/
-        params: { from: '{{col_net}}', to: '{{name}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}', stab: true }
-      switch_mcu:       # ~ and } ] (PgUp and { [ on the right) turned 90°, so their sockets stand in
-                        # a strip up the column and the controller's pad rows pass either side
-        what: ogre_hotswap
-        where: /extra_(num|top)/
-        adjust.rotate: 90
-        params: { from: '{{col_net}}', to: '{{name}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}' }
+        where: true
+        params: { from: '{{col_net}}', to: '{{name}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}', stab: '{{stab}}', turn: '{{turn}}' }
 
       # One diode per key, a part of its own so it can be moved clear of traces.
       # Each starts at the switch's right edge, where the 2024 footprint drew it

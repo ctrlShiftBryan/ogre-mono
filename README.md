@@ -97,9 +97,9 @@ inner columns. `ergogen/config.yaml` also generates its PCB (unrouted), which
 keeps the as-built board's snap-apart single/split design. It is unrelated to
 the 68-key 2019 tkl above. See `ergogen/README.md`.
 
-Each `.kle.json` has a matching `.svg`/`.png` render. `layout/kle.py` is a
-small deserializer that follows KLE's own rules (the npm `kle-serial` build
-mishandles `rx`/`ry` cluster resets) and renders the SVGs.
+Each `.kle.json` has a matching `.svg` render. `layout/kle.py` is a small
+deserializer that follows KLE's own rules (the npm `kle-serial` build mishandles
+`rx`/`ry` cluster resets) and renders the SVGs.
 
 **The QMK geometry is not the design.** Bryan's PR-era `info.json` files were
 empty; the `keyboards/ogre/ergo_*` coordinates in upstream QMK were added by a

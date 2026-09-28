@@ -13,7 +13,7 @@ use `npm run serve` below.
 | File | What it is |
 |---|---|
 | `config.yaml` | Layout, outline and PCB |
-| `footprints/` | Switch, diode, Pro Micro, reset switch and TRRS jack |
+| `footprints/` | Switch, diode, Pro Micro, reset switch and TRRS jack; hotswap switch with built-in diode, nice!nano and JST PH battery connector from the 2024 library (available, not yet placed) |
 | `serve.js` | Live viewer: watches the config, rebuilds and shows every view |
 | `bundle.js` | Packs the config and footprints into an archive the web UI can open |
 | `points.snapshot.json` | Baseline geometry for `npm run snapshot` |

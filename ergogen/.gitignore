@@ -1,2 +1,5 @@
 node_modules/
 output/
+ogre-ergo.kicad_pcb
+ogre-ergo.demo.svg
+ogre-ergo.board.svg

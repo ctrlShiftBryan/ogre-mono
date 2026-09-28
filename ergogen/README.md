@@ -19,11 +19,9 @@ which sit about 1 mm off the KLE.
 |---|---|
 | `config.yaml` | Layout, outline and PCB |
 | `footprints/` | Switch, diode, Pro Micro, reset switch and TRRS jack, copied from the as-built board's footprints |
-| `ogre-ergo.kicad_pcb` | Generated PCB, unrouted |
 | `serve.js` | Live viewer: watches the config, rebuilds and shows every view |
 | `bundle.js` | Packs the config and footprints into an archive the web UI can open |
-| `ogre-ergo.board.svg` | Board outline |
-| `ogre-ergo.demo.svg`, `ogre-ergo.keycaps.svg` | Key previews |
+| `ogre-ergo.keycaps.svg` | Key preview, the one committed render |
 
 ## Changes from the as-built board (70 → 68 keys)
 
@@ -101,14 +99,15 @@ spots that don't have room: the Esc/Del diode stands in the gap beside its
 key, and the 3/8 key's diode (it sits over a Pro Micro) moves down below the
 E/I key's diode.
 
-Routing is left for KiCad. Route in a copy of `ogre-ergo.kicad_pcb`, since
-`npm run build` regenerates it.
+Routing is left for KiCad. The PCB is build output, not a committed file:
+`npm run build` writes it to `output/pcbs/ogre.kicad_pcb` and overwrites it
+every time, so route in a copy.
 
 ## Commands
 
 ```sh
 npm install
-npm run build    # write output/ and refresh the committed .svg and .kicad_pcb files
+npm run build    # write output/ (points, outlines, PCB)
 npm run keycaps  # build, then render ogre-ergo.keycaps.svg with legends
 npm run verify   # compare key positions to the as-built PCB
 npm run check    # check the generated PCB's parts, nets and KiCad DRC

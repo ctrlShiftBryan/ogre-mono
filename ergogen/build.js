@@ -39,7 +39,9 @@ const write = (results, out) => {
   put('points/units.yaml', results.units)
   twodee('points/demo', results.demo)
   for (const [name, o] of Object.entries(results.outlines)) twodee(`outlines/${name}`, o)
-  for (const [name, pcb] of Object.entries(results.pcbs)) put(`pcbs/${name}.kicad_pcb`, pcb)
+  // ergogen stamps today's date into the title block (templates/kicad8.js); blank it
+  // so rebuilding an unchanged config gives a byte-identical PCB
+  for (const [name, pcb] of Object.entries(results.pcbs)) put(`pcbs/${name}.kicad_pcb`, pcb.replace(/\(date "[^"]*"\)/, '(date "")'))
 }
 
 module.exports = { run, write, OUT: path.join(here, 'output') }

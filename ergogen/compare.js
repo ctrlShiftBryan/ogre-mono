@@ -1,7 +1,9 @@
-// Checks config.yaml (68-key redesign) against the switch positions on the
-// as-built 70-key PCB (ctrlShiftBryan/ogre-v1, ogre-v1.kicad_pcb).
-// Keys the redesign keeps must still match the PCB; the intended changes are
-// listed as expected differences. Usage: npm run verify
+// Reports how the Ogre 68 differs from the as-built 70-key PCB
+// (ctrlShiftBryan/ogre-v1, ogre-v1.kicad_pcb): which keys still sit where that
+// board put them, which moved or changed size, which went, which are new.
+// The as-built board was the starting point, not the specification, so this
+// prints an account and never fails. `npm run snapshot` is the gate that
+// catches geometry the design didn't mean to change. Usage: npm run compare
 const { run } = require('./build')
 
 const U = 19.05
@@ -62,72 +64,54 @@ const KEYS = {
   thumb_far_cluster: ['MX76', 'MX78'],
 }
 
-// Intended differences from the as-built board.
-const RIGHT_SHIFT = 1.25 * U // mirror distance 3U -> 4.25U moves the right half out
-const REMOVED = ['matrix_outer_mod', 'matrix_pinky_mod']
-const CHANGED = [
-  'matrix_outer_bottom', 'thumb_far_cluster', // resized
-  // 0.25U lower: far + outer columns (vs pinky) and the innermost column (vs T/G/B)
-  'matrix_far_num', 'matrix_outer_num', 'matrix_outer_top', 'matrix_outer_home',
-  'matrix_extra_num', 'matrix_extra_top', 'matrix_extra_home',
-  'thumb_home_cluster', // thumb block staggered 0.25U up from Cmd
-]
-const ADDED = ['thumb_far_upper']
+// The as-built board's mirror distance; the Ogre 68 sets its own (half_spread),
+// so the right half's offset follows from the design rather than a constant.
+const AS_BUILT_SPREAD = 3 * U
 
 const ORIGIN = { pcb: 'MX54', point: 'matrix_middle_mod' } // left key below C
 const TOL = 0.02 // mm; KiCad positions are rounded to 0.01
 
 ;(async () => {
-  const { points } = await run()
+  const { points, units } = await run()
+  const shift = units.half_spread - AS_BUILT_SPREAD
   const o = points[ORIGIN.point], po = PCB[ORIGIN.pcb]
   const pcbXY = p => [po[1] + (p.x - o.x), po[2] - (p.y - o.y)]
   const size = p => (Math.max(p.meta.width, p.meta.height) + 1) / U
   const norm = r => ((r % 180) + 180) % 180 // footprint rotation is 180°-symmetric
   const fmt = n => +n.toFixed(2)
 
-  const errors = [], changed = [], seen = new Set()
-  let matched = 0, worst = 0
+  const same = [], moved = [], gone = [], added = []
+  const seen = new Set()
+  let worst = 0
   for (const [name, refs] of Object.entries(KEYS)) {
     for (const [side, key, ref] of [['left', name, refs[0]], ['right', `mirror_${name}`, refs[1]]]) {
       const p = points[key]
       seen.add(key)
-      if (REMOVED.includes(name)) {
-        if (p) errors.push(`${key}: should be removed (was ${ref})`)
-        continue
-      }
-      if (!p) { errors.push(`${key}: missing (${ref})`); continue }
+      if (!p) { gone.push(`${key} (was ${ref}, ${PCB[ref][0]}U)`); continue }
       const [pSize, px0, py, pr] = PCB[ref]
-      const px = px0 + (side === 'right' ? RIGHT_SHIFT : 0)
+      const px = px0 + (side === 'right' ? shift : 0)
       const [x, y] = pcbXY(p)
       const d = Math.hypot(px - x, py - y)
-      if (CHANGED.includes(name)) {
-        changed.push(`${key}: ${pSize}U -> ${fmt(size(p))}U, moved ${fmt(d)} mm (${ref})`)
-        continue
-      }
-      worst = Math.max(worst, d)
-      if (d > TOL) errors.push(`${key}: ${d.toFixed(3)} mm from ${ref}`)
-      if (Math.abs(size(p) - pSize) > 1e-6) errors.push(`${key}: ${fmt(size(p))}U, ${ref} is ${pSize}U`)
-      if (norm(p.r) !== norm(pr) && norm(p.r) !== norm(pr + 90)) errors.push(`${key}: rot ${p.r}, ${ref} is ${pr}`)
-      matched++
+      const resized = Math.abs(size(p) - pSize) > 1e-6
+      const turned = norm(p.r) !== norm(pr) && norm(p.r) !== norm(pr + 90)
+      if (d <= TOL && !resized && !turned) { same.push(key); worst = Math.max(worst, d); continue }
+      const what = [
+        d > TOL ? `moved ${fmt(d)} mm` : null,
+        resized ? `${pSize}U -> ${fmt(size(p))}U` : null,
+        turned ? `turned ${fmt(p.r)}°, was ${fmt(pr)}°` : null
+      ].filter(Boolean).join(', ')
+      moved.push(`${key}: ${what} (${ref})`)
     }
   }
-  const added = []
-  for (const name of ADDED) {
-    for (const key of [name, `mirror_${name}`]) {
-      seen.add(key)
-      if (points[key]) added.push(`${key}: ${fmt(size(points[key]))}U`)
-      else errors.push(`${key}: missing (new key)`)
-    }
-  }
-  for (const key of Object.keys(points)) if (!seen.has(key)) errors.push(`${key}: not expected`)
+  for (const key of Object.keys(points)) if (!seen.has(key)) added.push(`${key}: ${fmt(size(points[key]))}U`)
 
-  console.log(`${Object.keys(points).length} keys; ${matched} match the as-built PCB ` +
-    `(right half shifted ${fmt(RIGHT_SHIFT)} mm), worst error ${worst.toFixed(3)} mm`)
-  console.log('\nExpected differences:')
-  console.log(`  right half: every key ${fmt(RIGHT_SHIFT)} mm further out (mirror distance 3U -> 4.25U)`)
-  console.log(`  removed: ${REMOVED.flatMap(n => [n, `mirror_${n}`]).join(', ')}`)
-  for (const line of changed) console.log(`  changed: ${line}`)
-  for (const line of added) console.log(`  new: ${line}`)
-  if (errors.length) { console.error('\nFAIL:\n' + errors.join('\n')); process.exit(1) }
-  console.log('\nOK: unchanged keys match the as-built PCB')
+  const n = Object.keys(points).length
+  console.log(`Ogre 68: ${n} keys. Against the as-built 70-key board, with the right half ` +
+    `${fmt(shift)} mm further out (half_spread ${fmt(units.half_spread / U)}U vs 3U as built):\n`)
+  console.log(`  ${same.length} in the same place (worst ${worst.toFixed(3)} mm)`)
+  console.log(`  ${moved.length} moved or resized`)
+  console.log(`  ${gone.length} gone, ${added.length} new\n`)
+  for (const line of moved) console.log(`  moved: ${line}`)
+  for (const line of gone) console.log(`  gone:  ${line}`)
+  for (const line of added) console.log(`  new:   ${line}`)
 })()

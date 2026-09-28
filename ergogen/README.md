@@ -21,6 +21,7 @@ which sit about 1 mm off the KLE.
 | `footprints/` | Switch, diode, Pro Micro, reset switch and TRRS jack, copied from the as-built board's footprints |
 | `serve.js` | Live viewer: watches the config, rebuilds and shows every view |
 | `bundle.js` | Packs the config and footprints into an archive the web UI can open |
+| `points.snapshot.json` | Baseline geometry for `npm run snapshot` |
 | `ogre-ergo.keycaps.svg` | Key preview, the one committed render |
 
 ## Changes from the as-built board (70 → 68 keys)
@@ -109,8 +110,9 @@ every time, so route in a copy.
 npm install
 npm run build    # write output/ (points, outlines, PCB)
 npm run keycaps  # build, then render ogre-ergo.keycaps.svg with legends
-npm run verify   # compare key positions to the as-built PCB
+npm run snapshot # fail on geometry that changed since the last baseline
 npm run check    # check the generated PCB's parts, nets and KiCad DRC
+npm run compare  # report how the design differs from the as-built PCB
 npm run serve    # live viewer on http://localhost:5174
 npm run bundle   # pack config + footprints into output/ogre-ergo.ekb for the web UI
 ```
@@ -124,12 +126,19 @@ only loads custom footprints from a folder, and this folder also holds
 writes in debug mode and draws each key as a keycap with its legend: alphas
 in cream, modifiers and arrows in grey, Esc and Enter in red.
 
-`npm run verify` checks every key the redesign keeps against the 70-key PCB
-(within 0.01 mm, KiCad's rounding), with the right half offset by the
-23.81 mm shift. It lists the intended changes as expected differences: the
-four removed keys, the resized row-4 outer and far thumb keys, the keys moved
-by the new staggers (outer, far and innermost columns, Shift/Enter thumbs), the
-two new 1U keys, and the right-half shift. Anything else that moves fails.
+`npm run snapshot` is the regression gate. It holds the build against
+`points.snapshot.json` — position, rotation and size of all 68 keys — and fails
+on any key that moved, appeared or went. A change you meant to make is a new
+baseline: `npm run snapshot:update` rewrites the file and prints what it
+accepted, and that file goes in the commit with the config change that caused
+it.
+
+`npm run compare` reports how the Ogre 68 sits against the as-built 70-key
+board: how many keys are still in the same place, which moved or changed size,
+which went and which are new. The as-built board was this design's starting
+point rather than its specification, so this one prints an account and never
+fails. It reads the right half's offset from `half_spread`, so the report
+follows the design.
 
 `npm run serve` starts a viewer that watches `config.yaml` and `footprints/`,
 rebuilds on save (about 0.4 s) and refreshes the browser by itself, so the
@@ -137,8 +146,8 @@ files in this folder stay the single source of truth. Tabs: **Keycaps** (the
 `render_keycaps.py` render), **Points** (ergogen's demo), **Outline** (any
 outline in `output/outlines/`) and **PCB** (rendered by `kicad-cli`, with a
 layer picker). Drag to pan, wheel to zoom about the pointer, double click (or
-**fit**) to fit the pane. The `verify` and `check` buttons run those scripts
-and print their output. A YAML or footprint error shows in a red bar and the last good
+**fit**) to fit the pane. The `snapshot`, `compare` and `check` buttons run
+those scripts and print their output. A YAML or footprint error shows in a red bar and the last good
 render stays up until the next good build. Nothing leaves the machine.
 
 `npm run bundle` writes `output/ogre-ergo.ekb`, a zip holding `config.yaml`

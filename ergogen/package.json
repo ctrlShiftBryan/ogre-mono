@@ -5,7 +5,9 @@
     "build": "node build.js",
     "keycaps": "npm run build && python3 render_keycaps.py output/points/points.yaml ogre-ergo.keycaps.svg \"Ogre Ergo\"",
     "check": "node check-pcb.js",
-    "verify": "node verify.js",
+    "compare": "node compare.js",
+    "snapshot": "node snapshot.js",
+    "snapshot:update": "node snapshot.js --update",
     "serve": "node serve.js",
     "bundle": "node bundle.js"
   },

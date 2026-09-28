@@ -90,7 +90,8 @@ const server = http.createServer(async (req, res) => {
     return
   }
   if (p === '/rebuild') { await build(); return send(res, 200, 'application/json', JSON.stringify(state)) }
-  if (p === '/verify' || p === '/check') return send(res, 200, 'text/plain; charset=utf-8', await script(p === '/verify' ? 'verify.js' : 'check-pcb.js'))
+  const SCRIPTS = { '/compare': 'compare.js', '/snapshot': 'snapshot.js', '/check': 'check-pcb.js' }
+  if (SCRIPTS[p]) return send(res, 200, 'text/plain; charset=utf-8', await script(SCRIPTS[p]))
   if (p === '/outlines') {
     const dir = path.join(OUT, 'outlines')
     const names = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => f.endsWith('.svg')).map(f => f.slice(0, -4)) : []
@@ -141,7 +142,8 @@ main { cursor:grab }
   <select id="opt"></select>
   <div class="group">
     <button id="zout">−</button><button id="zfit">fit</button><button id="zin">+</button>
-    <button id="verify">verify</button><button id="check">check</button><button id="rebuild">rebuild</button>
+    <button id="snapshot">snapshot</button><button id="compare">compare</button>
+    <button id="check">check</button><button id="rebuild">rebuild</button>
     <span id="status"><span id="dot"></span><span id="msg">starting…</span></span>
   </div>
 </header>
@@ -222,7 +224,7 @@ main.addEventListener('wheel', function (e) {
 }, { passive: false });
 main.addEventListener('dblclick', fit);
 document.getElementById('rebuild').onclick = function () { fetch('/rebuild'); };
-['verify','check'].forEach(function (name) {
+['snapshot','compare','check'].forEach(function (name) {
   document.getElementById(name).onclick = function () {
     show('running ' + name + '…');
     fetch('/' + name).then(function (r) { return r.text(); }).then(show);

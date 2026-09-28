@@ -20,10 +20,16 @@ Trunk based development: commit directly to `main`. Work in this repo lands on
 are build output that `npm run build` overwrites, so changes belong in the
 config, and routing belongs in a copy of the PCB.
 
-The as-built 70-key PCB (`ctrlShiftBryan/ogre-v1`) is the geometric reference.
-`npm run verify` holds every kept key against it and lists the intended
-differences by name; that list is part of the design record, so extend it when a
-change is deliberate. Run `verify` and `check` before committing anything that
+The values that shape the board — column staggers, the thumb fan, the half
+separation — live by name in the config's `units` block. Change the design
+there, not by editing numbers inside the zones.
+
+`npm run snapshot` is the geometry gate: it fails on any key that moved, appeared
+or went since the baseline in `points.snapshot.json`. When the move was
+deliberate, `npm run snapshot:update` and commit the new baseline alongside the
+config change. `npm run compare` reports the design against the as-built 70-key
+board, which was this design's starting point rather than its specification —
+a record, not a gate. Run `snapshot` and `check` before committing anything that
 moves a key or touches the PCB.
 
 `npm run build` stamps the current date into the PCB title block, so a rebuild on

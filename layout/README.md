@@ -1,7 +1,7 @@
 # Layouts
 
-`ogre-ergo.kle.json` is the as-built 70-key Ogre Ergo, the geometry the Ogre 68
-redesign in `ergogen/` is measured against (`npm run verify`). `ogre-ergo.svg`
+`ogre-ergo.kle.json` is the as-built 70-key Ogre Ergo — the board the Ogre 68
+started from, and the one `ergogen/compare.js` reports against. `ogre-ergo.svg`
 is its render, `kle.py` the renderer, `kle-gists.md` the index of every KLE gist
 on the account.
 

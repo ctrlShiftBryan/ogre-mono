@@ -199,18 +199,17 @@ outlines:
     - { what: outline, name: _thumb_grown, expand: -thumb_web }
   _thumb_walls:
     - { what: outline, name: _thumb_keys, expand: pocket_wall }
-  _gaps:                # web left over once each key keeps a pocket_wall rim, shrunk by pocket_min / 2 ...
+  _gaps:                # web left over once each key keeps a pocket_wall rim, shrunk by pocket_min / 2
     web:   { what: outline, name: _webs }
     walls: { operation: subtract, what: outline, name: _thumb_walls, expand: -pocket_min / 2 }
-  _gaps_open:           # ... and grown back, so slivers narrower than pocket_min drop out
-    - { what: outline, name: _gaps, expand: pocket_min / 2 }
   _pockets:             # only the biggest gap, over Cmd and under the index/inner columns
     zone:
       what: rectangle
       asym: both
       where: { ref: matrix_inner_bottom, shift: [0.675, -18.3] }
       size: [38.65, 23.4]           # clears the smaller gaps beside it by 1.5 mm or more
-    gaps: { operation: intersect, what: outline, name: _gaps_open }
+    gaps: { operation: intersect, what: outline, name: _gaps, expand: pocket_min / 2 }
+                        # grown back, so slivers narrower than pocket_min drop out
   _caps:                # every keycap at its real size, both halves
     ones:   { what: rectangle, where: '-/outer_(top|home|bottom)|thumb_(near|home|far)_cluster/', size: [U, U] }
     tab:    { what: rectangle, where: /outer_top/,          size: [1.5U, U] }

@@ -3,11 +3,14 @@
 // pinout as ogre_promicro; the controller sits on the front, face up, with the
 // pads' mask open on the back only, and USB-C toward local -y.
 //   pads 1-12:  TX0(D3) RX1(D2) GND GND D1 D0 D4 C6 D7 E6 B4 B5
-//   pads 13-24: B6 B2 B3 B1 F7 F6 F5 F4 VCC RST GND RAW
+//   pads 13-24: B6 B2 B3 B1 F7 F6 F5 F4 VCC RST GND RAW (B+ on a nice!nano)
 // Params
 //    pad1..pad24: net on each pad ('' leaves it unconnected)
+//    side: 'front' (as drawn) or 'back', the whole footprint mirrored onto the
+//      back of the board, soldered from the front. Rotated a further 90°, a back
+//      nice!nano puts every pad where ogre_promicro has it, 0.508 mm toward the USB.
 
-const params = { designator: 'MCU' }   // not 'U': ergogen reads that as the 19.05 mm unit
+const params = { designator: 'MCU', side: 'front' }   // not 'U': ergogen reads that as the 19.05 mm unit
 for (let i = 1; i <= 24; i++) params[`pad${i}`] = { type: 'net', value: '' }
 
 // pin labels on the front silkscreen, [text, x, y]
@@ -21,6 +24,12 @@ const labels = [
   ['USB-C', -0.05, -18.95]
 ]
 
+// mirror onto the back: x negated, F./B. layers swapped, text read from behind
+const flip = fp => fp
+  .replace(/\((at|start|end) ([-\d.]+) /g, (_, k, x) => `(${k} ${-x} `)
+  .replace(/\b([FB])\.(Cu|SilkS|Fab|Mask|CrtYd|Paste)\b/g, (_, s, l) => `${s === 'F' ? 'B' : 'F'}.${l}`)
+  .replace(/\(thickness ([\d.]+)\)\)\)/g, '(thickness $1)) (justify mirror))')
+
 module.exports = {
   params,
   body: p => {
@@ -33,9 +42,9 @@ module.exports = {
     }
     const text = labels.map(([t, x, y]) =>
       `(fp_text user "${t}" (at ${x} ${y} ${r}) (layer F.SilkS) (effects (font (size 0.75 0.67) (thickness 0.125))))`)
-    return `
+    const fp = `
     (module ogre:NiceNano_MillMax (layer F.Cu) (tedit 5DD4F656)
-      ${p.at}
+      AT
       (fp_text reference "${p.ref}" (at -0.1 -0.05 ${r - 90}) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1 1) (thickness 0.15))))
       (fp_text value "nice!nano" (at 0.02 15.79 ${r}) (layer F.SilkS) (effects (font (size 1 1) (thickness 0.15))))
       ${text.join('\n      ')}
@@ -71,5 +80,6 @@ module.exports = {
       ${pads.join('\n      ')}
     )
     `
+    return (p.side === 'back' ? flip(fp) : fp).replace('AT', p.at)
   }
 }

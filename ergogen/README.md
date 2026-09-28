@@ -104,6 +104,11 @@ the switch and nice!nano footprints come from the 2024 rework (`ogre.2024.pretty
 - **No underglow LEDs**, no alternate-size switch footprints, and no mounting
   holes yet (see below).
 
+The board sits on KiCad's page at `pcbs.ogre.params.origin` in the config: after
+ergogen runs, `build.js` moves the finished PCB there as a whole and puts KiCad's
+drill origin at the same spot. Ergogen's own coordinates (the points, the
+snapshot, the reference DXF) stay where they were.
+
 Routing is left for KiCad. The PCB is build output, not a committed file:
 `npm run build` writes it to `output/pcbs/ogre.kicad_pcb`, with an
 `ogre.kicad_pro` beside it so KiCad opens it as a project, and overwrites both

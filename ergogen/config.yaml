@@ -250,12 +250,12 @@ outlines:
       { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [13.305, 1.065] }, size: [7.73, 1.49] }
     cut_c:              # ... and down to the first bridge
       { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.47, -6.235] }, size: [2.06, 16.09], corner: 0.5 }
-    slot_1:             # routed slots between the four ~2 mm bridges
-      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.475, -20.255] }, size: [1.71, 8.05], corner: 0.85 }
+    slot_1:             # routed slots between the four ~2 mm bridges, ends round as a router bit cuts them
+      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.475, -20.255] }, size: [1.71, 8.05], corner: 1.71 / 2 }
     slot_2:
-      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.475, -30.44] }, size: [1.71, 8.05], corner: 0.85 }
+      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.475, -30.44] }, size: [1.71, 8.05], corner: 1.71 / 2 }
     slot_3:
-      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.475, -40.62] }, size: [1.71, 8.05], corner: 0.85 }
+      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.475, -40.62] }, size: [1.71, 8.05], corner: 1.71 / 2 }
     notch:              # bottom notch up to the last bridge
       { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.525, -49.05] }, size: [1.95, 4.9], corner: 0.5 }
 
@@ -268,6 +268,8 @@ outlines:
 pcbs:
   ogre:
     template: kicad8
+    params:
+      origin: [38.78015, 145.53875]   # where build.js moves the board on KiCad's page (mm, y down), as placed in KiCad
     outlines:
       edge: { outline: board }
     footprints:

@@ -18,7 +18,8 @@ const kicad = ['kicad-cli', '/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-
 run().then(results => {
   if (!kicad) throw new Error('kicad-cli not found: the reference DXF is plotted from the PCB')
   write(results, OUT)
-  // the PCB has no drill origin, so plotting from it keeps ergogen's coordinates;
+  // build.js puts the drill origin where it moved the board on the page, so
+  // plotting from it keeps ergogen's coordinates;
   // drill marks are left out, since KiCad repeats them on every layer
   execFileSync(kicad, ['pcb', 'export', 'dxf', '--mode-single', '--output-units', 'mm',
     '--use-drill-origin', '--drill-shape-opt', '0', '--exclude-refdes', '--exclude-value',

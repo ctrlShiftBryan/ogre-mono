@@ -21,6 +21,7 @@ which sit about 1 mm off the KLE.
 | `footprints/` | Switch, diode, Pro Micro, reset switch and TRRS jack, copied from the as-built board's footprints |
 | `ogre-ergo.kicad_pcb` | Generated PCB, unrouted |
 | `serve.js` | Live viewer: watches the config, rebuilds and shows every view |
+| `bundle.js` | Packs the config and footprints into an archive the web UI can open |
 | `ogre-ergo.board.svg` | Board outline |
 | `ogre-ergo.demo.svg`, `ogre-ergo.keycaps.svg` | Key previews |
 
@@ -112,6 +113,7 @@ npm run keycaps  # build, then render ogre-ergo.keycaps.svg with legends
 npm run verify   # compare key positions to the as-built PCB
 npm run check    # check the generated PCB's parts, nets and KiCad DRC
 npm run serve    # live viewer on http://localhost:5174
+npm run bundle   # pack config + footprints into output/ogre-ergo.ekb for the web UI
 ```
 
 `build.js` runs ergogen with the footprints in `footprints/`. The ergogen CLI
@@ -139,6 +141,14 @@ layer picker). Drag to pan, wheel to zoom about the pointer, double click (or
 **fit**) to fit the pane. The `verify` and `check` buttons run those scripts
 and print their output. A YAML or footprint error shows in a red bar and the last good
 render stays up until the next good build. Nothing leaves the machine.
+
+`npm run bundle` writes `output/ogre-ergo.ekb`, a zip holding `config.yaml`
+and `footprints/` as they are in the working tree. The ergogen web UI opens it
+under **From Local File**, footprints and all, so the PCB generates there too.
+Loading a bare `config.yaml` instead gives the layout and outlines but no PCB,
+since the footprints wouldn't come with it. The archive is a snapshot: edits
+made in the web editor don't come back to these files, so re-run `npm run
+bundle` after changing the config.
 
 `npm run check` reads the generated PCB and fails unless every key has one
 switch and one diode wired column → switch → diode → row, no two keys share a

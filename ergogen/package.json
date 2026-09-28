@@ -6,7 +6,8 @@
     "keycaps": "npm run build && python3 render_keycaps.py output/points/points.yaml ogre-ergo.keycaps.svg \"Ogre Ergo\"",
     "check": "node check-pcb.js",
     "verify": "node verify.js",
-    "serve": "node serve.js"
+    "serve": "node serve.js",
+    "bundle": "node bundle.js"
   },
   "devDependencies": {
     "ergogen": "4.2.1"

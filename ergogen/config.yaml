@@ -235,14 +235,14 @@ outlines:
       what: rectangle
       where: { ref: matrix_extra_num, shift: [2.125U, -19.69] }   # centered on the mirror axis
       size: [4.25U - 2 * 9.4, 58.62]
-    jack_tab:           # raises the top edge over the extra column so each half's TRRS jack sits at the edge
+    jack_tab:           # raises the top edge over the extra column, where each half's nice!nano has its USB (the 2019 board's TRRS jack sat here)
       what: rectangle
       asym: both
       where: { ref: matrix_extra_num, shift: [1.8375, 0.375U] }   # from 2 mm into the inner column (covers its corner) to x = 15.2
       size: [26.725, 0.75U]
     cut_a:              # break line: slot down beside the jack tab ...
       { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [16.185, 12.66] }, size: [1.97, 24.68] }
-    cut_b:              # ... across under the jack ...
+    cut_b:              # ... across under the tab ...
       { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [13.305, 1.065] }, size: [7.73, 1.49] }
     cut_c:              # ... and down to the first bridge
       { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.47, -6.235] }, size: [2.06, 16.09], corner: 0.5 }
@@ -270,17 +270,23 @@ pcbs:
     footprints:
       switch:
         what: ogre_hotswap_diode
-        where: '-/thumb_home_cluster/'
+        where: '-/thumb_home_cluster|extra_(num|top)/'
+        params: { from: '{{col_net}}', to: '{{row_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}' }
+      switch_mcu:       # ~ and } ] (PgUp and { [ on the right) turned 90°, so their sockets and diodes
+                        # stand in a strip up the column and the controller's pad rows pass either side
+        what: ogre_hotswap_diode
+        where: /extra_(num|top)/
+        adjust.rotate: 90
         params: { from: '{{col_net}}', to: '{{row_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}' }
       switch_2u:        # 2.25U thumb keys get stabilizer holes
         what: ogre_hotswap_diode
         where: /thumb_home_cluster/
         params: { from: '{{col_net}}', to: '{{row_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}', stab: true }
 
-      mcu_left:         # MCU1: lying across the back of Esc and +=, USB flush with the outer edge;
-                        # its pad rows run just above and below the keys' sockets and diodes
+      mcu_left:         # MCU1: up the back of the inner column under ~ and } ], USB flush with the
+                        # top of the jack tab; its pad rows clear the turned switches' strip by ~0.9 mm
         what: ogre_nicenano
-        where: { ref: matrix_far_num, shift: [8.775, 0.38], rotate: 90 }
+        where: { ref: matrix_extra_num, shift: [-0.845, 0.375U + 0.375U - 18.3] }
         params: &half_mcu
           side: back
           pad3: GND
@@ -300,9 +306,9 @@ pcbs:
           pad21: VCC
           pad22: RESET1
           pad23: GND
-      mcu_right:        # MCU2: across Del and - _, turned so its USB also faces the outer edge
+      mcu_right:        # MCU2: the same under PgUp and { [
         what: ogre_nicenano
-        where: { ref: mirror_matrix_far_num, shift: [-8.775, 0.38], rotate: 270, resist: true }
+        where: { ref: mirror_matrix_extra_num, shift: [-0.845, 0.375U + 0.375U - 18.3] }
         params:
           <<: *half_mcu
           pad8: row5

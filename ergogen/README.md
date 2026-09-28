@@ -74,16 +74,17 @@ the switch and nice!nano footprints come from the 2024 rework (`ogre.2024.pretty
   - Pad 24 (RAW) is the nice!nano's B+. No battery connector or power switch
     is placed yet.
 - **Break lines** beside each half's innermost column: a cut down from the
-  top edge (jogging around the tab where the TRRS jack was), three 1.7 × 8 mm slots and a
+  top edge (jogging around the raised tab), three 1.7 × 8 mm slots and a
   bottom notch, leaving four ~2 mm bridges. Every row and column net, plus VCC
   and GND, has to cross at those bridges. Sizes and spacing are measured from
   the innermost column.
 - **Center piece:** MCU3 with its USB at the top edge, and reset switch SW3.
-- **Each half:** its nice!nano lying across the back of Esc and `+ =` (Del and
-  `_ -` on the right), USB-C flush with the outer edge. Its two pad rows run
-  just above and just below those keys' sockets and diodes, so the controller
-  stands over them on its sockets. A 6 mm reset switch sits on the back below
-  Tab (`| \` on the right).
+- **Each half:** its nice!nano up the back of the inner column, under `` ` ~ ``
+  and `} ]` (PgUp and `{ [` on the right), USB-C flush with the top of the
+  raised tab over that column. Those two keys' switches are turned 90°, so their
+  sockets and diodes stand in a strip up the column and the controller's pad
+  rows pass either side, about 0.9 mm clear. A 6 mm reset switch sits on the
+  back below Tab (`| \` on the right).
 - **Outline:** keycap edges with 1 mm corners, thumbs included. The thumb
   cluster joins the matrix by filling only the gaps between neighboring keys
   (`thumb_web`), and one pocket per half is cut out over Cmd, as on the 2019

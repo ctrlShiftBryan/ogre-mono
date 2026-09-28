@@ -117,7 +117,7 @@ points:
             mod.skip: true
             bottom: { legend: 'B',   mirror.legend: 'N' }
             home:   { legend: 'G',   mirror.legend: 'H' }
-            top:    { legend: 'T',   mirror.legend: 'Y' }
+            top:    { legend: 'T',   mirror.legend: 'Y', diode: [0.7, -6.25625, 90], mirror.diode: [8.15, -0.63, 0] }   # T's diode placed in KiCad; Y's stays at its switch
             num:    { legend: '% 5', mirror.legend: '^ 6' }
         extra:          # inner 1u column (num, top, home only)
           key.stagger: stagger_extra
@@ -126,8 +126,10 @@ points:
             mod.skip: true
             bottom.skip: true
             home:   { legend: 'PgDn', mirror.legend: "\" '" }
-            top:    { legend: '} ]',  mirror.legend: '{ [' }
-            num:    { legend: '~ `',  mirror.legend: 'PgUp' }
+            # the switches here turn 90° (-90° on the right), so their diodes do too;
+            # } ], ~ and PgUp were then placed in KiCad, clear of the controller's traces
+            top:    { legend: '} ]',  mirror.legend: '{ [',  diode: [-0.575, -10.26875, -90], mirror.diode: [-0.63, -8.15, -90] }
+            num:    { legend: '~ `',  mirror.legend: 'PgUp', diode: [-0.35, 12.68125, -90],   mirror.diode: [0.1875, 12.68125, -90] }
       rows:
         mod:    { row_net: row4, mirror.row_net: row9 }
         bottom: { row_net: row3, mirror.row_net: row8 }
@@ -286,21 +288,11 @@ pcbs:
       # Each starts at the switch's right edge, where the 2024 footprint drew it
       # built in: (8.15, 0.63) in the switch's frame. resist keeps the right half's
       # diodes on that same side, since the switch footprint isn't mirrored.
-      diode:
+      diode:            # one per key, at the key's `diode` ([x, y, r] from the key; see the zones)
+                        # or, without one, at the switch's right edge
         what: ogre_socket_diode
-        where: '-/extra_(num|top)/'
-        adjust: { shift: [8.15, -0.63], resist: true }
-        params: { from: '{{name}}', to: '{{row_net}}' }
-      diode_mcu:        # turned with their switch
-        what: ogre_socket_diode
-        where: /^matrix_extra_(num|top)$/
-        adjust: { orient: 90, shift: [8.15, -0.63] }
-        params: { from: '{{name}}', to: '{{row_net}}' }
-      diode_mcu_right:
-        what: ogre_socket_diode
-        where: /^mirror_matrix_extra_(num|top)$/
-        adjust: { orient: -90, shift: [8.15, -0.63], resist: true }
-        params: { from: '{{name}}', to: '{{row_net}}' }
+        where: true
+        params: { from: '{{name}}', to: '{{row_net}}', place: '{{diode}}' }
 
       mcu_left:         # MCU1: up the back of the inner column under ~ and } ], USB flush with the
                         # top of the jack tab; its pad rows clear the turned switches' strip by ~0.9 mm

@@ -64,8 +64,10 @@ the switch and nice!nano footprints come from the 2024 rework (`ogre.2024.pretty
   socket and SOD-123 or through-hole diode, both on the back, COL2ROW). The
   2.25U thumb keys add stabilizer holes. The 2024 footprint had the diode built
   in; here it's a part of its own (`ogre_socket_diode`) so it can be moved
-  clear of traces, and each starts where the built-in one was, at the switch's
-  right edge.
+  clear of traces. A key's `diode: [x, y, r]` in the zones places its diode
+  (mm from the key, in its frame, y up; `mirror.diode` for the right half);
+  without one it sits at the switch's right edge, where the built-in one was.
+  Diodes number in key order, so moving one never renumbers the rest.
   Rows 0–4 are the left half, rows 5–9 the right; columns 0–6 run across both,
   numbered from the outer edge inward on each half. The thumb Home/End keys
   take row4/col1 and row9/col1; row4/col0 and row9/col0 stay unused.

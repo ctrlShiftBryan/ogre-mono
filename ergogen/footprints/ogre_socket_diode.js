@@ -5,18 +5,30 @@
 // Nets
 //    from: anode, pad 2 (from the switch)
 //    to: cathode, pad 1 (to the row)
+// Params
+//    place: 'x,y,r' from the key, in the key's frame (mm, y up) and degrees,
+//      from its `diode` ('{{diode}}'); empty for the switch's right edge, where
+//      the 2024 footprint had it built in. The footprint places itself from this,
+//      so one entry serves every key and designators stay in key order.
+
+const DEFAULT = [8.15, -0.63, 0]
 
 module.exports = {
   params: {
     designator: 'D',
     from: undefined,
-    to: undefined
+    to: undefined,
+    place: ''
   },
   body: p => {
-    const r = p.r
+    const [dx, dy, dr] = p.place ? String(p.place).split(',').map(Number) : DEFAULT
+    const a = p.r * Math.PI / 180
+    const x = p.x + dx * Math.cos(a) - dy * Math.sin(a)
+    const y = p.y - (dx * Math.sin(a) + dy * Math.cos(a))   // KiCad y points down
+    const r = p.r + dr
     return `
     (module ogre:Socket_Diode (layer F.Cu) (tedit 5DD4F656)
-      ${p.at}
+      (at ${+x.toFixed(6)} ${+y.toFixed(6)} ${r})
       (fp_text reference "${p.ref}" (at 1.6 0 ${r + 90}) (layer B.SilkS) ${p.ref_hide} (effects (font (size 0.8 0.8) (thickness 0.12)) (justify mirror)))
       (fp_text value "" (at 0 0 ${r}) (layer B.Fab) hide (effects (font (size 0.8 0.8) (thickness 0.12)) (justify mirror)))
 

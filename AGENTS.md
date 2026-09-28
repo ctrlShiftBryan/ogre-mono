@@ -1,10 +1,10 @@
 # ogre-mono
 
-Design files for the Ogre keyboards. `ergogen/` is the live work: a 68-key
-redesign of the Ogre Ergo that generates the board outline and an unrouted KiCad
-PCB. `layout/` holds the KLE designs and their renders. `README.md` inventories
-every Ogre repo and the original KLE gists, and says which geometry is real —
-consult it before trusting coordinates found in another repo.
+The Ogre 68: a redesign of the Ogre Ergo that generates its layout, outline and
+KiCad PCB from `ergogen/config.yaml`. `layout/` holds the as-built board's KLE
+design and the gist index; `docs/ogre-repos.md` inventories the other Ogre repos.
+Geometry found in another repo is suspect until checked against those two —
+upstream QMK's coordinates in particular are a maintainer's guess.
 
 ## Commits
 

@@ -1,9 +1,8 @@
 # Layouts
 
-`ogre-ergo.kle.json` is the as-built 70-key Ogre Ergo — the board the Ogre 68
-started from, and the one `ergogen/compare.js` reports against. `ogre-ergo.svg`
-is its render, `kle.py` the renderer, `kle-gists.md` the index of every KLE gist
-on the account.
+`ogre-ergo.kle.json` is the 70-key Ogre Ergo of 2019, the board that came
+before the Ogre 68. `ogre-ergo.svg` is its render, `kle.py` the renderer, and
+`kle-gists.md` indexes every KLE gist on the account.
 
 ## The original KLE designs (gists)
 

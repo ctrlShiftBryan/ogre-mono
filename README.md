@@ -20,9 +20,7 @@ it; `ergogen/ogre-ergo.keycaps.svg` renders the result.
 - The design's own values — column staggers, thumb fan, half separation — are
   named in the config's `units` block, so the board is tuned in one place.
 - `npm run snapshot` holds the geometry against a committed baseline, so a key
-  that moves without you meaning it fails. `npm run compare` reports where the
-  design now sits against the as-built board: 46 keys in the same place, 20
-  moved or resized, 4 gone, 2 new.
+  that moves without you meaning it fails.
 - `npm run check` fails on one known thing: KiCad DRC courtyard overlaps where
   each half's Pro Micro sits under its middle-column keys, which is how the
   as-built board is arranged. That wants a decision — allowlist those four
@@ -38,8 +36,8 @@ npm run serve     # live viewer on http://localhost:5174
 ```
 
 The viewer watches `config.yaml` and `footprints/`, rebuilds on save and
-refreshes itself: keycaps, points, outlines and the PCB, with the snapshot,
-compare and check scripts a button away. `ergogen/README.md` covers the other commands, the
+refreshes itself: keycaps, points, outlines and the PCB, with the snapshot and
+check scripts a button away. `ergogen/README.md` covers the other commands, the
 PCB's matrix and break lines, and the ZMK changes the two removed keys imply.
 
 ## The rest of the repo

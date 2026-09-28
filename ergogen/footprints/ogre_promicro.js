@@ -1,4 +1,4 @@
-// Pro Micro on Mill-Max sockets, pad layout from the as-built Ogre (Pro-MillMax-v2).
+// Pro Micro on Mill-Max sockets, pad layout from the 2019 Ogre (Pro-MillMax-v2).
 // Pads are numbered 1-24 counterclockwise from TX0; pad 1 is next to the USB end.
 //   pads 1-12:  TX0(D3) RX1(D2) GND GND D1 D0 D4 C6 D7 E6 B4 B5
 //   pads 13-24: B6 B2 B3 B1 F7 F6 F5 F4 VCC RST GND RAW

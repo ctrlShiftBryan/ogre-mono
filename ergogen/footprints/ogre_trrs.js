@@ -1,4 +1,4 @@
-// PJ-320A TRRS jack on the back of the board, geometry from the as-built Ogre.
+// PJ-320A TRRS jack on the back of the board, geometry from the 2019 Ogre.
 // The plug opening is at local y = 0; the body runs to y = -12.1.
 // Nets: sleeve (pad 1), tip (pad 2), ring1 (pad 3), ring2 (pad 4)
 

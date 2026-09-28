@@ -1,4 +1,4 @@
-// 6 mm tactile reset switch, on the back of the board (as on the as-built Ogre).
+// 6 mm tactile reset switch, on the back of the board (as on the 2019 Ogre).
 // Nets
 //    from: pads 1 (GND)
 //    to: pads 2 (RST)

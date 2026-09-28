@@ -1,7 +1,7 @@
 // Checks the generated PCB (output/pcbs/ogre.kicad_pcb; run `npm run build` first):
 //   - one switch and one diode per key, wired col -> switch -> diode -> row
 //   - the 10x7 matrix has no duplicate positions
-//   - every Pro Micro pad carries the as-built board's net (U1/U2 halves, U3 center)
+//   - every Pro Micro pad carries its net (MCU1/MCU2 halves, MCU3 center)
 //   - reset switches and TRRS jacks
 //   - KiCad DRC (overlaps, clearances), if kicad-cli is installed
 // Usage: npm run check

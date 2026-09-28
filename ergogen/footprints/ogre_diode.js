@@ -1,4 +1,4 @@
-// Through-hole switch diode (1N4148, 7.62 mm pitch), as on the as-built Ogre.
+// Through-hole switch diode (1N4148, 7.62 mm pitch), as on the 2019 Ogre.
 // Nets
 //    from: anode, pad 2 (from the switch)
 //    to: cathode, square pad 1 (to the row)

@@ -1,10 +1,11 @@
 # ogre-mono
 
-The Ogre 68: a redesign of the Ogre Ergo that generates its layout, outline and
-KiCad PCB from `ergogen/config.yaml`. `layout/` holds the as-built board's KLE
-design and the gist index; `docs/ogre-repos.md` inventories the other Ogre repos.
-Geometry found in another repo is suspect until checked against those two —
-upstream QMK's coordinates in particular are a maintainer's guess.
+The Ogre 68: a 68-key ergonomic keyboard whose layout, outline and KiCad PCB all
+generate from `ergogen/config.yaml`. That file is the design; nothing else in the
+repo defines the board. `layout/` holds the 2019 Ogre Ergo that came before it,
+and `docs/ogre-repos.md` the other Ogre repos — history, not input. Upstream
+QMK's coordinates for the old board are a maintainer's guess, so treat geometry
+from another repo as suspect.
 
 ## Commits
 
@@ -34,5 +35,5 @@ anything that moves a key or touches the PCB.
 its own leaves a one-line diff in `ogre-ergo.kicad_pcb`. Leave that date-only
 change out of commits.
 
-`ergogen/README.md` covers the commands, the redesign's changes from the as-built
-board, the PCB's matrix and break lines, and the live viewer.
+`ergogen/README.md` covers the commands, the design, the PCB's matrix and break
+lines, and the live viewer.

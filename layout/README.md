@@ -11,7 +11,7 @@ GitHub gists. The account holds about 150 keyboard gists from 2019-04 to
 2025-09; `kle-gists.md` indexes all of them with key counts. The ones
 that matter, verified against the QMK readme photos and the KiCad footprints:
 
-Only the as-built board is copied locally; the rest live in their gists.
+Only the 2019 board is copied locally; the rest live in their gists.
 
 | Gist | Date | What it is | Copy in `layout/` |
 |---|---|---|---|

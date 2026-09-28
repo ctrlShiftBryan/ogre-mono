@@ -1,4 +1,4 @@
-// PCB-mount (5-pin) MX switch, geometry from the as-built Ogre's MX_PCB_* footprints.
+// PCB-mount (5-pin) MX switch, geometry from the 2019 Ogre's MX_PCB_* footprints.
 // Nets
 //    from: pin 1 (column)
 //    to: pin 2 (to the diode)

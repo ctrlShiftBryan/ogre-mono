@@ -1,6 +1,6 @@
-# Ogre Ergo redesign (68 keys) in ergogen
+# The Ogre 68 in ergogen
 
-`config.yaml` is a 68-key redesign of the Ogre Ergo, written by hand for
+`config.yaml` is the whole board, written by hand for
 [ergogen](https://ergogen.xyz): key layout, board outline and an unrouted
 KiCad PCB. It needs ergogen 4.1+ and the custom footprints in `footprints/`.
 On ergogen.xyz (or a local clone of `ergogen/ergogen-gui`), load it from GitHub
@@ -10,43 +10,35 @@ load. That web UI reads the pushed repo, not the working tree, and its local
 file picker is a one-shot upload that brings no footprints; for local work
 use `npm run serve` below.
 
-It starts from the as-built 70-key board: the switch positions of the PCB in
-`ctrlShiftBryan/ogre-v1` (`ogre-v1.kicad_pcb`, branch `sent-to-allpcb`), which
-match the KLE design (`../layout/ogre-ergo.kle.json`) except for the thumbs,
-which sit about 1 mm off the KLE.
-
 | File | What it is |
 |---|---|
 | `config.yaml` | Layout, outline and PCB |
-| `footprints/` | Switch, diode, Pro Micro, reset switch and TRRS jack, copied from the as-built board's footprints |
+| `footprints/` | Switch, diode, Pro Micro, reset switch and TRRS jack |
 | `serve.js` | Live viewer: watches the config, rebuilds and shows every view |
 | `bundle.js` | Packs the config and footprints into an archive the web UI can open |
 | `points.snapshot.json` | Baseline geometry for `npm run snapshot` |
 | `ogre-ergo.keycaps.svg` | Key preview, the one committed render |
 
-## Changes from the as-built board (70 → 68 keys)
+## The design
 
-- **Row-4 outer keys (Shift position)** are 1.25U instead of 2.25U, still
-  right-aligned to the pinky column (`matrix_outer_bottom`).
-- **Bottom-row outer keys removed.** The 1.25U + 1U keys at the outer end of
-  the bottom row are gone on both halves (`matrix_outer_mod`,
-  `matrix_pinky_mod`).
-- **Far thumb keys** are 1.25U instead of 1.5U, with a new 1U key above each
-  (`thumb_far_upper`).
-- **Outer columns 0.25U lower.** The far and outer columns (Esc, `+ =`, Tab,
-  Caps Lock, Ctrl) sit 0.25U below the pinky column, the same step as 1 → 2.
-- **Innermost column 0.25U lower.** `~ \``, `} ]`, PgDn sit 0.25U below the
-  T/G/B column.
-- **Thumb cluster staggered.** Cmd/Fn stay put; the Shift/Alt/Home block is
-  0.25U up from Cmd (`home` stagger 0.625U → 0.875U), and the Alt/Home column
-  another 0.25U up from Shift (`far` stagger −0.5U → −0.25U).
-- **Halves 1.25U (23.81 mm) further apart.** The mirror distance went from 3U
-  to 4.25U so the staggered thumb keys keep the original 12.1 mm gap between
-  halves. Every right-half key moves out by that amount.
-- **Thumb keys are wide keys turned 90°** (`width` + `adjust.rotate: 90`)
-  rather than tall keys, so switch and stabilizer footprints face the right
-  way. Positions and outlines are unchanged.
-- **Legends** on every key (see below).
+Everything that shapes the board is named in the config's `units` block. The
+zones below it place keys and give them legends; the shape lives in `units`.
+
+- **34 keys a half.** Four rows across six columns (outer, pinky, ring, middle,
+  index, inner), a three-key extra column inboard of them, a lone Esc on the far
+  column, two arrow keys below ring and middle, and four thumb keys.
+- **Column stagger.** Each column steps against the one before it, and the
+  steps add up to the profile across the hand: the middle column is highest at
+  +0.375U, falling away to the pinky on one side and the inner and extra
+  columns on the other. `stagger_far` through `stagger_extra`.
+- **Key sizes.** 1U throughout, except the outer column's wide caps —
+  1.5U Tab, 1.75U Caps Lock, 1.25U Ctrl — right-aligned to the pinky column.
+- **Thumb cluster.** Three columns fanned `thumb_splay` (−30°) off the bottom
+  of the middle column: 1.25U Cmd, 2.25U Shift, then 1.25U Alt with a 1U Home
+  above it. The wide thumb caps are drawn as wide keys turned 90°, so switch
+  and stabilizer footprints face the right way.
+- **Halves.** Mirrored about an axis `half_spread` (4.25U) right of the extra
+  column, which sets the gap between them.
 
 ## Legends
 
@@ -63,28 +55,26 @@ a space: `'! 1'` is the key with `!` over `1`. Anything else (`Esc`,
 ## The PCB
 
 One board that builds either as a single keyboard or, snapped along two break
-lines, as a split with a spare center piece. That is the as-built Ogre's
-design, kept as is:
+lines, as a split with a spare center piece. The matrix, the Pro Micro pad map,
+the break-line dimensions and the footprints come from the 2019 Ogre Ergo,
+where they were fabricated and worked:
 
 - **One 10×7 matrix, one diode per key** (through-hole 1N4148, COL2ROW).
   Rows 0–4 are the left half, rows 5–9 the right; columns 0–6 run across both,
-  numbered from the outer edge inward on each half. Every key keeps its
-  as-built row and column; the new Home/End keys take row4/col1 and
-  row9/col1, freed by the removed bottom-row keys. row4/col0 and row9/col0 stay
-  unused.
+  numbered from the outer edge inward on each half. The thumb Home/End keys
+  take row4/col1 and row9/col1; row4/col0 and row9/col0 stay unused.
 - **Three Pro Micro footprints on the same nets.** Solder MCU3 alone for the
-  single board, or MCU1 + MCU2 for the split. Pads are the as-built board's
-  (MCU1/2/3 were U1/U2/U0):
+  single board, or MCU1 + MCU2 for the split:
   - MCU3 (center): pads 1, 2, 5–12 = row0–row9; pads 20→14 = col0–col6; 22 = RESET0.
   - MCU1 (left): pads 8–12 = row0–row4; 20→14 = col0–col6; 1/2 = SCL1/SDA1; 22 = RESET1.
   - MCU2 (right): pads 8–12 = row5–row9; same columns; 1/2 = SCL2/SDA2; 22 = RESET2.
-  - The SCL/SDA names are historical: pads 1/2 are D3/D2, which QMK used for
-    split serial.
+  - SCL/SDA name pads 1/2, which are D3/D2 — the pins QMK used for split
+    serial.
 - **Break lines** beside each half's innermost column: a cut down from the
   top edge (jogging around the TRRS jack), three 1.7 × 8 mm slots and a
   bottom notch, leaving four ~2 mm bridges. Every row and column net, plus VCC
-  and GND, has to cross at those bridges. Sizes and spacing are the as-built
-  board's, measured from the innermost column.
+  and GND, has to cross at those bridges. Sizes and spacing are measured from
+  the innermost column.
 - **Center piece:** MCU3 with its USB at the top edge, and reset switch SW3.
 - **Each half:** its Pro Micro under the middle column (USB at the top edge),
   a 6 mm reset switch on the back between Tab and Q, and a PJ-320A TRRS jack
@@ -92,11 +82,10 @@ design, kept as is:
 - **Outline:** keycap edges with 1 mm corners, plus convex webs that join the
   thumb cluster to the matrix. Nothing from the halves enters the center zone
   above the thumbs, leaving a 2 mm gap under the center piece.
-- **Not carried over:** underglow LEDs (and `RGB`/`RGB2`), alternate-size
-  switch footprints, the old Edge.Cuts art, and mounting holes (see below).
+- **No underglow LEDs**, no alternate-size switch footprints, and no mounting
+  holes yet (see below).
 
-Diodes sit 8 mm below their switch, as on the as-built board, except two
-spots that don't have room: the Esc/Del diode stands in the gap beside its
+Diodes sit 8 mm below their switch, except two spots that don't have room: the Esc/Del diode stands in the gap beside its
 key, and the 3/8 key's diode (it sits over a Pro Micro) moves down below the
 E/I key's diode.
 
@@ -178,7 +167,6 @@ halves match `ogre/ergo_split`.
 
 ## Not done yet
 
-- **Mounting holes.** The as-built board had ten M2 holes at key corners.
-  They depend on the case, and the new staggers move most of those corners,
-  so they're left out until the case is redesigned.
+- **Mounting holes.** None yet. They sit at key corners, so they follow from
+  the case, and the case is a new design too.
 - **Routing**, in KiCad.

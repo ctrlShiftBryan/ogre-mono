@@ -270,14 +270,37 @@ pcbs:
     footprints:
       switch:
         what: ogre_hotswap_diode
-        where: '-/thumb_home_cluster|extra_(num|top)/'
+        where: '-/thumb_home_cluster|extra_(num|top)|^matrix_inner_(num|top)$/'
         params: { from: '{{col_net}}', to: '{{row_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}' }
       switch_mcu:       # ~ and } ] (PgUp and { [ on the right) turned 90°, so their sockets and diodes
                         # stand in a strip up the column and the controller's pad rows pass either side
         what: ogre_hotswap_diode
-        where: /extra_(num|top)/
+        where: /^matrix_extra_(num|top)$/
         adjust.rotate: 90
         params: { from: '{{col_net}}', to: '{{row_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}' }
+
+      # Four keys beside a controller keep their diode as a part of its own, so it can
+      # be moved clear of traces to the controller's pins: 5 and T next to MCU1, PgUp
+      # and { [ under MCU2. Each starts where the built-in diode would be.
+      switch_loose:     # 5 and T
+        what: ogre_hotswap_diode
+        where: /^matrix_inner_(num|top)$/
+        params: { from: '{{col_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}', diode: false }
+      switch_mcu_loose: # PgUp and { [, turned like ~ and } ]
+        what: ogre_hotswap_diode
+        where: /^mirror_matrix_extra_(num|top)$/
+        adjust.rotate: 90
+        params: { from: '{{col_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}', diode: false }
+      diode_loose:
+        what: ogre_socket_diode
+        where: /^matrix_inner_(num|top)$/
+        adjust.shift: [8.15, -0.63]
+        params: { from: '{{name}}', to: '{{row_net}}' }
+      diode_mcu_loose:  # the switch there is turned -90°, so its diode is too
+        what: ogre_socket_diode
+        where: /^mirror_matrix_extra_(num|top)$/
+        adjust: { orient: -90, shift: [8.15, -0.63], resist: true }
+        params: { from: '{{name}}', to: '{{row_net}}' }
       switch_2u:        # 2.25U thumb keys get stabilizer holes
         what: ogre_hotswap_diode
         where: /thumb_home_cluster/

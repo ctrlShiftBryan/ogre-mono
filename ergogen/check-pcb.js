@@ -1,5 +1,5 @@
 // Checks the generated PCB (output/pcbs/ogre.kicad_pcb; run `npm run build` first):
-//   - one hotswap switch per key, its built-in diode wired col -> switch -> diode -> row
+//   - one hotswap switch per key, its diode (built in or loose) wired col -> switch -> diode -> row
 //   - the 10x7 matrix has no duplicate positions
 //   - every nice!nano pad carries its net (MCU1/MCU2 halves, MCU3 center)
 //   - reset switches
@@ -47,18 +47,25 @@ const EXPECTED_MCU = {
   const fps = parse(fs.readFileSync(PCB, 'utf8'))
   const net = (fp, pad) => [...(fp.pads[pad] || [])].join('+')
 
-  // switches, each with its diode built in: pad 1 column, pad 2 switch -> diode (the key's net), pad 3 row
-  const switches = fps.filter(f => f.kind.includes('Hotswap_Diode'))
+  // switches: pad 1 column, pad 2 switch -> diode anode (the key's net); the diode's cathode
+  // goes to the row, as pad 3 of the switch when it's built in, or pad 1 of a loose diode
+  const switches = fps.filter(f => f.kind.includes('CherryMX_Hotswap'))
+  const loose = fps.filter(f => f.kind.includes('Socket_Diode'))
   const keys = Object.values(points)
   if (switches.length !== keys.length) errors.push(`${switches.length} switches for ${keys.length} keys`)
   const seen = {}
   for (const p of keys) {
     const { name, row_net: row, col_net: col } = p.meta
     const sw = switches.filter(f => net(f, '2') === name)
+    const d = loose.filter(f => net(f, '2') === name)
     if (sw.length !== 1) errors.push(`${name}: ${sw.length} switches`)
     else {
       if (net(sw[0], '1') !== col) errors.push(`${name}: switch pad 1 on ${net(sw[0], '1')}, expected ${col}`)
-      if (net(sw[0], '3') !== row) errors.push(`${name}: diode cathode on ${net(sw[0], '3')}, expected ${row}`)
+      const built_in = sw[0].kind.includes('Hotswap_Diode')
+      if (built_in && d.length) errors.push(`${name}: a loose diode besides the built-in one`)
+      if (!built_in && d.length !== 1) errors.push(`${name}: ${d.length} loose diodes`)
+      const cathode = built_in ? net(sw[0], '3') : d.length === 1 ? net(d[0], '1') : undefined
+      if (cathode !== row) errors.push(`${name}: diode cathode on ${cathode}, expected ${row}`)
     }
     const rc = `${row}/${col}`
     if (seen[rc]) errors.push(`${name} and ${seen[rc]} share ${rc}`)
@@ -84,7 +91,7 @@ const EXPECTED_MCU = {
     if (!fp || net(fp, '1') !== 'GND' || net(fp, '2') !== reset) errors.push(`${ref}: expected GND / ${reset}`)
   }
 
-  console.log(`${switches.length} hotswap switches with diodes, ${Object.keys(seen).length} matrix positions, ` +
+  console.log(`${switches.length} hotswap switches (${loose.length} with loose diodes), ${Object.keys(seen).length} matrix positions, ` +
     `${fps.filter(f => f.ref.startsWith('MCU')).length} nice!nanos, 3 reset switches`)
 
   // KiCad DRC

@@ -13,7 +13,7 @@ use `npm run serve` below.
 | File | What it is |
 |---|---|
 | `config.yaml` | Layout, outline and PCB |
-| `footprints/` | Hotswap switch with built-in diode, nice!nano and reset switch on the board; the 2019 PCB-mount switch, diode, Pro Micro and TRRS jack, and a JST PH battery connector, available but not placed |
+| `footprints/` | Hotswap switch with built-in diode (or without, plus that diode on its own), nice!nano and reset switch on the board; the 2019 PCB-mount switch, diode, Pro Micro and TRRS jack, and a JST PH battery connector, available but not placed |
 | `serve.js` | Live viewer: watches the config, rebuilds and shows every view |
 | `bundle.js` | Packs the config and footprints into an archive the web UI can open |
 | `points.snapshot.json` | Baseline geometry for `npm run snapshot` |
@@ -85,6 +85,10 @@ the switch and nice!nano footprints come from the 2024 rework (`ogre.2024.pretty
   sockets and diodes stand in a strip up the column and the controller's pad
   rows pass either side, about 0.9 mm clear. A 6 mm reset switch sits on the
   back below Tab (`| \` on the right).
+- **Loose diodes by the controllers.** `5` and `T` (beside MCU1) and PgUp and
+  `{ [` (under MCU2) use the switch footprint without its diode and carry the
+  same diode as a part of its own (`ogre_socket_diode`), placed where the
+  built-in one would be, so it can be moved clear of traces to the controller.
 - **Outline:** keycap edges with 1 mm corners, thumbs included. The thumb
   cluster joins the matrix by filling only the gaps between neighboring keys
   (`thumb_web`), and one pocket per half is cut out over Cmd, as on the 2019

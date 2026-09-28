@@ -256,8 +256,7 @@ outlines:
       { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.525, -49.05] }, size: [1.95, 4.9], corner: 0.5 }
 
 # ---------------------------------------------------------------------------
-# PCB. 10x7 matrix, COL2ROW diodes, one hotswap switch per key with its diode
-# built into the footprint.
+# PCB. 10x7 matrix, COL2ROW diodes, one hotswap switch and one diode per key.
 # Wireless only: nice!nanos on the back, no TRRS. MCU1/MCU2 (left/right half) and
 # MCU3 (center, single-board build) all sit on the same row/column nets; solder
 # MCU3 alone, or MCU1 + MCU2. Pad map in footprints/ogre_nicenano.js.
@@ -269,42 +268,39 @@ pcbs:
       edge: { outline: board }
     footprints:
       switch:
-        what: ogre_hotswap_diode
-        where: '-/thumb_home_cluster|extra_(num|top)|^matrix_inner_(num|top)$/'
-        params: { from: '{{col_net}}', to: '{{row_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}' }
-      switch_mcu:       # ~ and } ] (PgUp and { [ on the right) turned 90°, so their sockets and diodes
-                        # stand in a strip up the column and the controller's pad rows pass either side
-        what: ogre_hotswap_diode
-        where: /^matrix_extra_(num|top)$/
+        what: ogre_hotswap
+        where: '-/thumb_home_cluster|extra_(num|top)/'
+        params: { from: '{{col_net}}', to: '{{name}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}' }
+      switch_2u:        # 2.25U thumb keys get stabilizer holes
+        what: ogre_hotswap
+        where: /thumb_home_cluster/
+        params: { from: '{{col_net}}', to: '{{name}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}', stab: true }
+      switch_mcu:       # ~ and } ] (PgUp and { [ on the right) turned 90°, so their sockets stand in
+                        # a strip up the column and the controller's pad rows pass either side
+        what: ogre_hotswap
+        where: /extra_(num|top)/
         adjust.rotate: 90
-        params: { from: '{{col_net}}', to: '{{row_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}' }
+        params: { from: '{{col_net}}', to: '{{name}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}' }
 
-      # Four keys beside a controller keep their diode as a part of its own, so it can
-      # be moved clear of traces to the controller's pins: 5 and T next to MCU1, PgUp
-      # and { [ under MCU2. Each starts where the built-in diode would be.
-      switch_loose:     # 5 and T
-        what: ogre_hotswap_diode
-        where: /^matrix_inner_(num|top)$/
-        params: { from: '{{col_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}', diode: false }
-      switch_mcu_loose: # PgUp and { [, turned like ~ and } ]
-        what: ogre_hotswap_diode
-        where: /^mirror_matrix_extra_(num|top)$/
-        adjust.rotate: 90
-        params: { from: '{{col_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}', diode: false }
-      diode_loose:
+      # One diode per key, a part of its own so it can be moved clear of traces.
+      # Each starts at the switch's right edge, where the 2024 footprint drew it
+      # built in: (8.15, 0.63) in the switch's frame. resist keeps the right half's
+      # diodes on that same side, since the switch footprint isn't mirrored.
+      diode:
         what: ogre_socket_diode
-        where: /^matrix_inner_(num|top)$/
-        adjust.shift: [8.15, -0.63]
+        where: '-/extra_(num|top)/'
+        adjust: { shift: [8.15, -0.63], resist: true }
         params: { from: '{{name}}', to: '{{row_net}}' }
-      diode_mcu_loose:  # the switch there is turned -90°, so its diode is too
+      diode_mcu:        # turned with their switch
+        what: ogre_socket_diode
+        where: /^matrix_extra_(num|top)$/
+        adjust: { orient: 90, shift: [8.15, -0.63] }
+        params: { from: '{{name}}', to: '{{row_net}}' }
+      diode_mcu_right:
         what: ogre_socket_diode
         where: /^mirror_matrix_extra_(num|top)$/
         adjust: { orient: -90, shift: [8.15, -0.63], resist: true }
         params: { from: '{{name}}', to: '{{row_net}}' }
-      switch_2u:        # 2.25U thumb keys get stabilizer holes
-        what: ogre_hotswap_diode
-        where: /thumb_home_cluster/
-        params: { from: '{{col_net}}', to: '{{row_net}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}', stab: true }
 
       mcu_left:         # MCU1: up the back of the inner column under ~ and } ], USB flush with the
                         # top of the jack tab; its pad rows clear the turned switches' strip by ~0.9 mm

@@ -1,7 +1,7 @@
-// The diode ogre_hotswap_diode builds in beside its socket, on its own, for keys
-// whose diode has to move out of the way of traces (SOD-123 on the back, or
-// through-hole). Origin is the diode's center, at (8.15, 0.63) in the switch
-// footprint; anode toward local -y.
+// The switch diode, from the 2024 Ogre library's hotswap footprint
+// (CherryMX_Hotswap-diode), as a part of its own: SOD-123 on the back, or
+// through-hole. It was drawn at (8.15, 0.63) in the switch footprint, at the
+// key's right edge; anode toward local -y.
 // Nets
 //    from: anode, pad 2 (from the switch)
 //    to: cathode, pad 1 (to the row)

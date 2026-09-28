@@ -13,7 +13,7 @@ use `npm run serve` below.
 | File | What it is |
 |---|---|
 | `config.yaml` | Layout, outline and PCB |
-| `footprints/` | Hotswap switch with built-in diode (or without, plus that diode on its own), nice!nano and reset switch on the board; the 2019 PCB-mount switch, diode, Pro Micro and TRRS jack, and a JST PH battery connector, available but not placed |
+| `footprints/` | Hotswap switch, its diode, nice!nano and reset switch on the board; the 2019 PCB-mount switch, diode, Pro Micro and TRRS jack, and a JST PH battery connector, available but not placed |
 | `serve.js` | Live viewer: watches the config, rebuilds and shows every view |
 | `bundle.js` | Packs the config and footprints into an archive the web UI can open |
 | `points.snapshot.json` | Baseline geometry for `npm run snapshot` |
@@ -60,9 +60,12 @@ controllers, no TRRS. The matrix, the controller pad map and the break-line
 dimensions come from the 2019 Ogre Ergo, where they were fabricated and worked;
 the switch and nice!nano footprints come from the 2024 rework (`ogre.2024.pretty`):
 
-- **One 10×7 matrix, one hotswap switch per key** (Kailh MX socket on the back),
-  each with its own diode built into the footprint beside the socket (SOD-123
-  or through-hole, COL2ROW). The 2.25U thumb keys add stabilizer holes.
+- **One 10×7 matrix, one hotswap switch and one diode per key** (Kailh MX
+  socket and SOD-123 or through-hole diode, both on the back, COL2ROW). The
+  2.25U thumb keys add stabilizer holes. The 2024 footprint had the diode built
+  in; here it's a part of its own (`ogre_socket_diode`) so it can be moved
+  clear of traces, and each starts where the built-in one was, at the switch's
+  right edge.
   Rows 0–4 are the left half, rows 5–9 the right; columns 0–6 run across both,
   numbered from the outer edge inward on each half. The thumb Home/End keys
   take row4/col1 and row9/col1; row4/col0 and row9/col0 stay unused.
@@ -85,10 +88,6 @@ the switch and nice!nano footprints come from the 2024 rework (`ogre.2024.pretty
   sockets and diodes stand in a strip up the column and the controller's pad
   rows pass either side, about 0.9 mm clear. A 6 mm reset switch sits on the
   back below Tab (`| \` on the right).
-- **Loose diodes by the controllers.** `5` and `T` (beside MCU1) and PgUp and
-  `{ [` (under MCU2) use the switch footprint without its diode and carry the
-  same diode as a part of its own (`ogre_socket_diode`), placed where the
-  built-in one would be, so it can be moved clear of traces to the controller.
 - **Outline:** keycap edges with 1 mm corners, thumbs included. The thumb
   cluster joins the matrix by filling only the gaps between neighboring keys
   (`thumb_web`), and one pocket per half is cut out over Cmd, as on the 2019
@@ -164,7 +163,7 @@ made in the web editor don't come back to these files, so re-run `npm run
 bundle` after changing the config.
 
 `npm run check` reads the generated PCB and fails unless every key has one
-hotswap switch whose diode is wired column → switch → diode → row, no two keys
+hotswap switch and one diode wired column → switch → diode → row, no two keys
 share a matrix position, every nice!nano pad carries the net listed above, and
 the reset switches are wired to their own half. If `kicad-cli` is
 installed it also runs KiCad's DRC (overlapping parts, hole and edge

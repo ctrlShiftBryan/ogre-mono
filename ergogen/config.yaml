@@ -176,7 +176,9 @@ outlines:
       what: hull
       concavity: 1000
       points: [ ref: mirror_matrix_ring_mod, ref: mirror_matrix_middle_mod, ref: mirror_thumb_near_cluster ]
-      expand: 0.5       # hulls use the 18 mm cap size; grow them to the 19.05 mm key pitch
+      expand: 0.5       # grows all four webs, not just this hull: ergogen applies expand to the
+                        # outline accumulated so far, so it has to sit on the last part. The hulls
+                        # run through the 18 mm cap outlines; this takes them to the 19.05 mm pitch.
   _caps:                # every keycap at its real size, both halves
     ones:   { what: rectangle, where: '-/outer_(top|home|bottom)|thumb_(near|home|far)_cluster/', size: [U, U] }
     tab:    { what: rectangle, where: /outer_top/,          size: [1.5U, U] }
@@ -187,7 +189,7 @@ outlines:
     alt:    { what: rectangle, where: /thumb_far_cluster/,  size: [1.25U, U] }
     webs:   { what: outline, name: _webs }
   _halves:              # keycap edges with 1 mm rounded corners, like the as-built board
-    - { what: outline, name: _caps, fillet: 1 }
+    - { what: outline, name: _caps, fillet: 1 }   # fillet, like expand, rounds the whole accumulated outline
   board:
     halves: { what: outline, name: _halves }
     keepout:            # nothing from the halves inside the center zone, except the thumbs below it

@@ -41,7 +41,12 @@ const write = (results, out) => {
   for (const [name, o] of Object.entries(results.outlines)) twodee(`outlines/${name}`, o)
   // ergogen stamps today's date into the title block (templates/kicad8.js); blank it
   // so rebuilding an unchanged config gives a byte-identical PCB
-  for (const [name, pcb] of Object.entries(results.pcbs)) put(`pcbs/${name}.kicad_pcb`, pcb.replace(/\(date "[^"]*"\)/, '(date "")'))
+  for (const [name, pcb] of Object.entries(results.pcbs)) {
+    put(`pcbs/${name}.kicad_pcb`, pcb.replace(/\(date "[^"]*"\)/, '(date "")'))
+    // a project file beside the board, so KiCad opens it as a project; KiCad
+    // fills in every setting left out. There is no schematic: the board is it.
+    put(`pcbs/${name}.kicad_pro`, JSON.stringify({ meta: { filename: `${name}.kicad_pro`, version: 1 } }, null, 2) + '\n')
+  }
 }
 
 module.exports = { run, write, OUT: path.join(here, 'output') }

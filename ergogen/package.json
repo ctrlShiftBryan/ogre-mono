@@ -8,6 +8,7 @@
     "snapshot": "node snapshot.js",
     "snapshot:update": "node snapshot.js --update",
     "reference": "node reference.js",
+    "kicad": "node kicad.js",
     "serve": "node serve.js",
     "bundle": "node bundle.js"
   },

@@ -92,8 +92,10 @@ key, and the 3/8 key's diode (it sits over a Pro Micro) moves down below the
 E/I key's diode.
 
 Routing is left for KiCad. The PCB is build output, not a committed file:
-`npm run build` writes it to `output/pcbs/ogre.kicad_pcb` and overwrites it
-every time, so route in a copy.
+`npm run build` writes it to `output/pcbs/ogre.kicad_pcb`, with an
+`ogre.kicad_pro` beside it so KiCad opens it as a project, and overwrites both
+every time, so route in a copy. The project has no schematic; the board and its
+nets are the whole design.
 
 ## Commands
 
@@ -106,7 +108,14 @@ npm run check    # check the generated PCB's parts, nets and KiCad DRC
 npm run serve    # live viewer on http://localhost:5174
 npm run bundle   # pack config + footprints into output/ogre-ergo.ekb for the web UI
 npm run reference # output/reference.dxf, the board to draw a new outline over
+npm run kicad    # build, then open the KiCad project
 ```
+
+`npm run kicad` opens `output/pcbs/ogre.kicad_pro` in KiCad, to look the board
+over, run DRC or try things out. Nothing done there comes back: parts change in
+`footprints/` and the design in `config.yaml`, and the next build overwrites the
+project. After a rebuild (`npm run serve` rebuilds on every save), **File >
+Revert** in the PCB editor loads the new board.
 
 `npm run reference` plots the built PCB to a DXF for a vector editor: board
 edge on `Edge.Cuts`, keycaps on `User.Drawings`, and the courtyards of the

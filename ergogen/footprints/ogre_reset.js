@@ -1,35 +1,17 @@
-// 6 mm tactile reset switch, on the back of the board (as on the 2019 Ogre).
+// Reset switch: a 5.1 mm surface-mount tactile switch (XKB TS-1187A-B-A-B, LCSC
+// C318884), JLCPCB's footprint (footprints/jlc/ts1187a). Its four pads are two
+// pairs joined inside the switch; which pairs isn't worth trusting, so the nets
+// go on the diagonal, pads 1 and 4, which the button joins whichever way the
+// pairs run. Pads 2 and 3 just hold it down.
 // Nets
-//    from: pads 1 (GND)
-//    to: pads 2 (RST)
+//    from: pad 4 (GND)
+//    to: pad 1 (RESET)
+// Params
+//    side: 'front' or 'back'
+
+const { place } = require('../jlc')
 
 module.exports = {
-  params: {
-    designator: 'SW',
-    from: undefined,
-    to: undefined
-  },
-  body: p => `
-    (module ogre:SW_PUSH_6mm (layer B.Cu) (tedit 5DD4F656)
-      ${p.at}
-      (fp_text reference "${p.ref}" (at 0 0 ${p.r}) (layer B.SilkS) ${p.ref_hide} (effects (font (size 1 1) (thickness 0.15)) (justify mirror)))
-      (fp_text value "" (at 0 0 ${p.r}) (layer B.Fab) hide (effects (font (size 1 1) (thickness 0.15)) (justify mirror)))
-
-      (fp_line (start -2.1 -3.1) (end 2.1 -3.1) (layer B.SilkS) (width 0.12))
-      (fp_line (start 2.1 -3.1) (end 2.1 3.1) (layer B.SilkS) (width 0.12))
-      (fp_line (start 2.1 3.1) (end -2.1 3.1) (layer B.SilkS) (width 0.12))
-      (fp_line (start -2.1 3.1) (end -2.1 -3.1) (layer B.SilkS) (width 0.12))
-      (fp_circle (center 0 0) (end 1.75 0) (layer B.SilkS) (width 0.12))
-
-      (fp_line (start -4.75 -3.75) (end 4.75 -3.75) (layer B.CrtYd) (width 0.05))
-      (fp_line (start 4.75 -3.75) (end 4.75 3.75) (layer B.CrtYd) (width 0.05))
-      (fp_line (start 4.75 3.75) (end -4.75 3.75) (layer B.CrtYd) (width 0.05))
-      (fp_line (start -4.75 3.75) (end -4.75 -3.75) (layer B.CrtYd) (width 0.05))
-
-      (pad 1 thru_hole circle (at -3.25 2.25 ${p.r}) (size 2 2) (drill 1.1) (layers *.Cu *.Mask) ${p.from})
-      (pad 1 thru_hole circle (at 3.25 2.25 ${p.r}) (size 2 2) (drill 1.1) (layers *.Cu *.Mask) ${p.from})
-      (pad 2 thru_hole circle (at -3.25 -2.25 ${p.r}) (size 2 2) (drill 1.1) (layers *.Cu *.Mask) ${p.to})
-      (pad 2 thru_hole circle (at 3.25 -2.25 ${p.r}) (size 2 2) (drill 1.1) (layers *.Cu *.Mask) ${p.to})
-    )
-  `
+  params: { designator: 'SW', side: 'front', from: undefined, to: undefined },
+  body: p => place('ts1187a', p, { 1: p.to, 4: p.from }, { id: 'SW_Reset_TS1187A', value: 'RESET' })
 }

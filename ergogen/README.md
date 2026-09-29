@@ -110,13 +110,11 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   ([unified-daughterboard.github.io](https://unified-daughterboard.github.io/))
   mounted in the case, which carries the USB-C port, its fuse and ESD
   protection. The board's end is a Molex Pico-EZmate (J2, 78171-0004) with the
-  daughterboard's pinout, 1 VBUS 2 D− 3 D+ 4 GND, on the half's inner edge
-  under `} ]` / `{ [`, opening toward the edge so the cable leaves the board
-  toward the middle.
+  daughterboard's pinout, 1 VBUS 2 D− 3 D+ 4 GND, below S (L on the right),
+  opening toward the index column.
 - **Battery connector** (J2): a JST PH 2-pin side-entry surface-mount connector
-  (S2B-PH-SM4-TB) on the inner edge under `~ \`` / PgUp, the plug entering
-  from the edge like the USB cable, + on BAT and − on GND. JST sets no
-  polarity. Pad 1 is +, the Adafruit and
+  (S2B-PH-SM4-TB) below Q (P on the right), the plug entering from the outer
+  edge's side, + on BAT and − on GND. JST sets no polarity. Pad 1 is +, the Adafruit and
   SparkFun convention (the battery plug's mating face toward you, polarizing
   bump up: red on the right), which the community wireless Corne also uses;
   the silkscreen marks it. About half of generic LiPos come wired the other
@@ -124,32 +122,32 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   crimps, or set the connector's `plus` to 2.
 - **Power switch** (SW2): a Shouhan MSK-12C02 side-actuated SPDT slide switch
   (pin-compatible with the Alps SSSS811101 the community wireless Corne uses),
-  on the bottom edge below Z (`? /` on the right), body 0.6 mm in from it,
-  lever out past it. BAT comes in on the common pin 2, VBAT goes out on pin 1
+  on the half's inner edge below `~ \`` (PgUp on the right), lever out past
+  it. BAT comes in on the common pin 2, VBAT goes out on pin 1
   when on (the silkscreen marks that end ON), and pin 3 is left open, as on
   the Corne.
-- **Reset** (SW1): a 5.1 mm surface-mount tactile switch (TS-1187A) under
-  `% 5` / `^ 6`, wired across its diagonal pads so it works whichever way its
-  pin pairs run.
+- **Reset** (SW1): a 5.1 mm surface-mount tactile switch (TS-1187A) below R
+  (U on the right), wired across its diagonal pads so it works whichever way
+  its pin pairs run.
 - **SWD** (J3): six bare pads and three locating holes for a Tag-Connect
   TC2030-NL cable, under T / Y. The module arrives blank; this is how the UF2
   bootloader gets on once (any SWD probe; a Raspberry Pi Pico running
   debugprobe will do).
 - **LEDs**: two 3 mm through-hole LEDs on the front, soldered by hand, on a tab
   below Esc (Del on the right) so they shine up through a hole in the case
-  just below that key: LED1 the status LED (P0.15 through 1k, blue) and LED2
-  the charge LED (VDDH through 1k, sinking into the charger's CHG, orange).
+  just below that key, one above the other: LED2 the charge LED (VDDH through
+  1k, sinking into the charger's CHG, orange) and, below it, LED1 the status
+  LED (P0.15 through 1k, blue).
   Their flat side (cathode) is at each footprint's origin; the anode points
   toward Tab.
 - **Where the rest sits.** Nothing juts out of the outline for the controller:
   the parts hide on the back in the 10 mm strips between one key's socket and
   the next key's switch pins. The module's inductor, capacitors and the crystal
   are in the strip between G and B, next to the module's pad end; the charger
-  and LDO with their passives in the strip between `} ]` and PgDn, with the
-  USB connector at that strip's end on the inner edge; the battery connector
-  on the inner edge one strip up; the SWD pads under T and reset under `% 5`,
-  each between a switch's side pins; the power switch on the bottom edge
-  below Z. Each is placed from a nearby key in
+  and LDO with their passives in the strip between `} ]` and PgDn; the SWD
+  pads under T, between that switch's side pins; the USB connector below S,
+  the battery connector below Q, reset below R, and the power switch on the
+  inner edge below `~ \``, as placed in KiCad. Each is placed from a nearby key in
   the config (`mcu_x` / `mcu_y` for the module) and the right half reuses the
   same placement from the mirrored key. The config's numbers are a working
   first layout, not a final one: move parts in KiCad and carry them back (see

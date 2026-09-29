@@ -56,10 +56,11 @@ units:
   mcu_x: -1.9            # 9.44 (the inner edge) - 0.34 - 11: on the right half the socket of N sits closer, and this clears its pad
   mcu_y: -11.2
 
-  # LED tab: a lip below Esc (Del on the right) for the two 3 mm LEDs, which shine
-  # up through a hole in the case just below that key.
-  led_tab_w: 10.5
-  led_tab_h: 7
+  # LED tab: a lip below Esc (Del on the right) for the two 3 mm LEDs, one above the
+  # other, which shine up through a hole in the case just below that key. Its right
+  # edge runs into Tab's cap, so the two join.
+  led_tab_w: 7.5
+  led_tab_h: 12.5
 
   # Outline. The thumb cluster joins the matrix by filling the gaps between
   # keys up to twice this wide; the rest of the edge follows the keycaps.
@@ -95,7 +96,7 @@ points:
             mod.skip: true
             bottom: { legend: 'Z',   mirror.legend: '? /' }
             home:   { legend: 'A',   mirror.legend: ': ;' }
-            top:    { legend: 'Q',   mirror.legend: 'P' }
+            top:    { legend: 'Q',   mirror.legend: 'P', mirror.diode: [-2.87, -5.28, 0] }   # right: below the switch, off the battery connector's mounting pad
             num:    { legend: '! 1', mirror.legend: ') 0' }
         ring:
           key.stagger: stagger_ring
@@ -141,7 +142,7 @@ points:
             bottom.skip: true
             home:   { legend: 'PgDn', mirror.legend: "\" '", diode: [-5.5, 8.1, 90], mirror.diode: [8.15, -0.63, 0] }   # left: lying in the strip past the socket, off the module's antenna and the power switch
             top:    { legend: '} ]',  mirror.legend: '{ [' }
-            num:    { legend: '~ `',  mirror.legend: 'PgUp' }
+            num:    { legend: '~ `',  mirror.legend: 'PgUp', diode: [2.87, -5.28, 0], mirror.diode: [2.87, -5.28, 0] }   # below the switch, off the inner edge where the power switch sits
       rows:
         mod:    { row_net: row4, mirror.row_net: row9 }
         bottom: { row_net: row3, mirror.row_net: row8 }
@@ -247,7 +248,7 @@ outlines:
     led_tab:            # below Esc / Del, hanging off the cap's bottom edge, left of Tab / | \
       what: rectangle
       asym: both
-      where: { ref: matrix_far_num, shift: [-0.5U + led_tab_w / 2 - 0.5, -0.5U + 1 - led_tab_h / 2] }
+      where: { ref: matrix_far_num, shift: [-0.5U + 10 - led_tab_w / 2, -0.5U + 1 - led_tab_h / 2] }
       size: [led_tab_w, led_tab_h]
   left:                 # the left half's PCB outline: everything left of the mirror axis
     - { what: outline, name: board }
@@ -402,40 +403,37 @@ pcbs:
         what: ogre_r0603
         where: &w_ldo_r_ce { ref: matrix_extra_home, shift: [-4.3, 14.5] }
         params: &r_ce { side: back, value: 10M, lcsc: C7250, from: VDDH, to: PWR_EN }
-      usb:              # J1: the daughterboard cable, on the inner edge beside the LDO, opening toward
-                        # the edge so the cable leaves the board toward the middle
+      # The connectors, reset and power switch as placed in KiCad (see AGENTS.md)
+      usb:              # J1: the daughterboard cable, below S, opening toward the index column
         what: ogre_usb
-        where: &w_usb { ref: matrix_extra_home, shift: [9.44 - 0.6 - 2.48, 11.9] }
+        where: &w_usb { ref: matrix_ring_home, shift: [-6.43, -5.824] }
         params: &usb { side: back }
-      # between ~ `'s socket and } ]: the battery plug, on the inner edge, opening toward it
-      battery:          # J2: + on pad 1, the Adafruit/SparkFun convention
+      battery:          # J2: the battery plug, below Q, opening toward the outer edge; + on pad 1,
+                        # the Adafruit/SparkFun convention
         what: ogre_battery
-        where: &w_battery { ref: matrix_extra_top, shift: [9.44 - 1 - 4.37, 11.5], rotate: 90 }   # its mounting pads reach 0.26 past the courtyard
+        where: &w_battery { ref: matrix_pinky_top, shift: [-3.81, -7.111], rotate: -90 }
         params: &battery { side: back, plus: 1 }
-      # between T's socket and G: the programming pads, between T's side pins
-      swd:              # J3
+      swd:              # J3: programming pads, between T's socket and G, between T's side pins
         what: ogre_swd
         where: &w_swd { ref: matrix_inner_home, shift: [0, 12.5] }
         params: &swd { side: back }
-      # between % 5's socket and T: reset, between % 5's side pins
-      reset:            # SW1
+      reset:            # SW1: below R
         what: ogre_reset
-        where: &w_reset { ref: matrix_inner_top, shift: [0, 12] }
+        where: &w_reset { ref: matrix_index_top, shift: [4.47, -6.874] }
         params: &reset { side: back, from: GND, to: RESET }
-      power:            # SW2: on the bottom edge below Z, body 0.6 mm in, lever out past it;
-                        # BAT in on the common, VBAT out when on
+      power:            # SW2: on the inner edge below ~ `, lever out past it; BAT in on the common, VBAT out when on
         what: ogre_power_switch
-        where: &w_power { ref: matrix_pinky_bottom, shift: [0, -0.5U + 0.6 + 1.4] }
+        where: &w_power { ref: matrix_extra_num, shift: [7.47, -5.78], rotate: 90 }   # 0.4 mm in from where KiCad had it: its mounting pad needs 0.5 mm to the edge
         params: &power { common: BAT, on: VBAT, side: back }
 
-      led_status:       # LED1, LED2: on the front, on the tab below Esc; cathode (flat) at each origin,
-                        # anode toward Tab (turned round on the right half, where the tab mirrors)
+      led_status:       # LED1, LED2: on the front, one above the other on the tab below Esc; cathode
+                        # (flat) at each origin, anode toward Tab (turned round on the right half, where the tab mirrors)
         what: ogre_led
-        where: { ref: matrix_far_num, shift: [-8.6, -0.5U - 3.3] }
+        where: { ref: matrix_far_num, shift: [-4.78, -0.5U - 8.875] }
         params: &led_status { anode: LED_S, cathode: GND, value: STATUS, color: blue }
-      led_charge:
+      led_charge:       # above the status LED
         what: ogre_led
-        where: { ref: matrix_far_num, shift: [-2.7, -0.5U - 3.3] }
+        where: { ref: matrix_far_num, shift: [-4.78, -0.5U - 3.3] }
         params: &led_charge { anode: LED_C, cathode: CHG, value: CHARGE, color: orange }
 
   right:
@@ -479,10 +477,10 @@ pcbs:
       ldo_c_in:       { what: ogre_c0603, where: { <<: *w_ldo_c_in, ref: mirror_matrix_extra_home }, params: *c_10u_vddh }
       ldo_c_out:      { what: ogre_c0603, where: { <<: *w_ldo_c_out, ref: mirror_matrix_extra_home }, params: *c_4u7_vcc }
       ldo_r_ce:       { what: ogre_r0603, where: { <<: *w_ldo_r_ce, ref: mirror_matrix_extra_home }, params: *r_ce }
-      usb:            { what: ogre_usb, where: { <<: *w_usb, ref: mirror_matrix_extra_home, rotate: 180 }, params: *usb }   # turned round: its opening is a matter of x, which the mirror doesn't flip for the footprint
-      battery:        { what: ogre_battery, where: { <<: *w_battery, ref: mirror_matrix_extra_top }, params: *battery }
+      usb:            { what: ogre_usb, where: { <<: *w_usb, ref: mirror_matrix_ring_home, rotate: 180 }, params: *usb }   # turned round: its opening is a matter of x, which the mirror doesn't flip for the footprint
+      battery:        { what: ogre_battery, where: { <<: *w_battery, ref: mirror_matrix_pinky_top }, params: *battery }
       swd:            { what: ogre_swd, where: { <<: *w_swd, ref: mirror_matrix_inner_home }, params: *swd }
-      reset:          { what: ogre_reset, where: { <<: *w_reset, ref: mirror_matrix_inner_top }, params: *reset }
-      power:          { what: ogre_power_switch, where: { <<: *w_power, ref: mirror_matrix_pinky_bottom }, params: *power }
-      led_status:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-8.6, -0.5U - 3.3], rotate: 180 }, params: *led_status }
-      led_charge:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-2.7, -0.5U - 3.3], rotate: 180 }, params: *led_charge }
+      reset:          { what: ogre_reset, where: { <<: *w_reset, ref: mirror_matrix_index_top }, params: *reset }
+      power:          { what: ogre_power_switch, where: { <<: *w_power, ref: mirror_matrix_extra_num }, params: *power }
+      led_status:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-4.78, -0.5U - 8.875], rotate: 180 }, params: *led_status }
+      led_charge:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-4.78, -0.5U - 3.3], rotate: 180 }, params: *led_charge }

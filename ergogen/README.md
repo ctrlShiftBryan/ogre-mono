@@ -18,7 +18,8 @@ use `npm run serve` below.
 | `serve.js` | Live viewer: watches the config, rebuilds and shows every view |
 | `bundle.js` | Packs the config and footprints into an archive the web UI can open |
 | `points.snapshot.json` | Baseline geometry for `npm run snapshot` |
-| `ogre-ergo.keycaps.svg` | Key preview, the one committed render |
+| `ogre-ergo.keycaps.svg` | Key preview |
+| `ogre-ergo.keycaps-print.svg` | The same keys for printing: white caps, black type, 1:1 in mm |
 
 ## The design
 
@@ -200,6 +201,7 @@ the board and its nets are the whole design.
 npm install
 npm run build    # write output/ (points, outlines, PCB)
 npm run keycaps  # build, then render ogre-ergo.keycaps.svg with legends
+npm run keycaps:print  # the same, black on white, as ogre-ergo.keycaps-print.svg
 npm run snapshot # fail on geometry that changed since the last baseline
 npm run check    # check the generated PCB's parts, nets and KiCad DRC
 npm run serve    # live viewer on http://localhost:5174
@@ -232,7 +234,10 @@ plain `pip install` and has no `pyyaml` formula, use
 renders it too, so without PyYAML the viewer prints `No module named 'yaml'`
 on every rebuild. It reads the `output/points/points.yaml` that ergogen
 writes in debug mode and draws each key as a keycap with its legend: alphas
-in cream, modifiers and arrows in grey, Esc and Enter in red.
+in cream, modifiers and arrows in grey, Esc and Enter in red. With `--print`
+(`npm run keycaps:print`) every cap is white with black type on a white
+page, and the SVG is sized in mm, so it prints at 1:1: 412 × 176 mm, on
+tabloid (11 × 17 in) landscape.
 
 `npm run snapshot` is the regression gate. It holds the build against
 `points.snapshot.json` — position, rotation and size of all 68 keys — and fails

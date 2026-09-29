@@ -4,6 +4,7 @@
   "scripts": {
     "build": "node build.js",
     "keycaps": "npm run build && python3 render_keycaps.py output/points/points.yaml ogre-ergo.keycaps.svg \"Ogre Ergo\"",
+    "keycaps:print": "npm run build && python3 render_keycaps.py --print output/points/points.yaml ogre-ergo.keycaps-print.svg \"Ogre 68\"",
     "check": "node check-pcb.js",
     "snapshot": "node snapshot.js",
     "snapshot:update": "node snapshot.js --update",

@@ -13,7 +13,7 @@ use `npm run serve` below.
 | File | What it is |
 |---|---|
 | `config.yaml` | Layout, outline and PCB |
-| `footprints/` | Hotswap switch, its diode, nice!nano, battery connector, power and reset switches on the board; the 2019 PCB-mount switch, diode, Pro Micro and TRRS jack, and a JST PH battery connector, available but not placed |
+| `footprints/` | Hotswap switch, its diode, nice!nano, OLED, battery connector, power and reset switches on the board; the 2019 PCB-mount switch, diode, Pro Micro and TRRS jack, and a JST PH battery connector, available but not placed |
 | `serve.js` | Live viewer: watches the config, rebuilds and shows every view |
 | `bundle.js` | Packs the config and footprints into an archive the web UI can open |
 | `points.snapshot.json` | Baseline geometry for `npm run snapshot` |
@@ -78,8 +78,15 @@ rework (`ogre.2024.pretty`):
   numbered from the outer edge inward. The thumb Home/End keys take row4/col1
   and row9/col1; row4/col0 and row9/col0 stay unused.
 - **One nice!nano per half**, MCU1 on each board, on the back on Mill-Max
-  sockets: pads 8–12 = its five rows (row0–4 left, row5–9 right); pads 20→14 =
-  col0–col6; 22 = RESET; 24 (RAW, the nice!nano's B+) = RAW, from the power switch.
+  sockets: pads 5 / 6 = SDA / SCL (I2C, D1 / D0); pads 8–12 = its five rows
+  (row0–4 left, row5–9 right); pads 20→14 = col0–col6; 22 = RESET; 24 (RAW, the
+  nice!nano's B+) = RAW, from the power switch.
+- **OLED per half** (OLED1): a 0.91" 128x32 SSD1306 I2C module on a 4-pin
+  header, as on the Corne, on the front of the controller bay just past the
+  nice!nano's far end, the module lying over it. Pins run SDA, SCL, VCC, GND from
+  pin 1 (the Corne's order), which common modules (GND VCC SCL SDA along their
+  pin edge, face up) plug into the right way round. The header's holes are the
+  nice!nano's Mill-Max size, so the module can sit on sockets too.
 - **Battery connector per half** (J1): a JST PH 2-pin side-entry through-hole
   connector (S2B-PH-K) on the back, + on BAT and − on GND. JST sets no polarity.
   Pad 1 is +, the Adafruit and SparkFun convention (the battery plug's mating

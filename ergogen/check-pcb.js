@@ -4,7 +4,7 @@
 //     and the half's key n (points order, L/Rn on the keycap render) is MXn and Dn
 //   - the 10x7 matrix has no duplicate positions, and each row is on its own half
 //   - every nice!nano pad carries its net
-//   - the battery connector, power switch and reset switch
+//   - the OLED header, battery connector, power switch and reset switch
 //   - KiCad DRC (overlaps, clearances), if kicad-cli is installed
 // Usage: npm run check
 const fs = require('fs')
@@ -27,7 +27,7 @@ const parse = text => text.split(/\n\s*\(module /).slice(1).map(block => {
 
 const range = (n, f) => Array.from({ length: n }, (_, i) => f(i))
 const expectedMcu = rows => ({
-  1: '', 2: '', 3: 'GND', 4: 'GND', 5: '', 6: '', 7: '',
+  1: '', 2: '', 3: 'GND', 4: 'GND', 5: 'SDA', 6: 'SCL', 7: '',
   ...Object.fromEntries(rows.map((r, i) => [8 + i, `row${r}`])),
   13: '', ...Object.fromEntries(range(7, i => [20 - i, `col${i}`])),
   21: 'VCC', 22: 'RESET', 23: 'GND', 24: 'RAW'
@@ -83,6 +83,8 @@ const cli = ['/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli', '/Applica
         if (net(mcus[0], String(pad)) !== want[pad]) err(`${mcus[0].ref} pad ${pad}: ${net(mcus[0], String(pad)) || '(none)'}, expected ${want[pad] || '(none)'}`)
       }
     }
+    const oleds = fps.filter(f => f.kind.includes('OLED'))
+    if (oleds.length !== 1 || ['SDA', 'SCL', 'VCC', 'GND'].some((n, i) => net(oleds[0], String(i + 1)) !== n)) err('expected one OLED header: SDA, SCL, VCC, GND')
     const batteries = fps.filter(f => f.kind.includes('JST_PH'))
     if (batteries.length !== 1 || [net(batteries[0], '1'), net(batteries[0], '2')].sort().join() !== 'BAT,GND') err('expected one battery connector on BAT / GND')
     const power = fps.filter(f => f.kind.includes('SW_SPDT'))
@@ -90,7 +92,7 @@ const cli = ['/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli', '/Applica
     const resets = fps.filter(f => f.kind.includes('SW_PUSH'))
     if (resets.length !== 1 || net(resets[0], '1') !== 'GND' || net(resets[0], '2') !== 'RESET') err('expected one reset switch on GND / RESET')
 
-    console.log(`${half}: ${switches.length} hotswap switches, ${diodes.length} diodes, ${mcus.length} nice!nano, ${batteries.length} battery connector, ${power.length} power switch, ${resets.length} reset switch`)
+    console.log(`${half}: ${switches.length} hotswap switches, ${diodes.length} diodes, ${mcus.length} nice!nano, ${oleds.length} OLED, ${batteries.length} battery connector, ${power.length} power switch, ${resets.length} reset switch`)
 
     // KiCad DRC
     if (cli) {

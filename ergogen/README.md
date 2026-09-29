@@ -226,7 +226,11 @@ only loads custom footprints from a folder, and this folder also holds
 `node_modules`.
 
 `npm run keycaps` runs `render_keycaps.py`, which needs Python 3 and PyYAML
-(`pip install pyyaml`). It reads the `output/points/points.yaml` that ergogen
+(`pip install pyyaml`; on macOS with Homebrew's Python, which refuses a
+plain `pip install` and has no `pyyaml` formula, use
+`python3 -m pip install --user --break-system-packages pyyaml`). `npm run serve`
+renders it too, so without PyYAML the viewer prints `No module named 'yaml'`
+on every rebuild. It reads the `output/points/points.yaml` that ergogen
 writes in debug mode and draws each key as a keycap with its legend: alphas
 in cream, modifiers and arrows in grey, Esc and Enter in red.
 

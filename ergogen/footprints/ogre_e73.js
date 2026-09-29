@@ -50,7 +50,7 @@ module.exports = {
   body: p => {
     const nets = { 5: p.gnd, 21: p.gnd, 24: p.gnd }
     for (const [name, pad] of Object.entries(PADS)) nets[pad] = p[name]
-    return place('e73', p, nets, { id: 'E73-2G4M08S1C', value: 'E73-2G4M08S1C' })
+    return place('e73', p, nets, { id: 'E73-2G4M08S1C', value: 'E73-2G4M08S1C', value_size: 1 })
       .replace(/([FB])\.SilkS/g, '$1.Fab')   // outline on the fab layer: the antenna end sits on the board edge
   }
 }

@@ -10,7 +10,8 @@
 //   name: file in footprints/jlc/, without .kicad_mod
 //   p: the ergogen params of the calling footprint (at, r, ref, ref_hide, side)
 //   nets: { padName: net } as ergogen net params ('' leaves a pad unconnected)
-//   opts.value: the value text (part number or value), on F.Fab
+//   opts.value: the value text (part number or value), on F.Fab at the origin
+//   opts.value_size: its font size, 0.6 mm unless given
 //   opts.lcsc: LCSC number, when the file's isn't the part used (a 10k on the
 //     0603 resistor footprint); '' drops the property (hand-soldered parts)
 //   opts.id: footprint id, ogre:<id>; defaults to the file name
@@ -75,8 +76,10 @@ const place = (name, p, nets = {}, opts = {}) => {
   fp = fp.replace(/^\(module \S+ \(layer F\.Cu\)[^\n]*/, `(module ogre:${opts.id || name} (layer F.Cu) (tedit 5DD4F656)\n\tAT`)
   fp = fp.replace(/\(fp_text reference REF\*\* \(at ([-\d.]+) ([-\d.]+)\) \(layer F\.SilkS\)/,
     `(fp_text reference "${p.ref}" (at $1 $2 ${r}) (layer F.SilkS) ${p.ref_hide}`)
-  fp = fp.replace(/\(fp_text value \S+ \(at ([-\d.]+) ([-\d.]+)\) \(layer F\.Fab\)/,
-    `(fp_text value "${opts.value || name}" (at $1 $2 ${r}) (layer F.Fab)`)
+  // the value on the part itself, small: JLC puts it 4-11 mm out at 1 mm, which
+  // piles up on the neighbours when parts sit close
+  fp = fp.replace(/\(fp_text value \S+ \(at [-\d.]+ [-\d.]+\) \(layer F\.Fab\)\n\t\t\(effects \(font \(size 1 1\) \(thickness 0\.15\)\)\)/,
+    `(fp_text value "${opts.value || name}" (at 0 0 ${r}) (layer F.Fab)\n\t\t(effects (font (size ${opts.value_size || 0.6} ${opts.value_size || 0.6}) (thickness 0.1)))`)
   // the LCSC number: a hidden field (bare, KiCad would draw it at its default size)
   fp = fp.replace(/\n\t\(property "LCSC Part" "([^"]*)"\)/, (_, code) => {
     const lcsc = opts.lcsc !== undefined ? opts.lcsc : code

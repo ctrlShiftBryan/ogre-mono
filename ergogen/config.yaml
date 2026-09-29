@@ -249,8 +249,8 @@ outlines:
 # with its own nice!nano on the back, reset switch and nets. 10x7 matrix, COL2ROW
 # diodes, one hotswap switch and one diode per key. Rows 0-4 are the left half,
 # 5-9 the right; columns 0-6 on both. Pad map in footprints/ogre_nicenano.js.
-# Power: a JST PH battery connector per half, + to the nice!nano's B+ (pad 24,
-# net BAT) and - to GND; the power switch will go in series on BAT.
+# Power: a JST PH battery connector per half, + (BAT) through a slide switch to
+# the nice!nano's B+ (pad 24, RAW), - to GND.
 # Each board numbers its own parts in key order: MX1-MX34 and D1-D34.
 # ---------------------------------------------------------------------------
 pcbs:
@@ -297,17 +297,24 @@ pcbs:
           pad21: VCC
           pad22: RESET
           pad23: GND
-          pad24: BAT
+          pad24: RAW
 
       battery:          # J1: on the back below 5, clear of the sockets; + on pad 1, the Adafruit/SparkFun convention
         what: ogre_jst_ph2
         where: { ref: matrix_inner_num, shift: [3.92, -5.043] }
         params: &battery { pos: BAT, neg: GND, plus: 1, side: back }
 
+
       reset:            # on the back, below Tab, clear of Tab's diode and Caps Lock's socket
         what: ogre_reset
         where: { ref: matrix_outer_top, shift: [0, -8.5] }
         params: { from: GND, to: RESET }
+
+      power:            # SW2: on the back at the top edge over 5, body 0.6 mm in from the edge (its
+                        # tabs clear it), lever out ~0.85 mm, in the strip between the edge and 5's socket; BAT in on the common, RAW out when on
+        what: ogre_power_switch
+        where: { ref: matrix_inner_num, shift: [-4.3, 9.525 - 2], rotate: 180 }
+        params: &power { common: BAT, on: RAW, side: back }
 
   right:
     template: kicad8
@@ -336,3 +343,7 @@ pcbs:
         what: ogre_reset
         where: { ref: mirror_matrix_outer_top, shift: [0, -8.5] }
         params: { from: GND, to: RESET }
+      power:            # over 6; the sockets don't mirror, so neither does this spot
+        what: ogre_power_switch
+        where: { ref: mirror_matrix_inner_num, shift: [-4.3, 9.525 - 2], rotate: 180, resist: true }
+        params: *power

@@ -13,7 +13,7 @@ use `npm run serve` below.
 | File | What it is |
 |---|---|
 | `config.yaml` | Layout, outline and PCB |
-| `footprints/` | Hotswap switch, its diode, nice!nano, battery connector and reset switch on the board; the 2019 PCB-mount switch, diode, Pro Micro and TRRS jack, and a JST PH battery connector, available but not placed |
+| `footprints/` | Hotswap switch, its diode, nice!nano, battery connector, power and reset switches on the board; the 2019 PCB-mount switch, diode, Pro Micro and TRRS jack, and a JST PH battery connector, available but not placed |
 | `serve.js` | Live viewer: watches the config, rebuilds and shows every view |
 | `bundle.js` | Packs the config and footprints into an archive the web UI can open |
 | `points.snapshot.json` | Baseline geometry for `npm run snapshot` |
@@ -79,7 +79,7 @@ rework (`ogre.2024.pretty`):
   and row9/col1; row4/col0 and row9/col0 stay unused.
 - **One nice!nano per half**, MCU1 on each board, on the back on Mill-Max
   sockets: pads 8–12 = its five rows (row0–4 left, row5–9 right); pads 20→14 =
-  col0–col6; 22 = RESET; 24 (RAW, the nice!nano's B+) = BAT.
+  col0–col6; 22 = RESET; 24 (RAW, the nice!nano's B+) = RAW, from the power switch.
 - **Battery connector per half** (J1): a JST PH 2-pin side-entry through-hole
   connector (S2B-PH-K) on the back, + on BAT and − on GND. JST sets no polarity.
   Pad 1 is +, the Adafruit and SparkFun convention (the battery plug's mating
@@ -87,7 +87,12 @@ rework (`ogre.2024.pretty`):
   wireless Corne also uses; the silkscreen marks it. About half of generic
   LiPos come wired the other way: check a new battery against that picture (or
   a multimeter) and swap its crimps, or set the connector's `plus` to 2.
-  No power switch yet: it goes in series on BAT once one is chosen.
+- **Power switch per half** (SW2): a Shouhan MSK-12C02 side-actuated SPDT slide
+  switch (pin-compatible with the Alps SSSS811101 the community wireless Corne
+  uses), KiCad's stock footprint, on the back at the top edge over `5` / `6`:
+  body 0.6 mm in from the edge, lever out past it. BAT comes in on the common
+  pin 2, RAW goes out on pin 1 when on (the silkscreen marks that end ON), and
+  pin 3 is left open, as on the Corne.
 - **Each half:** its nice!nano up the back of the inner column, under `` ` ~ ``
   and `} ]` (PgUp and `{ [` on the right), USB-C flush with the top of the
   raised tab over that column. Those two keys' switches are turned 90°, so their

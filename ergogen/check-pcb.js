@@ -4,7 +4,7 @@
 //     and the half's key n (points order, L/Rn on the keycap render) is MXn and Dn
 //   - the 10x7 matrix has no duplicate positions, and each row is on its own half
 //   - every nice!nano pad carries its net
-//   - the battery connector and the reset switch
+//   - the battery connector, power switch and reset switch
 //   - KiCad DRC (overlaps, clearances), if kicad-cli is installed
 // Usage: npm run check
 const fs = require('fs')
@@ -30,7 +30,7 @@ const expectedMcu = rows => ({
   1: '', 2: '', 3: 'GND', 4: 'GND', 5: '', 6: '', 7: '',
   ...Object.fromEntries(rows.map((r, i) => [8 + i, `row${r}`])),
   13: '', ...Object.fromEntries(range(7, i => [20 - i, `col${i}`])),
-  21: 'VCC', 22: 'RESET', 23: 'GND', 24: 'BAT'
+  21: 'VCC', 22: 'RESET', 23: 'GND', 24: 'RAW'
 })
 
 const cli = ['/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli', '/Applications/KiCad-2/KiCad.app/Contents/MacOS/kicad-cli', 'kicad-cli']
@@ -85,10 +85,12 @@ const cli = ['/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli', '/Applica
     }
     const batteries = fps.filter(f => f.kind.includes('JST_PH'))
     if (batteries.length !== 1 || [net(batteries[0], '1'), net(batteries[0], '2')].sort().join() !== 'BAT,GND') err('expected one battery connector on BAT / GND')
+    const power = fps.filter(f => f.kind.includes('SW_SPDT'))
+    if (power.length !== 1 || net(power[0], '2') !== 'BAT' || net(power[0], '1') !== 'RAW' || net(power[0], '3')) err('expected one power switch, BAT in on pad 2, RAW out on pad 1')
     const resets = fps.filter(f => f.kind.includes('SW_PUSH'))
     if (resets.length !== 1 || net(resets[0], '1') !== 'GND' || net(resets[0], '2') !== 'RESET') err('expected one reset switch on GND / RESET')
 
-    console.log(`${half}: ${switches.length} hotswap switches, ${diodes.length} diodes, ${mcus.length} nice!nano, ${batteries.length} battery connector, ${resets.length} reset switch`)
+    console.log(`${half}: ${switches.length} hotswap switches, ${diodes.length} diodes, ${mcus.length} nice!nano, ${batteries.length} battery connector, ${power.length} power switch, ${resets.length} reset switch`)
 
     // KiCad DRC
     if (cli) {

@@ -24,7 +24,7 @@ const parse = text => text.split(/\n\s*\(module /).slice(1).map(block => {
   const ref = block.match(/\(fp_text reference "([^"]*)"/)[1]
   const kind = block.match(/^(\S+)/)[1]
   const value = (block.match(/\(fp_text value "([^"]*)"/) || [])[1] || ''
-  const lcsc = (block.match(/\(property "LCSC Part" "([^"]*)"\)/) || [])[1] || ''
+  const lcsc = (block.match(/\(property "LCSC Part" "([^"]*)"/) || [])[1] || ''
   const pads = {}
   for (const [a, b] of blocks(block, 'pad')) {   // a pad may run over several lines (the charger's thermal pad)
     const pad = block.slice(a, b)

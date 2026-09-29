@@ -63,7 +63,7 @@ const blocks = (text, token) => {
 
 // mirror onto the back: x negated, F./B. layers swapped, text read from behind
 const flip = fp => fp
-  .replace(/\((at|start|end|center|xy) ([-\d.]+) ([-\d.]+)/g, (_, k, x, y) => `(${k} ${num(-x)} ${y}`)
+  .replace(/\((at|start|mid|end|center|xy) ([-\d.]+) ([-\d.]+)/g, (_, k, x, y) => `(${k} ${num(-x)} ${y}`)
   .replace(/\b([FB])\.(Cu|SilkS|Fab|Mask|CrtYd|Paste|Adhes)\b/g, (_, s, l) => `${s === 'F' ? 'B' : 'F'}.${l}`)
   .replace(/\(effects \(font \(size ([\d.]+ [\d.]+)\) \(thickness ([\d.]+)\)\)\)/g, '(effects (font (size $1) (thickness $2)) (justify mirror))')
 
@@ -77,10 +77,11 @@ const place = (name, p, nets = {}, opts = {}) => {
     `(fp_text reference "${p.ref}" (at $1 $2 ${r}) (layer F.SilkS) ${p.ref_hide}`)
   fp = fp.replace(/\(fp_text value \S+ \(at ([-\d.]+) ([-\d.]+)\) \(layer F\.Fab\)/,
     `(fp_text value "${opts.value || name}" (at $1 $2 ${r}) (layer F.Fab)`)
-  if (opts.lcsc !== undefined) {
-    fp = opts.lcsc ? fp.replace(/\(property "LCSC Part" "[^"]*"\)/, `(property "LCSC Part" "${opts.lcsc}")`)
-      : fp.replace(/\n\t\(property "LCSC Part" "[^"]*"\)/, '')
-  }
+  // the LCSC number: a hidden field (bare, KiCad would draw it at its default size)
+  fp = fp.replace(/\n\t\(property "LCSC Part" "([^"]*)"\)/, (_, code) => {
+    const lcsc = opts.lcsc !== undefined ? opts.lcsc : code
+    return lcsc ? `\n\t(property "LCSC Part" "${lcsc}" (at 0 0 ${r}) (layer F.Fab) hide (effects (font (size 0.5 0.5) (thickness 0.08))))` : ''
+  })
 
   // pads: the footprint's rotation goes onto each pad's own angle (KiCad keeps
   // pad angles absolute), and the pad's net goes before its closing paren

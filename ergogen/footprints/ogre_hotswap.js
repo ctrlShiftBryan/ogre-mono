@@ -3,7 +3,9 @@
 // hotswap socket is ogre_socket and the diode ogre_socket_diode, each a part of
 // its own on the back, placed from the same key. No nets here.
 // Params
-//    legend: printed on both silkscreens (key's `legend` via '{{legend}}')
+//    legend: printed on both silkscreens (key's `legend` via '{{legend}}'): under the
+//      switch on the front, in the strip past the socket on the back, clear of the
+//      parts in the strips between socket rows
 //    stab: add Cherry/Costar PCB-mount stabilizer holes (2U and up; key's `stab` via '{{stab}}')
 //    turn: degrees the switch turns on its key (key's `turn` via '{{turn}}'), so one
 //      footprint entry serves every key and designators stay in key order
@@ -25,7 +27,7 @@ module.exports = {
     const w = p.cap_w / 2, h = p.cap_h / 2
     const legend = p.legend ? `
       (fp_text user "${esc(p.legend)}" (at 0 4.6 ${r}) (layer F.SilkS) (effects (font (size 1 1) (thickness 0.15))))
-      (fp_text user "${esc(p.legend)}" (at 0 4.6 ${r}) (layer B.SilkS) (effects (font (size 1 1) (thickness 0.15)) (justify mirror)))` : ''
+      (fp_text user "${esc(p.legend)}" (at 0 -8.2 ${r}) (layer B.SilkS) (effects (font (size 1 1) (thickness 0.15)) (justify mirror)))` : ''
     const stab = p.stab ? `
       (pad "" np_thru_hole circle (at -11.938 -6.985 ${r}) (size 3.048 3.048) (drill 3.048) (layers *.Cu *.Mask))
       (pad "" np_thru_hole circle (at 11.938 -6.985 ${r}) (size 3.048 3.048) (drill 3.048) (layers *.Cu *.Mask))

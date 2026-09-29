@@ -26,7 +26,7 @@ are build output that `npm run build` overwrites, so changes belong in the
 config, and routing belongs in a copy of the PCB.
 
 The values that shape the board — column staggers, the thumb fan, the half
-separation, the controller bay — live by name in the config's `units` block.
+separation, the controller module's spot — live by name in the config's `units` block.
 Change the design there, not by editing numbers inside the zones.
 
 `footprints/jlc/*.kicad_mod` are JLCPCB's own footprints, pulled with
@@ -54,9 +54,10 @@ build reproduces it:
 2. Diff its footprints against a build written to the scratchpad, and encode
    each move as an offset from its key. A diode takes its key's
    `diode: [x, y, r]` in the zones (`mirror.diode` on the right half): mm in
-   the key's frame, y up, and degrees. A controller-bay part takes its `where`
-   shift from the extra column's num key (`mcu_x` / `mcu_y` for the module
-   itself), which the right half reuses from the mirrored key.
+   the key's frame, y up, and degrees. A controller or power part takes its
+   `where` shift from the key it sits under (`mcu_x` / `mcu_y` for the module
+   itself, from the extra column's home key), which the right half reuses from
+   the mirrored key.
 3. Done when a scratch build puts every footprint where the saved board has it.
    Then build, and the user reverts the board in KiCad.
 

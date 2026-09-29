@@ -83,9 +83,11 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   numbered from the outer edge inward. The thumb Home/End keys take row4/col1
   and row9/col1; row4/col0 and row9/col0 stay unused.
 - **The controller** (MCU1): an Ebyte E73-2G4M08S1C, an nRF52840 module with
-  its antenna, matching and crystals inside, in the bay beside the extra column
-  with its ceramic antenna end on the board's top edge. Keep copper off that
-  end on both layers. Its pin map is in `footprints/ogre_e73.js`: the seven
+  its antenna, matching and crystals inside, lying sideways on the back below
+  the extra column's home key (PgDn / `" '`), where that column has no bottom
+  key, with its ceramic antenna end just inside the half's inner edge. Keep
+  copper off that end on both layers; the diodes of the two keys beside it are
+  moved out of its way in the zones. Its pin map is in `footprints/ogre_e73.js`: the seven
   columns on P1.11 P1.10 P0.03 P0.28 P1.13 P0.02 P0.29, the half's five rows on
   P0.31 P0.30 P0.26 P0.06 P0.05, and the nice!nano's roles kept on the
   nice!nano's pins, so ZMK's `nice_nano_v2` configuration carries over with
@@ -108,25 +110,27 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   ([unified-daughterboard.github.io](https://unified-daughterboard.github.io/))
   mounted in the case, which carries the USB-C port, its fuse and ESD
   protection. The board's end is a Molex Pico-EZmate (J2, 78171-0004) with the
-  daughterboard's pinout, 1 VBUS 2 D− 3 D+ 4 GND, opening toward the bay's
-  bottom edge.
-- **Battery connector** (J3): a JST PH 2-pin side-entry surface-mount connector
-  (S2B-PH-SM4-TB) on the bay's bottom edge, the plug entering from below,
-  + on BAT and − on GND. JST sets no polarity. Pad 1 is +, the Adafruit and
+  daughterboard's pinout, 1 VBUS 2 D− 3 D+ 4 GND, under the index column's
+  home key, its opening toward the row below.
+- **Battery connector** (J1): a JST PH 2-pin side-entry surface-mount connector
+  (S2B-PH-SM4-TB) under the inner column's home key, between the pins of the
+  switch above it, the plug entering from the row below, + on BAT and − on
+  GND. JST sets no polarity. Pad 1 is +, the Adafruit and
   SparkFun convention (the battery plug's mating face toward you, polarizing
   bump up: red on the right), which the community wireless Corne also uses;
   the silkscreen marks it. About half of generic LiPos come wired the other
   way: check a new battery against that picture (or a multimeter) and swap its
   crimps, or set the connector's `plus` to 2.
-- **Power switch** (SW2): a Shouhan MSK-12C02 side-actuated SPDT slide switch
+- **Power switch** (SW1): a Shouhan MSK-12C02 side-actuated SPDT slide switch
   (pin-compatible with the Alps SSSS811101 the community wireless Corne uses),
-  on the bay's inner edge, body 0.6 mm in from it, lever out past it. BAT
-  comes in on the common pin 2, VBAT goes out on pin 1 when on (the silkscreen
-  marks that end ON), and pin 3 is left open, as on the Corne.
-- **Reset** (SW1): a 5.1 mm surface-mount tactile switch (TS-1187A) in the bay,
-  wired across its diagonal pads so it works whichever way its pin pairs run.
-- **SWD** (J1): six bare pads and three locating holes for a Tag-Connect
-  TC2030-NL cable, in the bay. The module arrives blank; this is how the UF2
+  on the half's inner edge beside the charger, body 0.6 mm in from it, lever
+  out past it. BAT comes in on the common pin 2, VBAT goes out on pin 1 when on
+  (the silkscreen marks that end ON), and pin 3 is left open, as on the Corne.
+- **Reset** (SW2): a 5.1 mm surface-mount tactile switch (TS-1187A) under the
+  extra column's top key, wired across its diagonal pads so it works whichever
+  way its pin pairs run.
+- **SWD** (J3): six bare pads and three locating holes for a Tag-Connect
+  TC2030-NL cable, beside the USB connector. The module arrives blank; this is how the UF2
   bootloader gets on once (any SWD probe; a Raspberry Pi Pico running
   debugprobe will do).
 - **LEDs**: two 3 mm through-hole LEDs on the front, soldered by hand, on a tab
@@ -135,21 +139,23 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   the charge LED (VDDH through 1k, sinking into the charger's CHG, orange).
   Their flat side (cathode) is at each footprint's origin; the anode points
   toward Tab.
-- **The bay** (`mcu_bay`, from `bay_left`, `bay_width`, `bay_top` and
-  `bay_bottom` in `units`): a strip beside the extra column, top flush with the
-  num row's caps, that holds the module (`mcu_x` / `mcu_y`) and, in rows below
-  it, the crystal, charger, LDO, reset, SWD pads and the two connectors, with
-  the power switch on its inner edge. Every part there is placed by hand in
-  KiCad and carried back into the config (see `AGENTS.md`); the config's
-  numbers are a working first layout, not a final one. The right half mirrors
-  the bay as a whole.
+- **Where the rest sits.** Nothing juts out of the outline for the controller:
+  the parts hide on the back in the 10 mm strips between one key's socket and
+  the next key's switch pins. The module's inductor, capacitors and the crystal
+  are in the strip between G and B, next to the module's pad end; the charger
+  and LDO with their passives in the strip between `} ]` and PgDn; the battery
+  and USB connectors and the SWD pads in the strip between T and G, spilling
+  left under R and F; reset under `{ [`. Each is placed from a nearby key in
+  the config (`mcu_x` / `mcu_y` for the module) and the right half reuses the
+  same placement from the mirrored key. The config's numbers are a working
+  first layout, not a final one: move parts in KiCad and carry them back (see
+  `AGENTS.md`).
 - **Outline:** keycap edges with 1 mm corners, thumbs included. The thumb
   cluster joins the matrix by filling only the gaps between neighboring keys
   (`thumb_web`), and one pocket per half is cut out over Cmd, as on the 2019
   board. Each half's inner edge runs straight up just inside its inner column,
-  the controller bay juts out from it, and the LED tab (`led_tab_w`,
-  `led_tab_h`) hangs below Esc / Del. The `left` and `right` outlines are the
-  halves; `board` is both together, for viewing.
+  and the LED tab (`led_tab_w`, `led_tab_h`) hangs below Esc / Del. The `left`
+  and `right` outlines are the halves; `board` is both together, for viewing.
 - **No underglow LEDs**, no alternate-size switch footprints, and no mounting
   holes yet (see below).
 

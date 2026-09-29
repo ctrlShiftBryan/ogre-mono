@@ -47,16 +47,14 @@ units:
   # so the gap between the two halves is a result of this number.
   half_spread: 4.25U
 
-  # Controller bay: the strip beside the extra column, from that column's num
-  # key (~ / PgUp), that holds the nRF52840 module and the power parts. Its top
-  # is flush with the num row's caps, so the module's antenna end sits on the
-  # board's top edge; `bay_bottom` keeps it above the thumb cluster.
-  bay_left: 8            # from the key's centre to the bay's inner edge, 1.5 mm inside the cap
-  bay_width: 22
-  bay_top: 9.525
-  bay_bottom: -42
-  mcu_x: 19              # the module's centre, from the same key
-  mcu_y: -2.5            # antenna end (11 mm from its centre) 1 mm inside the top edge
+  # Controller: the nRF52840 module lies sideways on the back below the extra
+  # column's home key (PgDn / " '), where the column has no bottom key, with its
+  # antenna end just inside the half's inner edge; the power parts sit in the
+  # strips between socket rows in the inner and extra columns. Nothing juts out
+  # of the outline for them. `mcu_x` / `mcu_y` are the module's origin from that
+  # home key; the origin is 7 mm from its pad end and 11 mm from its antenna end.
+  mcu_x: -1.9            # 9.44 (the inner edge) - 0.34 - 11: on the right half the socket of N sits closer, and this clears its pad
+  mcu_y: -11.2
 
   # LED tab: a lip below Esc (Del on the right) for the two 3 mm LEDs, which shine
   # up through a hole in the case just below that key.
@@ -131,7 +129,7 @@ points:
           key.col_net: col5
           rows:
             mod.skip: true
-            bottom: { legend: 'B',   mirror.legend: 'N' }
+            bottom: { legend: 'B',   mirror.legend: 'N', diode: [0, -6, 90], mirror.diode: [0, -6, 90] }   # below the socket: the controller module's pad end is at this key's right edge
             home:   { legend: 'G',   mirror.legend: 'H' }
             top:    { legend: 'T',   mirror.legend: 'Y' }
             num:    { legend: '% 5', mirror.legend: '^ 6' }
@@ -141,8 +139,8 @@ points:
           rows:
             mod.skip: true
             bottom.skip: true
-            home:   { legend: 'PgDn', mirror.legend: "\" '" }
-            top:    { legend: '} ]',  mirror.legend: '{ [' }
+            home:   { legend: 'PgDn', mirror.legend: "\" '", diode: [-5.5, 8.1, 90], mirror.diode: [8.15, -0.63, 0] }   # left: lying in the strip past the socket, off the module's antenna and the power switch
+            top:    { legend: '} ]',  mirror.legend: '{ [', diode: [5.5, 8.1, 90], mirror.diode: [8.15, -0.63, 0] }   # left: lying in the strip past the socket, clear of the power switch's ON mark
             num:    { legend: '~ `',  mirror.legend: 'PgUp' }
       rows:
         mod:    { row_net: row4, mirror.row_net: row9 }
@@ -239,17 +237,13 @@ outlines:
     halves: { what: outline, name: _halves }
     pockets:            # the cutout over each Cmd key
       { operation: subtract, what: outline, name: _pockets }
-    inner_edge:         # each half stops just inside its inner column's edge, above the thumbs
+    inner_edge:         # each half stops just inside its inner column's edge, above the thumbs;
+                        # the controller module's antenna end sits on this edge
       operation: subtract
       what: rectangle
       asym: both
       where: { ref: matrix_extra_num, shift: [(9.44 + 2.125U) / 2, 0] }
       size: [2.125U - 9.44, 102]    # to the mirror axis, down to just above the thumb cluster
-    mcu_bay:            # beside the extra column: the controller module and power parts (see units)
-      what: rectangle
-      asym: both
-      where: { ref: matrix_extra_num, shift: [bay_left + bay_width / 2, (bay_top + bay_bottom) / 2] }
-      size: [bay_width, bay_top - bay_bottom]
     led_tab:            # below Esc / Del, hanging off the cap's bottom edge, left of Tab / | \
       what: rectangle
       asym: both
@@ -276,7 +270,9 @@ outlines:
 # in the case. Two hand-soldered 3 mm LEDs on the front below Esc / Del: status
 # (P0.15) and charge (the charger's CHG).
 # Each board numbers its own parts in key order: MX1-MX34, S1-S34 and D1-D34.
-# Everything else is placed in the controller bay (see units) and moved in KiCad.
+# Everything else hides under the keys on the back: the module below the extra
+# column's home key (see units), the rest in the strips between socket rows,
+# each placed from a nearby key and moved in KiCad.
 # ---------------------------------------------------------------------------
 pcbs:
   left:
@@ -304,13 +300,12 @@ pcbs:
         where: '-/^mirror_/'
         params: { from: '{{name}}', to: '{{row_net}}', place: '{{diode}}' }
 
-      # ---- Controller bay (see units): everything on the back, laid out in rows below the
-      # module, from the extra column's num key; x >= 11 keeps clear of that column's diodes.
-      # The right half reuses each `where` from the mirrored key: the bay mirrors as a whole
-      # and the footprints turn the other way, so the module's antenna still points up.
-      mcu:              # MCU1: the module, antenna end on the top edge
+      # ---- Controller and power, on the back under the keys. The right half reuses
+      # each `where` from the mirrored key, and the footprints turn the other way,
+      # so the module's antenna still points at the inner edge.
+      mcu:              # MCU1: sideways below PgDn, antenna end on the inner edge
         what: ogre_e73
-        where: &w_mcu { ref: matrix_extra_num, shift: [mcu_x, mcu_y], rotate: 180 }
+        where: &w_mcu { ref: matrix_extra_home, shift: [mcu_x, mcu_y], rotate: 90 }
         params: &mcu
           side: back
           col_0: col0
@@ -325,112 +320,111 @@ pcbs:
           row_3: row2
           row_4: row3
           row_5: row4
-      # row A, under the module's bottom pads: its supply
+      # between G's socket and B: the module's supply, next to its pad end, and the crystal
       mcu_l:            # L1: DCCH -> VDD, the module's own 3.3 V
         what: ogre_l0805
-        where: &w_mcu_l { ref: matrix_extra_num, shift: [12.5, mcu_y - 10.5] }
+        where: &w_mcu_l { ref: matrix_inner_home, shift: [-7, -4.5] }
         params: &mcu_l { side: back, value: 10uH, lcsc: C1046, from: DCCH, to: VDD }
       mcu_c1:           # C1: VDD
         what: ogre_c0603
-        where: &w_mcu_c1 { ref: matrix_extra_num, shift: [15.5, mcu_y - 10.5] }
+        where: &w_mcu_c1 { ref: matrix_inner_home, shift: [-4, -4.5] }
         params: &c_4u7_vdd { side: back, value: 4.7uF, lcsc: C19666, from: VDD, to: GND }
       mcu_c2:           # C2: VDD
         what: ogre_c0603
-        where: &w_mcu_c2 { ref: matrix_extra_num, shift: [18.1, mcu_y - 10.5] }
+        where: &w_mcu_c2 { ref: matrix_inner_home, shift: [-1.4, -4.5] }
         params: &c_100n_vdd { side: back, value: 100nF, lcsc: C14663, from: VDD, to: GND }
       mcu_c3:           # C3: VDDH at the module
         what: ogre_c0603
-        where: &w_mcu_c3 { ref: matrix_extra_num, shift: [20.7, mcu_y - 10.5] }
+        where: &w_mcu_c3 { ref: matrix_inner_home, shift: [1.2, -4.5] }
         params: &c_4u7_vddh { side: back, value: 4.7uF, lcsc: C19666, from: VDDH, to: GND }
       mcu_c4:           # C4: VBUS at the module
         what: ogre_c0603
-        where: &w_mcu_c4 { ref: matrix_extra_num, shift: [23.3, mcu_y - 10.5] }
+        where: &w_mcu_c4 { ref: matrix_inner_home, shift: [3.8, -4.5] }
         params: &c_4u7_vbus { side: back, value: 4.7uF, lcsc: C19666, from: VBUS, to: GND }
-      # row B: the crystal and the LED resistors
       xtal:             # Y1: 32.768 kHz
         what: ogre_crystal
-        where: &w_xtal { ref: matrix_extra_num, shift: [13.5, mcu_y - 13.5] }
+        where: &w_xtal { ref: matrix_inner_home, shift: [-6.5, -9] }
         params: &xtal { side: back }
       xtal_c1:          # C5, C6: its load caps
         what: ogre_c0603
-        where: &w_xtal_c1 { ref: matrix_extra_num, shift: [17, mcu_y - 13.5] }
+        where: &w_xtal_c1 { ref: matrix_inner_home, shift: [-3, -9] }
         params: &c_xl1 { side: back, value: 12pF, lcsc: C38523, from: XL1, to: GND }
       xtal_c2:
         what: ogre_c0603
-        where: &w_xtal_c2 { ref: matrix_extra_num, shift: [19.6, mcu_y - 13.5] }
+        where: &w_xtal_c2 { ref: matrix_inner_home, shift: [-0.4, -9] }
         params: &c_xl2 { side: back, value: 12pF, lcsc: C38523, from: XL2, to: GND }
       led_r_status:     # R4: P0.15 -> status LED
         what: ogre_r0603
-        where: &w_led_r_status { ref: matrix_extra_num, shift: [22.2, mcu_y - 13.5] }
+        where: &w_led_r_status { ref: matrix_inner_home, shift: [2.2, -9] }
         params: &r_status { side: back, value: 1k, lcsc: C21190, from: BLED, to: LED_S }
       led_r_charge:     # R5: VDDH -> charge LED -> CHG
         what: ogre_r0603
-        where: &w_led_r_charge { ref: matrix_extra_num, shift: [24.8, mcu_y - 13.5] }
+        where: &w_led_r_charge { ref: matrix_inner_home, shift: [4.8, -9] }
         params: &r_charge { side: back, value: 1k, lcsc: C21190, from: VDDH, to: LED_C }
-      # row C: the charger
+      # between } ]'s socket and PgDn: the charger and the LDO, with the power switch on the inner edge
       charger:          # IC1: BQ24075
         what: ogre_bq24075
-        where: &w_charger { ref: matrix_extra_num, shift: [14.5, mcu_y - 17.5] }
+        where: &w_charger { ref: matrix_extra_home, shift: [-7, 11.2] }
         params: &charger { side: back }
       charger_c_in:     # C7: VBUS at IN
         what: ogre_c0603
-        where: &w_charger_c_in { ref: matrix_extra_num, shift: [17.8, mcu_y - 17.5], rotate: 90 }
+        where: &w_charger_c_in { ref: matrix_extra_home, shift: [-3.9, 11.2], rotate: 90 }
         params: &c_1u_vbus { side: back, value: 1uF, lcsc: C1592, from: VBUS, to: GND }
       charger_c_out:    # C8: VDDH at OUT
         what: ogre_c0603
-        where: &w_charger_c_out { ref: matrix_extra_num, shift: [19.6, mcu_y - 17.5], rotate: 90 }
+        where: &w_charger_c_out { ref: matrix_extra_home, shift: [-2.1, 11.2], rotate: 90 }
         params: *c_4u7_vddh
       charger_c_bat:    # C9: VBAT
         what: ogre_c0603
-        where: &w_charger_c_bat { ref: matrix_extra_num, shift: [21.4, mcu_y - 17.5], rotate: 90 }
+        where: &w_charger_c_bat { ref: matrix_extra_home, shift: [-0.3, 11.2], rotate: 90 }
         params: &c_4u7_vbat { side: back, value: 4.7uF, lcsc: C19666, from: VBAT, to: GND }
       charger_r_ts:     # R1: fakes the battery thermistor
         what: ogre_r0603
-        where: &w_charger_r_ts { ref: matrix_extra_num, shift: [23.2, mcu_y - 17.5], rotate: 90 }
+        where: &w_charger_r_ts { ref: matrix_extra_home, shift: [1.5, 11.2], rotate: 90 }
         params: &r_ts { side: back, value: 10k, lcsc: C25804, from: TS, to: GND }
       charger_r_iset:   # R2: charge current, K / 10k ≈ 100 mA
         what: ogre_r0603
-        where: &w_charger_r_iset { ref: matrix_extra_num, shift: [25, mcu_y - 17.5], rotate: 90 }
+        where: &w_charger_r_iset { ref: matrix_extra_home, shift: [3.3, 11.2], rotate: 90 }
         params: &r_iset { side: back, value: 10k, lcsc: C25804, from: ISET, to: GND }
-      # row D: the LDO
       ldo:              # IC2: XC6220, VCC for anything besides the module
         what: ogre_xc6220
-        where: &w_ldo { ref: matrix_extra_num, shift: [14, mcu_y - 21.5] }
+        where: &w_ldo { ref: matrix_extra_home, shift: [1.5, 14.5] }
         params: &ldo { side: back }
       ldo_c_in:         # C10
         what: ogre_c0603
-        where: &w_ldo_c_in { ref: matrix_extra_num, shift: [17.5, mcu_y - 21.5] }
+        where: &w_ldo_c_in { ref: matrix_extra_home, shift: [-7.5, 14.5] }
         params: &c_10u_vddh { side: back, value: 10uF, lcsc: C19702, from: VDDH, to: GND }
       ldo_c_out:        # C11
         what: ogre_c0603
-        where: &w_ldo_c_out { ref: matrix_extra_num, shift: [20.1, mcu_y - 21.5] }
+        where: &w_ldo_c_out { ref: matrix_extra_home, shift: [-4.9, 14.5] }
         params: &c_4u7_vcc { side: back, value: 4.7uF, lcsc: C19666, from: VCC, to: GND }
       ldo_r_ce:         # R3: CE pulled up, so VCC is on unless P0.13 says otherwise
         what: ogre_r0603
-        where: &w_ldo_r_ce { ref: matrix_extra_num, shift: [22.7, mcu_y - 21.5] }
+        where: &w_ldo_r_ce { ref: matrix_extra_home, shift: [-2.3, 14.5] }
         params: &r_ce { side: back, value: 10M, lcsc: C7250, from: VDDH, to: PWR_EN }
-      # row E: reset and programming
-      reset:            # SW1
-        what: ogre_reset
-        where: &w_reset { ref: matrix_extra_num, shift: [14, mcu_y - 27.5] }
-        params: &reset { side: back, from: GND, to: RESET }
-      swd:              # J3: programming pads
-        what: ogre_swd
-        where: &w_swd { ref: matrix_extra_num, shift: [21, mcu_y - 25.5] }
-        params: &swd { side: back }
-      # row F, on the bay's bottom edge: the cables
-      usb:              # J2: the daughterboard cable, plugging in from below
-        what: ogre_usb
-        where: &w_usb { ref: matrix_extra_num, shift: [13.8, mcu_y - 35.5], rotate: 270 }
-        params: &usb { side: back }
+      power:            # SW2: on the inner edge beside them, body 0.6 mm in, lever out past it;
+                        # BAT in on the common, VBAT out when on
+        what: ogre_power_switch
+        where: &w_power { ref: matrix_extra_home, shift: [9.44 - 0.6 - 1.4, 11.5], rotate: 90 }
+        params: &power { common: BAT, on: VBAT, side: back }
+      # between T's socket and G (and, left of them, R's and F's): the cables and the programming pads
       battery:          # J1: the battery plug, from below; + on pad 1, the Adafruit/SparkFun convention
         what: ogre_battery
-        where: &w_battery { ref: matrix_extra_num, shift: [21.5, mcu_y - 34] }
+        where: &w_battery { ref: matrix_inner_home, shift: [0, 11.7] }   # between T's side pins, its pads just under T's centre hole
         params: &battery { side: back, plus: 1 }
-      power:            # SW2: on the bay's inner edge, lever out past it; BAT in on the common, VBAT out when on
-        what: ogre_power_switch
-        where: &w_power { ref: matrix_extra_num, shift: [bay_left + bay_width - 2, mcu_y - 24], rotate: 90 }
-        params: &power { common: BAT, on: VBAT, side: back }
+      usb:              # J2: the daughterboard cable, plugging in from below
+        what: ogre_usb
+        where: &w_usb { ref: matrix_inner_home, shift: [-7.75, 9.5], rotate: 270 }   # between F's socket pad and the battery connector's mounting pad
+        params: &usb { side: back }
+      swd:              # J3: programming pads
+        what: ogre_swd
+        where: &w_swd { ref: matrix_inner_home, shift: [-7.75, 14.5] }
+        params: &swd { side: back }
+      # between { ['s socket and } ]: reset
+      reset:            # SW1
+        what: ogre_reset
+        where: &w_reset { ref: matrix_extra_top, shift: [-3, 12] }
+        params: &reset { side: back, from: GND, to: RESET }
 
       led_status:       # LED1, LED2: on the front, on the tab below Esc; cathode (flat) at each origin,
                         # anode toward Tab (turned round on the right half, where the tab mirrors)
@@ -452,10 +446,10 @@ pcbs:
       switch: { <<: *switch, where: /^mirror_/ }
       socket: { <<: *socket, where: /^mirror_/ }
       diode: { <<: *diode, where: /^mirror_/ }
-      # the bay, from the mirrored key (see the left half)
+      # the controller and power parts, from the mirrored keys (see the left half)
       mcu:
         what: ogre_e73
-        where: { <<: *w_mcu, ref: mirror_matrix_extra_num }
+        where: { <<: *w_mcu, ref: mirror_matrix_extra_home }
         params:
           <<: *mcu
           row_1: row5
@@ -463,30 +457,30 @@ pcbs:
           row_3: row7
           row_4: row8
           row_5: row9
-      mcu_l:          { what: ogre_l0805, where: { <<: *w_mcu_l, ref: mirror_matrix_extra_num }, params: *mcu_l }
-      mcu_c1:         { what: ogre_c0603, where: { <<: *w_mcu_c1, ref: mirror_matrix_extra_num }, params: *c_4u7_vdd }
-      mcu_c2:         { what: ogre_c0603, where: { <<: *w_mcu_c2, ref: mirror_matrix_extra_num }, params: *c_100n_vdd }
-      mcu_c3:         { what: ogre_c0603, where: { <<: *w_mcu_c3, ref: mirror_matrix_extra_num }, params: *c_4u7_vddh }
-      mcu_c4:         { what: ogre_c0603, where: { <<: *w_mcu_c4, ref: mirror_matrix_extra_num }, params: *c_4u7_vbus }
-      xtal:           { what: ogre_crystal, where: { <<: *w_xtal, ref: mirror_matrix_extra_num }, params: *xtal }
-      xtal_c1:        { what: ogre_c0603, where: { <<: *w_xtal_c1, ref: mirror_matrix_extra_num }, params: *c_xl1 }
-      xtal_c2:        { what: ogre_c0603, where: { <<: *w_xtal_c2, ref: mirror_matrix_extra_num }, params: *c_xl2 }
-      led_r_status:   { what: ogre_r0603, where: { <<: *w_led_r_status, ref: mirror_matrix_extra_num }, params: *r_status }
-      led_r_charge:   { what: ogre_r0603, where: { <<: *w_led_r_charge, ref: mirror_matrix_extra_num }, params: *r_charge }
-      charger:        { what: ogre_bq24075, where: { <<: *w_charger, ref: mirror_matrix_extra_num }, params: *charger }
-      charger_c_in:   { what: ogre_c0603, where: { <<: *w_charger_c_in, ref: mirror_matrix_extra_num }, params: *c_1u_vbus }
-      charger_c_out:  { what: ogre_c0603, where: { <<: *w_charger_c_out, ref: mirror_matrix_extra_num }, params: *c_4u7_vddh }
-      charger_c_bat:  { what: ogre_c0603, where: { <<: *w_charger_c_bat, ref: mirror_matrix_extra_num }, params: *c_4u7_vbat }
-      charger_r_ts:   { what: ogre_r0603, where: { <<: *w_charger_r_ts, ref: mirror_matrix_extra_num }, params: *r_ts }
-      charger_r_iset: { what: ogre_r0603, where: { <<: *w_charger_r_iset, ref: mirror_matrix_extra_num }, params: *r_iset }
-      ldo:            { what: ogre_xc6220, where: { <<: *w_ldo, ref: mirror_matrix_extra_num }, params: *ldo }
-      ldo_c_in:       { what: ogre_c0603, where: { <<: *w_ldo_c_in, ref: mirror_matrix_extra_num }, params: *c_10u_vddh }
-      ldo_c_out:      { what: ogre_c0603, where: { <<: *w_ldo_c_out, ref: mirror_matrix_extra_num }, params: *c_4u7_vcc }
-      ldo_r_ce:       { what: ogre_r0603, where: { <<: *w_ldo_r_ce, ref: mirror_matrix_extra_num }, params: *r_ce }
-      reset:          { what: ogre_reset, where: { <<: *w_reset, ref: mirror_matrix_extra_num }, params: *reset }
-      swd:            { what: ogre_swd, where: { <<: *w_swd, ref: mirror_matrix_extra_num }, params: *swd }
-      usb:            { what: ogre_usb, where: { <<: *w_usb, ref: mirror_matrix_extra_num }, params: *usb }
-      battery:        { what: ogre_battery, where: { <<: *w_battery, ref: mirror_matrix_extra_num }, params: *battery }
-      power:       { what: ogre_power_switch, where: { <<: *w_power, ref: mirror_matrix_extra_num }, params: *power }
+      mcu_l:          { what: ogre_l0805, where: { <<: *w_mcu_l, ref: mirror_matrix_inner_home }, params: *mcu_l }
+      mcu_c1:         { what: ogre_c0603, where: { <<: *w_mcu_c1, ref: mirror_matrix_inner_home }, params: *c_4u7_vdd }
+      mcu_c2:         { what: ogre_c0603, where: { <<: *w_mcu_c2, ref: mirror_matrix_inner_home }, params: *c_100n_vdd }
+      mcu_c3:         { what: ogre_c0603, where: { <<: *w_mcu_c3, ref: mirror_matrix_inner_home }, params: *c_4u7_vddh }
+      mcu_c4:         { what: ogre_c0603, where: { <<: *w_mcu_c4, ref: mirror_matrix_inner_home }, params: *c_4u7_vbus }
+      xtal:           { what: ogre_crystal, where: { <<: *w_xtal, ref: mirror_matrix_inner_home }, params: *xtal }
+      xtal_c1:        { what: ogre_c0603, where: { <<: *w_xtal_c1, ref: mirror_matrix_inner_home }, params: *c_xl1 }
+      xtal_c2:        { what: ogre_c0603, where: { <<: *w_xtal_c2, ref: mirror_matrix_inner_home }, params: *c_xl2 }
+      led_r_status:   { what: ogre_r0603, where: { <<: *w_led_r_status, ref: mirror_matrix_inner_home }, params: *r_status }
+      led_r_charge:   { what: ogre_r0603, where: { <<: *w_led_r_charge, ref: mirror_matrix_inner_home }, params: *r_charge }
+      charger:        { what: ogre_bq24075, where: { <<: *w_charger, ref: mirror_matrix_extra_home }, params: *charger }
+      charger_c_in:   { what: ogre_c0603, where: { <<: *w_charger_c_in, ref: mirror_matrix_extra_home }, params: *c_1u_vbus }
+      charger_c_out:  { what: ogre_c0603, where: { <<: *w_charger_c_out, ref: mirror_matrix_extra_home }, params: *c_4u7_vddh }
+      charger_c_bat:  { what: ogre_c0603, where: { <<: *w_charger_c_bat, ref: mirror_matrix_extra_home }, params: *c_4u7_vbat }
+      charger_r_ts:   { what: ogre_r0603, where: { <<: *w_charger_r_ts, ref: mirror_matrix_extra_home }, params: *r_ts }
+      charger_r_iset: { what: ogre_r0603, where: { <<: *w_charger_r_iset, ref: mirror_matrix_extra_home }, params: *r_iset }
+      ldo:            { what: ogre_xc6220, where: { <<: *w_ldo, ref: mirror_matrix_extra_home }, params: *ldo }
+      ldo_c_in:       { what: ogre_c0603, where: { <<: *w_ldo_c_in, ref: mirror_matrix_extra_home }, params: *c_10u_vddh }
+      ldo_c_out:      { what: ogre_c0603, where: { <<: *w_ldo_c_out, ref: mirror_matrix_extra_home }, params: *c_4u7_vcc }
+      ldo_r_ce:       { what: ogre_r0603, where: { <<: *w_ldo_r_ce, ref: mirror_matrix_extra_home }, params: *r_ce }
+      power:          { what: ogre_power_switch, where: { <<: *w_power, ref: mirror_matrix_extra_home }, params: *power }
+      battery:        { what: ogre_battery, where: { <<: *w_battery, ref: mirror_matrix_inner_home }, params: *battery }
+      usb:            { what: ogre_usb, where: { <<: *w_usb, ref: mirror_matrix_inner_home, rotate: -270 }, params: *usb }   # mirrored, ergogen turns it the other way; -270 lands on 270, opening down
+      swd:            { what: ogre_swd, where: { <<: *w_swd, ref: mirror_matrix_inner_home }, params: *swd }
+      reset:          { what: ogre_reset, where: { <<: *w_reset, ref: mirror_matrix_extra_top }, params: *reset }
       led_status:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-8.3, -0.5U - 3.3], rotate: 180 }, params: *led_status }
       led_charge:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-3, -0.5U - 3.3], rotate: 180 }, params: *led_charge }

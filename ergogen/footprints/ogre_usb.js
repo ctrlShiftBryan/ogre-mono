@@ -15,4 +15,5 @@ const net = value => ({ type: 'net', value })
 module.exports = {
   params: { designator: 'J', side: 'front', vbus: net('VBUS'), dm: net('D-'), dp: net('D+'), gnd: net('GND') },
   body: p => place('ezmate', p, { 1: p.vbus, 2: p.dm, 3: p.dp, 4: p.gnd, 6: p.gnd, 7: p.gnd }, { id: 'USB_PicoEZmate', value: 'USB' })
+    .replace(/([FB])\.SilkS/g, '$1.Fab')   // outline on the fab layer
 }

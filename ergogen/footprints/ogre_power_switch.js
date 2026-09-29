@@ -31,10 +31,10 @@ module.exports = {
     (module ogre:SW_SPDT_MSK12C02 (layer F.Cu) (tedit 5DD4F656)
       AT
       (attr smd)
-      (property "LCSC Part" "C431540")
+      (property "LCSC Part" "C431540" (at 0 0 ${r}) (layer F.Fab) hide (effects (font (size 0.5 0.5) (thickness 0.08))))
       (fp_text reference "${p.ref}" (at 0 -3.7 ${r}) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1 1) (thickness 0.15))))
       (fp_text value "POWER" (at 0 3.7 ${r}) (layer F.Fab) (effects (font (size 1 1) (thickness 0.15))))
-      (fp_text user "ON" (at -5.6 0.3 ${r}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user "ON" (at -5.4 0.3 ${r}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.12))))
 
       (fp_line (start -3.45 -0.4) (end -3.45 0.4) (layer F.SilkS) (width 0.12))
       (fp_line (start -1.6 -1.5) (end 0.1 -1.5) (layer F.SilkS) (width 0.12))

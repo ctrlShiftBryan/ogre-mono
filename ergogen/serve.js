@@ -15,10 +15,12 @@ const here = __dirname
 const PORT = +(process.env.PORT || 5174)
 const HALVES = ['left', 'right']
 const PCB = half => path.join(OUT, `pcbs/${half}.kicad_pcb`)
+// the Fab layers carry each part's body outline, which some stock footprints (the
+// power switch) draw nowhere else, so placement reads true
 const LAYERS = {
-  all: 'Edge.Cuts,F.Cu,B.Cu,F.SilkS,B.SilkS',
-  front: 'Edge.Cuts,F.Cu,F.SilkS',
-  back: 'Edge.Cuts,B.Cu,B.SilkS',
+  all: 'Edge.Cuts,F.Cu,B.Cu,F.SilkS,B.SilkS,F.Fab,B.Fab',
+  front: 'Edge.Cuts,F.Cu,F.SilkS,F.Fab',
+  back: 'Edge.Cuts,B.Cu,B.SilkS,B.Fab',
   outline: 'Edge.Cuts,F.SilkS',
   keycaps: 'Edge.Cuts,Dwgs.User'
 }

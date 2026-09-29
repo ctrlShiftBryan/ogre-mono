@@ -47,6 +47,11 @@ units:
   # so the gap between the two halves is a result of this number.
   half_spread: 4.25U
 
+  # Controller: each half's nice!nano, from the inner column's num key (~ / PgUp),
+  # as placed in KiCad. The outline's `mcu_bay` holds it.
+  mcu_x: 18.59265
+  mcu_y: -14.005
+
   # Outline. The thumb cluster joins the matrix by filling the gaps between
   # keys up to twice this wide; the rest of the edge follows the keycaps.
   thumb_web: 7
@@ -237,6 +242,13 @@ outlines:
       asym: both
       where: { ref: matrix_extra_num, shift: [(9.44 - 11.525) / 2, 0.375U] }   # from 2 mm into the next column (covers its corner) to the inner edge
       size: [9.44 + 11.525, 0.75U]
+    mcu_bay:            # beside the inner column: the nice!nano's body (18 x 33.05 mm, USB end 18.3 mm
+                        # above its origin) with 1 mm around, top flush with the USB end, and a
+                        # 1.44 mm overlap into the half so the two join
+      what: rectangle
+      asym: both
+      where: { ref: matrix_extra_num, shift: [(8 + mcu_x + 10) / 2, (mcu_y + 18.3 + mcu_y - 15.75) / 2] }
+      size: [mcu_x + 10 - 8, 18.3 + 15.75]
   left:                 # the left half's PCB outline: everything left of the mirror axis
     - { what: outline, name: board }
     - { operation: intersect, what: rectangle, where: { ref: matrix_extra_num, shift: [2.125U - 250, 0] }, size: [500, 500] }
@@ -274,10 +286,9 @@ pcbs:
         where: '-/^mirror_/'
         params: { from: '{{name}}', to: '{{row_net}}', place: '{{diode}}' }
 
-      mcu:              # up the back of the inner column under ~ and } ], USB flush with the
-                        # top of the USB tab; its pad rows clear the turned switches' strip by ~0.9 mm
+      mcu:              # in its own bay beside the inner column, as on a Corne; placed in KiCad
         what: ogre_nicenano
-        where: { ref: matrix_extra_num, shift: [-0.845, 0.375U + 0.375U - 18.3] }
+        where: { ref: matrix_extra_num, shift: [mcu_x, mcu_y] }
         params: &mcu
           side: back
           pad3: GND
@@ -327,7 +338,7 @@ pcbs:
       diode: { <<: *diode, where: /^mirror_/ }
       mcu:              # the same under PgUp and { [
         what: ogre_nicenano
-        where: { ref: mirror_matrix_extra_num, shift: [-0.845, 0.375U + 0.375U - 18.3] }
+        where: { ref: mirror_matrix_extra_num, shift: [mcu_x, mcu_y] }
         params:
           <<: *mcu
           pad8: row5

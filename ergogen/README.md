@@ -93,17 +93,17 @@ rework (`ogre.2024.pretty`):
   body 0.6 mm in from the edge, lever out past it. BAT comes in on the common
   pin 2, RAW goes out on pin 1 when on (the silkscreen marks that end ON), and
   pin 3 is left open, as on the Corne.
-- **Each half:** its nice!nano up the back of the inner column, under `` ` ~ ``
-  and `} ]` (PgUp and `{ [` on the right), USB-C flush with the top of the
-  raised tab over that column. Those two keys' switches are turned 90°, so their
-  sockets and diodes stand in a strip up the column and the controller's pad
-  rows pass either side, about 0.9 mm clear. A 6 mm reset switch (SW1) sits on
-  the back below Tab (`| \` on the right).
+- **Each half:** its nice!nano in a bay of its own beside the inner column, as
+  on a Corne, on the back with USB-C flush with the bay's top edge. Its place
+  is `mcu_x` / `mcu_y` in the config's `units`, from the inner column's top key,
+  as placed in KiCad; the right half mirrors it. A 6 mm reset switch (SW1) sits
+  on the back below Tab (`| \` on the right).
 - **Outline:** keycap edges with 1 mm corners, thumbs included. The thumb
   cluster joins the matrix by filling only the gaps between neighboring keys
   (`thumb_web`), and one pocket per half is cut out over Cmd, as on the 2019
   board. Each half's inner edge runs straight up just inside its inner column,
-  with a tab raised over that column for the USB-C. The `left` and `right`
+  with a tab raised over that column, and the controller bay (`mcu_bay`) juts
+  out from it. The `left` and `right`
   outlines are the halves; `board` is both together, for viewing.
 - **No underglow LEDs**, no alternate-size switch footprints, and no mounting
   holes yet (see below).

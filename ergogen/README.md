@@ -203,6 +203,18 @@ and leaves the project files and KiCad's other files alone; anything done to a
 board in KiCad is replaced, so route in a copy. The projects have no schematic;
 the board and its nets are the whole design.
 
+The copy is `routing/left.kicad_pcb` (left half only, for now), committed: the
+build's board with the parts not yet placed parked off its right edge. Routing
+goes one section at a time: `python3 route.py <section>` leaves every pad
+outside that section's parts and nets unconnected for the run, locks the
+traces already there, runs [Freerouting](https://github.com/freerouting/freerouting)
+headless (its jar in `~/.local/share/freerouting/`, or `FREEROUTING` set to
+it), brings its traces into the board and reports what's still unrouted and
+any DRC errors. The sections are listed in `route.py`; `matrix` is the
+switches' columns, rows and diodes. The script also corrects two things
+Freerouting gets wrong from KiCad's export: clearance to the curved board
+edge, and hole keepouts on the turned thumb keys (see `fix_dsn`).
+
 ## Commands
 
 ```sh

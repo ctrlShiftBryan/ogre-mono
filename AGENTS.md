@@ -23,6 +23,12 @@ history, before the `surface-mount` merge, if it's ever wanted again.
 are build output that `npm run build` overwrites, so changes belong in the
 config, and routing belongs in a copy of the PCB.
 
+`routing/left.kicad_pcb` is that copy: the routed left half, committed and the
+master for copper. The build never writes it; KiCad and `route.py` edit it. Its
+parts start from the build's placement; routing goes one section at a time
+(`python3 route.py <section>` autoroutes one, then the user reviews in KiCad),
+each section committed on its own.
+
 The values that shape the board — column staggers, the thumb fan, the half
 separation, the controller module's spot — live by name in the config's `units` block.
 Change the design there, not by editing numbers inside the zones.

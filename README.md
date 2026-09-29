@@ -14,9 +14,9 @@ column, 1.25U and 2.25U thumbs. `ergogen/README.md` describes the design;
 
 ## Where it stands
 
-- Layout, outline and PCBs all generate from the config: 68 keys on a 6x7
-  matrix per half that follows the physical rows and columns (the lone Esc /
-  Del borrows a free spot on the outer column), hotswap sockets
+- Layout, outline and PCBs all generate from the config: 68 keys on a 5x7
+  matrix per half laid out for routing (the physical columns and rows, with
+  the thumbs, arrows and Esc / Del fitted in), hotswap sockets
   with one diode per key, and an Ebyte E73 nRF52840 module with the nice!nano
   v2's power section on each half, all surface mount from JLC's parts library.
 - The design's own values — column staggers, thumb fan, half separation — are

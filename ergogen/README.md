@@ -70,7 +70,7 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   (`ogre-ergo.keycaps.svg`, and the viewer's Keycaps tab) prints each key's
   number as L*n* or R*n*, and `npm run check` fails if a part is numbered out
   of step with its key.
-- **One 12×7 matrix, one hotswap socket and one diode per key**, COL2ROW. The
+- **One 10×7 matrix, one hotswap socket and one diode per key**, COL2ROW. The
   switch (`ogre_hotswap`) is holes, cap outline and legend; its copper is the
   socket (`ogre_socket`, a Kailh-compatible MX socket, JLC's clone) and the
   1N4148W diode in SOD-123F (`ogre_socket_diode`), each a part of its own on
@@ -80,15 +80,23 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   and without one it sits at the switch's right edge, where the 2024 footprint
   had it built in. The 2.25U thumb keys add stabilizer holes (a key's `stab`),
   and a key's `turn` would turn its switch and socket together (no key uses it
-  now). The grid follows the board: one column net per physical column, col0
-  the outer column through col6 the extra column, and one row net per
-  physical row, num (row0) down to the arrows' mod row (row4), with the thumbs
-  a row of their own (row5) on col3–col6 in order of their x (Cmd, Shift, Alt,
-  Home). The lone Esc (Del) is the exception: it joins the outer column's net
-  on the mod row (row4/col0), which has no key of its own there, rather than
-  take a column for one key. The right half is the same grid on rows 6–11. Each half is its own
-  PCB with its own nets, so the numbering across both is a convention, not a
-  wire.
+  now). The grid is laid out for routing, five rows by seven columns:
+
+  |          | col0 | col1 | col2 | col3 | col4 | col5  | col6 |
+  |----------|------|------|------|------|------|-------|------|
+  | **row0** | + =  | 1    | 2    | 3    | 4    | 5     | ~ \` |
+  | **row1** | Tab  | Q    | W    | E    | R    | T     | } ]  |
+  | **row2** | Caps | A    | S    | D    | F    | G     | PgDn |
+  | **row3** | Ctrl | Z    | X    | C    | V    | B     | Home |
+  | **row4** | Esc  |      | ←    | →    | Cmd  | Shift | Alt  |
+
+  Each column net runs down a physical column, col0 the outer column through
+  col6 the extra column, and each thumb key joins the column above it. Rows
+  0–3 are the physical rows, with Home filling the extra column's empty bottom
+  spot, and row4 gathers the rest: Esc, the arrows and the other thumbs. The
+  right half is the same grid, mirrored (Del, End, Fn, Enter), on rows 5–9.
+  Each half is its own PCB with its own nets, so the numbering across both is
+  a convention, not a wire.
 - **The controller** (MCU1): an Ebyte E73-2G4M08S1C, an nRF52840 module with
   its antenna, matching and crystals inside, lying sideways on the back below
   the extra column's home key (PgDn / `" '`), where that column has no bottom
@@ -96,8 +104,8 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   copper off that end on both layers; the diodes of the two keys beside it are
   moved out of its way in the zones. Its pin map is in `footprints/ogre_e73.js`: the seven
   columns on P1.10 P0.03 P0.28 P1.13 P0.02 P0.29 P0.31 (module pins
-  2–9; P1.11 on pin 1 is free), the half's six rows on P0.30 P0.26 P0.06 P0.05 P0.08 P1.09 (pins
-  10–17), and the nice!nano's roles kept on the
+  2–9), the half's five rows on P0.30 P0.26 P0.06 P0.05 P0.08 (pins
+  10–16; P1.11 on pin 1 and P1.09 on pin 17 are free), and the nice!nano's roles kept on the
   nice!nano's pins, so ZMK's `nice_nano_v2` configuration carries over with
   the matrix pins renamed: P0.13 cuts the LDO (`PWR_EN`), P0.15 drives the
   status LED (`BLED`), P0.18 is reset, battery voltage is read from VDDH.
@@ -280,19 +288,16 @@ than a shield on `nice_nano_v2`. Start from ZMK's `nice_nano_v2` board files
 (the same charger, regulator cut-off on P0.13, battery read from VDDH, status
 LED on P0.15, external 32 kHz crystal). The matrix no longer matches the ZMK
 `ogre_ergo` shield in `ctrlShiftBryan/zmk-config2` (`boards/shields/ogre_ergo/`)
-or QMK's `ogre/ergo_split`: the 2019 board's 5×7 grid packed eight physical
-columns into seven nets and borrowed matrix spots for the thumbs, and this
-one is the board as drawn.
+or QMK's `ogre/ergo_split`: both are 5×7 too, but with the keys in
+different spots.
 
-- **kscan per half:** six rows on P0.30 P0.26 P0.06 P0.05 P0.08 P1.09 and
+- **kscan per half:** five rows on P0.30 P0.26 P0.06 P0.05 P0.08 and
   seven columns on P1.10 P0.03 P0.28 P1.13 P0.02 P0.29 P0.31, COL2ROW,
   so `diode-direction = "col2row"`.
-- **Transform:** 6 rows × 14 columns, `col-offset = <7>` for the right half.
-  Row 0 is the number row, row 4 the arrows, row 5 the thumbs; columns 0–6
-  are outer through extra, Esc (Del) is RC(4,0), and the thumbs sit on
-  columns 3–6 of row 5 as Cmd, Shift, Alt, Home (mirrored on the right: Fn,
-  Enter, Alt, End). 68
-  entries, in the same key order as the keycap render.
+- **Transform:** 5 rows × 14 columns, `col-offset = <7>` for the right half,
+  the grid in the PCB section above: Esc (Del) is RC(4,0), the arrows
+  RC(4,2) and RC(4,3), Cmd, Shift and Alt RC(4,4)–RC(4,6), Home (End)
+  RC(3,6). 68 entries, in the same key order as the keycap render.
 - **Bindings** carry over key by key; only their `RC` positions change.
 
 ## Not done yet

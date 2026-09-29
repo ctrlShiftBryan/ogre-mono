@@ -75,12 +75,12 @@ points:
     # Two-part legends are "shifted base", e.g. '! 1'.
     matrix:
       columns:
-        far:            # lone key left of the number row, on the outer column's net and the mod row's
+        far:            # lone key left of the number row, on the outer column's net and row4 with the arrows and thumbs
           key.skip: true
           key.stagger: stagger_far
           key.col_net: col0
           rows:
-            num: { skip: false, legend: 'Esc', mirror.legend: 'Del', row_net: row4, mirror.row_net: row10 }
+            num: { skip: false, legend: 'Esc', mirror.legend: 'Del', row_net: row4, mirror.row_net: row9 }
         outer:          # wide caps right-aligned to the pinky column
           key.col_net: col0
           rows:
@@ -144,14 +144,15 @@ points:
             top:    { legend: '} ]',  mirror.legend: '{ [' }
             num:    { legend: '~ `',  mirror.legend: 'PgUp', diode: [2.87, -5.28, 0], mirror.diode: [-2.87, -5.28, 0] }   # below the switch, between the power switch on the inner edge and reset
       rows:
-        mod:    { row_net: row4, mirror.row_net: row10 }
-        bottom: { row_net: row3, mirror.row_net: row9 }
-        home:   { row_net: row2, mirror.row_net: row8 }
-        top:    { row_net: row1, mirror.row_net: row7 }
-        num:    { row_net: row0, mirror.row_net: row6 }
+        mod:    { row_net: row4, mirror.row_net: row9 }
+        bottom: { row_net: row3, mirror.row_net: row8 }
+        home:   { row_net: row2, mirror.row_net: row7 }
+        top:    { row_net: row1, mirror.row_net: row6 }
+        num:    { row_net: row0, mirror.row_net: row5 }
 
-    thumb:              # 1.25u, 2.25u, then a 1.25u + 1u stack, fanned 30°; its own matrix
-                        # row, the keys on col3-col6 in order of their x
+    thumb:              # 1.25u, 2.25u, then a 1.25u + 1u stack, fanned 30°; each key on the
+                        # column above it (Cmd index, Shift inner, Alt and Home extra), Home
+                        # on the bottom row and the rest on row4 with the arrows
       anchor:
         ref: matrix_middle_mod
         shift: [thumb_offset_x, thumb_offset_y]
@@ -159,7 +160,7 @@ points:
       columns:
         near:
           key.width: 1.25U-1
-          key.col_net: col3
+          key.col_net: col4
           rows:
             cluster: { legend: 'Cmd', mirror.legend: 'Fn' }
             upper.skip: true
@@ -169,13 +170,13 @@ points:
           key.width: 2.25U-1
           key.adjust.rotate: 90   # a wide cap turned 90°, so switch and stabilizer footprints face the right way
           key.stab: true          # 2.25U: stabilizer holes
-          key.col_net: col4
+          key.col_net: col5
           rows:
             cluster: { legend: 'Shift', mirror.legend: 'Enter' }
             upper.skip: true
         far:            # 1.25u Alt with a 1u Home above it
           key.stagger: thumb_stagger_far
-          key.col_net: col5
+          key.col_net: col6
           rows:
             cluster:
               width: 1.25U-1
@@ -185,12 +186,11 @@ points:
               mirror.legend: 'Alt'
             upper:
               adjust.rotate: 90   # turned 90° like the 1.25u/2.25u thumb caps (mirror flips it to -90)
-              col_net: col6
               legend: 'Home'
               mirror.legend: 'End'
       rows:
-        cluster: { row_net: row5, mirror.row_net: row11 }
-        upper:   { row_net: row5, mirror.row_net: row11 }
+        cluster: { row_net: row4, mirror.row_net: row9 }
+        upper:   { row_net: row3, mirror.row_net: row8 }
 
   mirror:               # halves are symmetric; axis is 2.125U right of the extra column
     ref: matrix_extra_num
@@ -262,11 +262,12 @@ outlines:
 # PCB: two boards, always split, wireless only: `left` and `right`, each a half
 # with its own nRF52840 module and power section on the back, all surface mount
 # for JLCPCB assembly (footprints from JLC's library, each with its LCSC number).
-# 12x7 matrix, COL2ROW diodes, one hotswap socket and one diode per key: one
-# column net per physical column (col0 the outer column through col6 the extra
-# column) and one row net per physical row, the thumbs a row of their own; the
-# lone Esc / Del joins the outer column on the mod row. Rows 0-5 are the left
-# half, 6-11 the right; columns 0-6 on both. Pin map in footprints/ogre_e73.js.
+# 10x7 matrix, COL2ROW diodes, one hotswap socket and one diode per key, laid
+# out for routing: col0 the outer column (with Esc / Del) through col6 the extra
+# column, each thumb key on the column above it; row0-row3 the number, top, home
+# and bottom rows (Home / End on the bottom row), row4 Esc / Del, the arrows and
+# the other thumbs. Rows 0-4 are the left half, 5-9 the right; columns 0-6 on
+# both. Pin map in footprints/ogre_e73.js.
 # Power, as on the nice!nano v2: the battery (JST PH, + BAT) through a slide
 # switch (VBAT) into a BQ24075 charger/power path, whose OUT (VDDH) feeds the
 # module in high-voltage mode and an XC6220 LDO (VCC, cut off by P0.13) for
@@ -324,7 +325,6 @@ pcbs:
           row_2: row2
           row_3: row3
           row_4: row4
-          row_5: row5
       # between G's socket and B: the module's supply, next to its pad end, and the crystal
       mcu_l:            # L1: DCCH -> VDD, the module's own 3.3 V
         what: ogre_l0805
@@ -457,12 +457,11 @@ pcbs:
         where: { <<: *w_mcu, ref: mirror_matrix_extra_home }
         params:
           <<: *mcu
-          row_0: row6
-          row_1: row7
-          row_2: row8
-          row_3: row9
-          row_4: row10
-          row_5: row11
+          row_0: row5
+          row_1: row6
+          row_2: row7
+          row_3: row8
+          row_4: row9
       mcu_l:          { what: ogre_l0805, where: { <<: *w_mcu_l, ref: mirror_matrix_inner_home }, params: *mcu_l }
       mcu_c1:         { what: ogre_c0603, where: { <<: *w_mcu_c1, ref: mirror_matrix_inner_home }, params: *c_4u7_vdd }
       mcu_c2:         { what: ogre_c0603, where: { <<: *w_mcu_c2, ref: mirror_matrix_inner_home }, params: *c_100n_vdd }

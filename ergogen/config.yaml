@@ -78,11 +78,11 @@ points:
         far:            # lone key left of the number row
           key.skip: true
           key.stagger: stagger_far
-          key.col_net: col6
-          rows:
-            num: { skip: false, row_net: row3, mirror.row_net: row8, legend: 'Esc', mirror.legend: 'Del' }   # col6 is shared with the extra column, so Esc takes row3
-        outer:          # wide caps right-aligned to the pinky column
           key.col_net: col0
+          rows:
+            num: { skip: false, legend: 'Esc', mirror.legend: 'Del' }
+        outer:          # wide caps right-aligned to the pinky column
+          key.col_net: col1
           rows:
             mod.skip: true
             bottom: { width: 1.25U-1, adjust.shift: [-0.125U, 0], legend: 'Ctrl',      mirror.legend: 'Ctrl' }
@@ -91,7 +91,7 @@ points:
             num:    { legend: '+ =', mirror.legend: '_ -' }
         pinky:
           key.stagger: stagger_pinky
-          key.col_net: col1
+          key.col_net: col2
           rows:
             mod.skip: true
             bottom: { legend: 'Z',   mirror.legend: '? /' }
@@ -100,7 +100,7 @@ points:
             num:    { legend: '! 1', mirror.legend: ') 0' }
         ring:
           key.stagger: stagger_ring
-          key.col_net: col2
+          key.col_net: col3
           rows:
             mod:    { legend: '←',   mirror.legend: '↑' }
             bottom: { legend: 'X',   mirror.legend: '> .' }
@@ -109,7 +109,7 @@ points:
             num:    { legend: '@ 2', mirror.legend: '( 9' }
         middle:
           key.stagger: stagger_middle
-          key.col_net: col3
+          key.col_net: col4
           rows:
             mod:    { legend: '→',   mirror.legend: '↓' }
             bottom: { legend: 'C',   mirror.legend: '< ,' }
@@ -118,7 +118,7 @@ points:
             num:    { legend: '# 3', mirror.legend: '* 8' }
         index:
           key.stagger: stagger_index
-          key.col_net: col4
+          key.col_net: col5
           rows:
             mod.skip: true
             bottom: { legend: 'V',   mirror.legend: 'M' }
@@ -127,7 +127,7 @@ points:
             num:    { legend: '$ 4', mirror.legend: '& 7' }
         inner:
           key.stagger: stagger_inner
-          key.col_net: col5
+          key.col_net: col6
           rows:
             mod.skip: true
             bottom: { legend: 'B',   mirror.legend: 'N', diode: [0, -6, 90], mirror.diode: [0, -6, 90] }   # below the socket: the controller module's pad end is at this key's right edge
@@ -136,7 +136,7 @@ points:
             num:    { legend: '% 5', mirror.legend: '^ 6' }
         extra:          # inner 1u column (num, top, home only)
           key.stagger: stagger_extra
-          key.col_net: col6
+          key.col_net: col7
           rows:
             mod.skip: true
             bottom.skip: true
@@ -144,13 +144,14 @@ points:
             top:    { legend: '} ]',  mirror.legend: '{ [' }
             num:    { legend: '~ `',  mirror.legend: 'PgUp', diode: [2.87, -5.28, 0], mirror.diode: [-2.87, -5.28, 0] }   # below the switch, between the power switch on the inner edge and reset
       rows:
-        mod:    { row_net: row4, mirror.row_net: row9 }
-        bottom: { row_net: row3, mirror.row_net: row8 }
-        home:   { row_net: row2, mirror.row_net: row7 }
-        top:    { row_net: row1, mirror.row_net: row6 }
-        num:    { row_net: row0, mirror.row_net: row5 }
+        mod:    { row_net: row4, mirror.row_net: row10 }
+        bottom: { row_net: row3, mirror.row_net: row9 }
+        home:   { row_net: row2, mirror.row_net: row8 }
+        top:    { row_net: row1, mirror.row_net: row7 }
+        num:    { row_net: row0, mirror.row_net: row6 }
 
-    thumb:              # 1.25u, 2.25u, then a 1.25u + 1u stack, fanned 30°
+    thumb:              # 1.25u, 2.25u, then a 1.25u + 1u stack, fanned 30°; its own matrix
+                        # row, the keys on col4-col7 in order of their x
       anchor:
         ref: matrix_middle_mod
         shift: [thumb_offset_x, thumb_offset_y]
@@ -184,12 +185,12 @@ points:
               mirror.legend: 'Alt'
             upper:
               adjust.rotate: 90   # turned 90° like the 1.25u/2.25u thumb caps (mirror flips it to -90)
-              col_net: col1       # free matrix spot left by the removed bottom-row keys
+              col_net: col7
               legend: 'Home'
               mirror.legend: 'End'
       rows:
-        cluster: { row_net: row4, mirror.row_net: row9 }
-        upper:   { row_net: row4, mirror.row_net: row9 }
+        cluster: { row_net: row5, mirror.row_net: row11 }
+        upper:   { row_net: row5, mirror.row_net: row11 }
 
   mirror:               # halves are symmetric; axis is 2.125U right of the extra column
     ref: matrix_extra_num
@@ -261,8 +262,10 @@ outlines:
 # PCB: two boards, always split, wireless only: `left` and `right`, each a half
 # with its own nRF52840 module and power section on the back, all surface mount
 # for JLCPCB assembly (footprints from JLC's library, each with its LCSC number).
-# 10x7 matrix, COL2ROW diodes, one hotswap socket and one diode per key. Rows 0-4
-# are the left half, 5-9 the right; columns 0-6 on both. Pin map in
+# 12x8 matrix, COL2ROW diodes, one hotswap socket and one diode per key: one
+# column net per physical column (col0 the far Esc column through col7 the extra
+# column) and one row net per physical row, the thumbs a row of their own. Rows
+# 0-5 are the left half, 6-11 the right; columns 0-7 on both. Pin map in
 # footprints/ogre_e73.js.
 # Power, as on the nice!nano v2: the battery (JST PH, + BAT) through a slide
 # switch (VBAT) into a BQ24075 charger/power path, whose OUT (VDDH) feeds the
@@ -316,11 +319,13 @@ pcbs:
           col_4: col4
           col_5: col5
           col_6: col6
-          row_1: row0
-          row_2: row1
-          row_3: row2
-          row_4: row3
-          row_5: row4
+          col_7: col7
+          row_0: row0
+          row_1: row1
+          row_2: row2
+          row_3: row3
+          row_4: row4
+          row_5: row5
       # between G's socket and B: the module's supply, next to its pad end, and the crystal
       mcu_l:            # L1: DCCH -> VDD, the module's own 3.3 V
         what: ogre_l0805
@@ -453,11 +458,12 @@ pcbs:
         where: { <<: *w_mcu, ref: mirror_matrix_extra_home }
         params:
           <<: *mcu
-          row_1: row5
-          row_2: row6
-          row_3: row7
-          row_4: row8
-          row_5: row9
+          row_0: row6
+          row_1: row7
+          row_2: row8
+          row_3: row9
+          row_4: row10
+          row_5: row11
       mcu_l:          { what: ogre_l0805, where: { <<: *w_mcu_l, ref: mirror_matrix_inner_home }, params: *mcu_l }
       mcu_c1:         { what: ogre_c0603, where: { <<: *w_mcu_c1, ref: mirror_matrix_inner_home }, params: *c_4u7_vdd }
       mcu_c2:         { what: ogre_c0603, where: { <<: *w_mcu_c2, ref: mirror_matrix_inner_home }, params: *c_100n_vdd }

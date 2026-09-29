@@ -4,9 +4,9 @@ ogre-ergo.kicad_pcb
 ogre-ergo.demo.svg
 ogre-ergo.board.svg
 # KiCad session files beside the routed board
-routing/*.kicad_prl
-routing/~*.lck
-routing/*-backups/
-routing/fp-info-cache
-routing/.history/
+routing/**/*.kicad_prl
+routing/**/~*.lck
+routing/**/*-backups/
+routing/**/fp-info-cache
+routing/**/.history/
 __pycache__/

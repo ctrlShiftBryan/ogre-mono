@@ -68,7 +68,7 @@ rework (`ogre.2024.pretty`):
 - **One 10×7 matrix, one hotswap switch and one diode per key** (Kailh MX
   socket and SOD-123 or through-hole diode, both on the back, COL2ROW). The
   2.25U thumb keys add stabilizer holes (a key's `stab`), and a key's `turn`
-  turns its switch (the four under the controllers). The 2024 footprint had the diode built
+  would turn its switch (no key uses it now). The 2024 footprint had the diode built
   in; here it's a part of its own (`ogre_socket_diode`) so it can be moved
   clear of traces. A key's `diode: [x, y, r]` in the zones places its diode
   (mm from the key, in its frame, y up; `mirror.diode` for the right half);
@@ -102,8 +102,7 @@ rework (`ogre.2024.pretty`):
   cluster joins the matrix by filling only the gaps between neighboring keys
   (`thumb_web`), and one pocket per half is cut out over Cmd, as on the 2019
   board. Each half's inner edge runs straight up just inside its inner column,
-  with a tab raised over that column, and the controller bay (`mcu_bay`) juts
-  out from it. The `left` and `right`
+  and the controller bay (`mcu_bay`) juts out from it. The `left` and `right`
   outlines are the halves; `board` is both together, for viewing.
 - **No underglow LEDs**, no alternate-size switch footprints, and no mounting
   holes yet (see below).

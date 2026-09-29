@@ -126,9 +126,9 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   it. BAT comes in on the common pin 2, VBAT goes out on pin 1
   when on (the silkscreen marks that end ON), and pin 3 is left open, as on
   the Corne.
-- **Reset** (SW1): a 5.1 mm surface-mount tactile switch (TS-1187A) below R
-  (U on the right), wired across its diagonal pads so it works whichever way
-  its pin pairs run.
+- **Reset** (SW1): a 5.1 mm surface-mount tactile switch (TS-1187A) below
+  `~ \`` (PgUp on the right), beside that key's diode, wired across its
+  diagonal pads so it works whichever way its pin pairs run.
 - **SWD** (J3): six bare pads and three locating holes for a Tag-Connect
   TC2030-NL cable, under T / Y. The module arrives blank; this is how the UF2
   bootloader gets on once (any SWD probe; a Raspberry Pi Pico running
@@ -146,8 +146,8 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   are in the strip between G and B, next to the module's pad end; the charger
   and LDO with their passives in the strip between `} ]` and PgDn; the SWD
   pads under T, between that switch's side pins; the USB connector below S,
-  the battery connector below Q, reset below R, and the power switch on the
-  inner edge below `~ \``, as placed in KiCad. Each is placed from a nearby key in
+  the battery connector below Q, and reset and the power switch below `~ \``,
+  the switch on the inner edge, as placed in KiCad. Each is placed from a nearby key in
   the config (`mcu_x` / `mcu_y` for the module) and the right half reuses the
   same placement from the mirrored key. The config's numbers are a working
   first layout, not a final one: move parts in KiCad and carry them back (see

@@ -142,7 +142,7 @@ points:
             bottom.skip: true
             home:   { legend: 'PgDn', mirror.legend: "\" '", diode: [-5.5, 8.1, 90], mirror.diode: [8.15, -0.63, 0] }   # left: lying in the strip past the socket, off the module's antenna and the power switch
             top:    { legend: '} ]',  mirror.legend: '{ [' }
-            num:    { legend: '~ `',  mirror.legend: 'PgUp', diode: [2.87, -5.28, 0], mirror.diode: [2.87, -5.28, 0] }   # below the switch, off the inner edge where the power switch sits
+            num:    { legend: '~ `',  mirror.legend: 'PgUp', diode: [2.87, -5.28, 0], mirror.diode: [-2.87, -5.28, 0] }   # below the switch, between the power switch on the inner edge and reset
       rows:
         mod:    { row_net: row4, mirror.row_net: row9 }
         bottom: { row_net: row3, mirror.row_net: row8 }
@@ -417,9 +417,9 @@ pcbs:
         what: ogre_swd
         where: &w_swd { ref: matrix_inner_home, shift: [0, 12.5] }
         params: &swd { side: back }
-      reset:            # SW1: below R
+      reset:            # SW1: below ~ `, beside its diode
         what: ogre_reset
-        where: &w_reset { ref: matrix_index_top, shift: [4.47, -6.874] }
+        where: &w_reset { ref: matrix_extra_num, shift: [-4.5, -5.8] }
         params: &reset { side: back, from: GND, to: RESET }
       power:            # SW2: on the inner edge below ~ `, lever out past it; BAT in on the common, VBAT out when on
         what: ogre_power_switch
@@ -481,7 +481,7 @@ pcbs:
       usb:            { what: ogre_usb, where: { <<: *w_usb, ref: mirror_matrix_ring_home, rotate: 180 }, params: *usb }   # turned round: its opening is a matter of x, which the mirror doesn't flip for the footprint
       battery:        { what: ogre_battery, where: { <<: *w_battery, ref: mirror_matrix_pinky_top }, params: *battery }
       swd:            { what: ogre_swd, where: { <<: *w_swd, ref: mirror_matrix_inner_home }, params: *swd }
-      reset:          { what: ogre_reset, where: { <<: *w_reset, ref: mirror_matrix_index_top }, params: *reset }
+      reset:          { what: ogre_reset, where: { <<: *w_reset, ref: mirror_matrix_extra_num }, params: *reset }
       power:          { what: ogre_power_switch, where: { <<: *w_power, ref: mirror_matrix_extra_num }, params: *power }
       led_status:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-4.78, -0.5U - 8.875], rotate: -90 }, params: *led_status }   # mirrored, ergogen turns it the other way; -90 lands on 90, anode up
       led_charge:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-4.78, -0.5U - 3.3], rotate: -90 }, params: *led_charge }

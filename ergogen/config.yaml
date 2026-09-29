@@ -236,7 +236,7 @@ outlines:
       size: [2.125U - 9.44, 102]    # to the mirror axis, down to just above the thumb cluster
     mcu_bay:            # beside the inner column: the nice!nano's body (18 x 33.05 mm, USB end 18.3 mm
                         # above its origin) with 1 mm around, top flush with the USB end, down past
-                        # the OLED header below it, and a 1.44 mm overlap into the half so the two join
+                        # the display header below it, and a 1.44 mm overlap into the half so the two join
       what: rectangle
       asym: both
       where: { ref: matrix_extra_num, shift: [(8 + mcu_x + 10) / 2, (mcu_y + 18.3 + mcu_y - 19.75) / 2] }
@@ -253,7 +253,8 @@ outlines:
 # with its own nice!nano on the back, reset switch and nets. 10x7 matrix, COL2ROW
 # diodes, one hotswap switch and one diode per key. Rows 0-4 are the left half,
 # 5-9 the right; columns 0-6 on both. Pad map in footprints/ogre_nicenano.js.
-# Each half has a 0.91" I2C OLED over its controller (SDA / SCL on pads 5 / 6).
+# Each half has a nice!view over its controller: MOSI / SCK / CS on the nice!nano's
+# pads 5 / 6 / 1 (D2 / D3 / D1, the nice!view defaults).
 # Power: a JST PH battery connector per half, + (BAT) through a slide switch to
 # the nice!nano's B+ (pad 24, RAW), - to GND.
 # Each board numbers its own parts in key order: MX1-MX34 and D1-D34.
@@ -284,10 +285,11 @@ pcbs:
         where: { ref: matrix_extra_num, shift: [mcu_x, mcu_y] }
         params: &mcu
           side: back
+          pad1: CS
           pad3: GND
           pad4: GND
-          pad5: SDA
-          pad6: SCL
+          pad5: MOSI
+          pad6: SCK
           pad8: row0
           pad9: row1
           pad10: row2
@@ -305,11 +307,11 @@ pcbs:
           pad23: GND
           pad24: RAW
 
-      oled:             # on the front of the bay, its header just past the nice!nano's far end and the
-                        # module lying over it, as on a Corne; I2C on the nice!nano's SDA / SCL
-        what: ogre_oled
+      display:          # nice!view on the front of the bay, its header just past the nice!nano's far
+                        # end and the display lying over it, where a Corne puts its OLED
+        what: ogre_nice_view
         where: { ref: matrix_extra_num, shift: [mcu_x, mcu_y - 17.25] }
-        params: &oled { sda: SDA, scl: SCL, vcc: VCC, gnd: GND }
+        params: &display { mosi: MOSI, sck: SCK, vcc: VCC, gnd: GND, cs: CS }
 
       battery:          # J1: on the back below 5, clear of the sockets; + on pad 1, the Adafruit/SparkFun convention
         what: ogre_jst_ph2
@@ -347,10 +349,10 @@ pcbs:
           pad10: row7
           pad11: row8
           pad12: row9
-      oled:
-        what: ogre_oled
+      display:
+        what: ogre_nice_view
         where: { ref: mirror_matrix_extra_num, shift: [mcu_x, mcu_y - 17.25] }
-        params: *oled
+        params: *display
       battery:          # below 6, turned: the sockets don't mirror, so the free spot differs
         what: ogre_jst_ph2
         where: { ref: mirror_matrix_inner_num, shift: [-6.143, -5.043], rotate: 90, resist: true }

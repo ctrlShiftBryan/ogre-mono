@@ -2,7 +2,7 @@
 // right.kicad_pcb; run `npm run build` first):
 //   - one hotswap switch and one diode per key, wired col -> switch -> diode -> row,
 //     and the half's key n (points order, L/Rn on the keycap render) is MXn and Dn
-//   - the 10x7 matrix has no duplicate positions, and each row is on its own half
+//   - the 12x8 matrix has no duplicate positions, and each row is on its own half
 //   - every nice!nano pad carries its net
 //   - the nice!view header, battery connector, power switch and reset switch
 //   - KiCad DRC (overlaps, clearances), if kicad-cli is installed
@@ -13,7 +13,7 @@ const { execFileSync } = require('child_process')
 const { run } = require('./build')
 
 const PCBS = path.join(__dirname, 'output/pcbs')
-const HALVES = { left: { mirrored: false, rows: [0, 1, 2, 3, 4] }, right: { mirrored: true, rows: [5, 6, 7, 8, 9] } }
+const HALVES = { left: { mirrored: false, rows: [0, 1, 2, 3, 4, 5] }, right: { mirrored: true, rows: [6, 7, 8, 9, 10, 11] } }
 
 const parse = text => text.split(/\n\s*\(module /).slice(1).map(block => {
   const ref = block.match(/\(fp_text reference "([^"]*)"/)[1]
@@ -27,9 +27,9 @@ const parse = text => text.split(/\n\s*\(module /).slice(1).map(block => {
 
 const range = (n, f) => Array.from({ length: n }, (_, i) => f(i))
 const expectedMcu = rows => ({
-  1: 'CS', 2: '', 3: 'GND', 4: 'GND', 5: 'MOSI', 6: 'SCK', 7: '',
-  ...Object.fromEntries(rows.map((r, i) => [8 + i, `row${r}`])),
-  13: '', ...Object.fromEntries(range(7, i => [20 - i, `col${i}`])),
+  1: 'CS', 2: '', 3: 'GND', 4: 'GND', 5: 'MOSI', 6: 'SCK',
+  ...Object.fromEntries(rows.map((r, i) => [7 + i, `row${r}`])),
+  ...Object.fromEntries(range(8, i => [20 - i, `col${i}`])),
   21: 'VCC', 22: 'RESET', 23: 'GND', 24: 'RAW'
 })
 

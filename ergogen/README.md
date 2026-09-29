@@ -65,7 +65,7 @@ rework (`ogre.2024.pretty`):
   board's switch MX*n* and diode D*n*. The keycap render (`ogre-ergo.keycaps.svg`,
   and the viewer's Keycaps tab) prints each key's number as L*n* or R*n*, and
   `npm run check` fails if a switch or diode is numbered out of step with its key.
-- **One 10×7 matrix, one hotswap switch and one diode per key** (Kailh MX
+- **One 12×8 matrix, one hotswap switch and one diode per key** (Kailh MX
   socket and SOD-123 or through-hole diode, both on the back, COL2ROW). The
   2.25U thumb keys add stabilizer holes (a key's `stab`), and a key's `turn`
   would turn its switch (no key uses it now). The 2024 footprint had the diode built
@@ -74,14 +74,17 @@ rework (`ogre.2024.pretty`):
   (mm from the key, in its frame, y up; `mirror.diode` for the right half);
   without one it sits at the switch's right edge, where the built-in one was.
   Diodes number in key order, so moving one never renumbers the rest.
-  Rows 0–4 are the left half, rows 5–9 the right; columns 0–6 on each,
-  numbered from the outer edge inward. The thumb Home/End keys take row4/col1
-  and row9/col1; row4/col0 and row9/col0 stay unused.
+  The grid follows the board: one column net per physical column, col0 the
+  far Esc column through col7 the extra column, and one row net per physical
+  row, num (row0) down to the arrows' mod row (row4), with the thumbs a row of
+  their own (row5) on col4–col7 in order of their x (Cmd, Shift, Alt, Home). The
+  right half is the same grid on rows 6–11. Each half is its own PCB with its
+  own nets, so the numbering across both is a convention, not a wire.
 - **One nice!nano per half**, MCU1 on each board, on the back on Mill-Max
   sockets: pad 1 = CS and pads 5 / 6 = MOSI / SCK for the nice!view (D1, D2, D3:
-  its defaults); pads 8–12 = its five rows (row0–4 left, row5–9 right); pads
-  20→14 = col0–col6; 22 = RESET; 24 (RAW, the nice!nano's B+) = RAW, from the
-  power switch.
+  its defaults); pads 7–12 = its six rows (row0–5 left, row6–11 right); pads
+  20→13 = col0–col7; 22 = RESET; 24 (RAW, the nice!nano's B+) = RAW, from the
+  power switch. Pad 2 (D0) is the one GPIO left free.
 - **nice!view per half** (DISP1): the 5-pin header, MOSI, SCK, VCC, GND, CS from
   pin 1 (the nice!view's own KiCad library), on the front of the controller bay
   just past the nice!nano's far end, the 14 × 36 mm display lying over it, where
@@ -199,21 +202,21 @@ clearances) and fails on any violation other than the unrouted connections.
 
 ## Firmware notes
 
-Compared with the ZMK `ogre_ergo` shield in `ctrlShiftBryan/zmk-config2`
-(`boards/shields/ogre_ergo/`), nothing changes in the wiring: the same GPIOs,
-the same diode direction and the same `col-offset = <5>` for the right half.
-In ZMK terms, `RC(r, c)` is PCB column `r`, PCB row `c`.
+The matrix no longer matches the ZMK `ogre_ergo` shield in
+`ctrlShiftBryan/zmk-config2` (`boards/shields/ogre_ergo/`) or QMK's
+`ogre/ergo_split`: the 2019 board's 5×7 grid packed eight physical columns
+into seven nets and borrowed matrix spots for the thumbs, and this one is the
+board as drawn. A new shield wants:
 
-- **Removed:** `RC(0,4)` and `RC(0,9)`. Drop them from the matrix transform
-  and their bindings (`&mt LCTRL GRAVE` and `&kp RCTRL` today).
-- **Reused for the new thumb keys:** `RC(1,4)` is now the left Home key and
-  `RC(1,9)` the right End key. They used to be the bottom-row keys bound to
-  `&kp LALT` and `&kp LBKT`. Move them into the thumb group of the transform
-  and give them new bindings.
-- **Everything else** keeps its matrix position, including the resized and
-  moved keys. The transform goes from 70 to 68 entries.
-
-The halves match QMK's `ogre/ergo_split` pins.
+- **kscan per half:** six rows on D4, D5, D6, D7, D8, D9 (pads 7–12) and eight
+  columns on D21, D20, D19, D18, D15, D14, D16, D10 (pads 20→13), COL2ROW, so
+  `diode-direction = "col2row"`.
+- **Transform:** 6 rows × 16 columns, `col-offset = <8>` for the right half.
+  Row 0 is the number row, row 4 the arrows, row 5 the thumbs; column 0 is Esc,
+  columns 1–7 outer through extra, and the thumbs sit on columns 4–7 of row 5
+  as Cmd, Shift, Alt, Home (mirrored on the right: Fn, Enter, Alt, End). 68
+  entries, in the same key order as the keycap render.
+- **Bindings** carry over key by key; only their `RC` positions change.
 
 ## Not done yet
 

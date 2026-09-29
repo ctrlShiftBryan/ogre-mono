@@ -110,27 +110,29 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   ([unified-daughterboard.github.io](https://unified-daughterboard.github.io/))
   mounted in the case, which carries the USB-C port, its fuse and ESD
   protection. The board's end is a Molex Pico-EZmate (J2, 78171-0004) with the
-  daughterboard's pinout, 1 VBUS 2 D− 3 D+ 4 GND, under the index column's
-  home key, its opening toward the row below.
-- **Battery connector** (J1): a JST PH 2-pin side-entry surface-mount connector
-  (S2B-PH-SM4-TB) under the inner column's home key, between the pins of the
-  switch above it, the plug entering from the row below, + on BAT and − on
-  GND. JST sets no polarity. Pad 1 is +, the Adafruit and
+  daughterboard's pinout, 1 VBUS 2 D− 3 D+ 4 GND, on the half's inner edge
+  under `} ]` / `{ [`, opening toward the edge so the cable leaves the board
+  toward the middle.
+- **Battery connector** (J2): a JST PH 2-pin side-entry surface-mount connector
+  (S2B-PH-SM4-TB) on the inner edge under `~ \`` / PgUp, the plug entering
+  from the edge like the USB cable, + on BAT and − on GND. JST sets no
+  polarity. Pad 1 is +, the Adafruit and
   SparkFun convention (the battery plug's mating face toward you, polarizing
   bump up: red on the right), which the community wireless Corne also uses;
   the silkscreen marks it. About half of generic LiPos come wired the other
   way: check a new battery against that picture (or a multimeter) and swap its
   crimps, or set the connector's `plus` to 2.
-- **Power switch** (SW1): a Shouhan MSK-12C02 side-actuated SPDT slide switch
+- **Power switch** (SW2): a Shouhan MSK-12C02 side-actuated SPDT slide switch
   (pin-compatible with the Alps SSSS811101 the community wireless Corne uses),
-  on the half's inner edge beside the charger, body 0.6 mm in from it, lever
-  out past it. BAT comes in on the common pin 2, VBAT goes out on pin 1 when on
-  (the silkscreen marks that end ON), and pin 3 is left open, as on the Corne.
-- **Reset** (SW2): a 5.1 mm surface-mount tactile switch (TS-1187A) under the
-  extra column's top key, wired across its diagonal pads so it works whichever
-  way its pin pairs run.
+  on the bottom edge below Z (`? /` on the right), body 0.6 mm in from it,
+  lever out past it. BAT comes in on the common pin 2, VBAT goes out on pin 1
+  when on (the silkscreen marks that end ON), and pin 3 is left open, as on
+  the Corne.
+- **Reset** (SW1): a 5.1 mm surface-mount tactile switch (TS-1187A) under
+  `% 5` / `^ 6`, wired across its diagonal pads so it works whichever way its
+  pin pairs run.
 - **SWD** (J3): six bare pads and three locating holes for a Tag-Connect
-  TC2030-NL cable, beside the USB connector. The module arrives blank; this is how the UF2
+  TC2030-NL cable, under T / Y. The module arrives blank; this is how the UF2
   bootloader gets on once (any SWD probe; a Raspberry Pi Pico running
   debugprobe will do).
 - **LEDs**: two 3 mm through-hole LEDs on the front, soldered by hand, on a tab
@@ -143,9 +145,11 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   the parts hide on the back in the 10 mm strips between one key's socket and
   the next key's switch pins. The module's inductor, capacitors and the crystal
   are in the strip between G and B, next to the module's pad end; the charger
-  and LDO with their passives in the strip between `} ]` and PgDn; the battery
-  and USB connectors and the SWD pads in the strip between T and G, spilling
-  left under R and F; reset under `{ [`. Each is placed from a nearby key in
+  and LDO with their passives in the strip between `} ]` and PgDn, with the
+  USB connector at that strip's end on the inner edge; the battery connector
+  on the inner edge one strip up; the SWD pads under T and reset under `% 5`,
+  each between a switch's side pins; the power switch on the bottom edge
+  below Z. Each is placed from a nearby key in
   the config (`mcu_x` / `mcu_y` for the module) and the right half reuses the
   same placement from the mirrored key. The config's numbers are a working
   first layout, not a final one: move parts in KiCad and carry them back (see

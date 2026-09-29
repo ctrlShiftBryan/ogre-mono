@@ -140,7 +140,7 @@ points:
             mod.skip: true
             bottom.skip: true
             home:   { legend: 'PgDn', mirror.legend: "\" '", diode: [-5.5, 8.1, 90], mirror.diode: [8.15, -0.63, 0] }   # left: lying in the strip past the socket, off the module's antenna and the power switch
-            top:    { legend: '} ]',  mirror.legend: '{ [', diode: [5.5, 8.1, 90], mirror.diode: [8.15, -0.63, 0] }   # left: lying in the strip past the socket, clear of the power switch's ON mark
+            top:    { legend: '} ]',  mirror.legend: '{ [' }
             num:    { legend: '~ `',  mirror.legend: 'PgUp' }
       rows:
         mod:    { row_net: row4, mirror.row_net: row9 }
@@ -402,29 +402,31 @@ pcbs:
         what: ogre_r0603
         where: &w_ldo_r_ce { ref: matrix_extra_home, shift: [-4.3, 14.5] }
         params: &r_ce { side: back, value: 10M, lcsc: C7250, from: VDDH, to: PWR_EN }
-      power:            # SW2: on the inner edge beside them, body 0.6 mm in, lever out past it;
-                        # BAT in on the common, VBAT out when on
-        what: ogre_power_switch
-        where: &w_power { ref: matrix_extra_home, shift: [9.44 - 0.6 - 1.4, 12], rotate: 90 }
-        params: &power { common: BAT, on: VBAT, side: back }
-      # between T's socket and G (and, left of them, R's and F's): the cables and the programming pads
-      battery:          # J1: the battery plug, from below; + on pad 1, the Adafruit/SparkFun convention
-        what: ogre_battery
-        where: &w_battery { ref: matrix_inner_home, shift: [0, 11.7] }   # between T's side pins, its pads just under T's centre hole
-        params: &battery { side: back, plus: 1 }
-      usb:              # J2: the daughterboard cable, plugging in from above (toward T)
+      usb:              # J1: the daughterboard cable, on the inner edge beside the LDO, opening toward
+                        # the edge so the cable leaves the board toward the middle
         what: ogre_usb
-        where: &w_usb { ref: matrix_inner_home, shift: [-8.75, 9.9], rotate: 90 }   # under R and F, clear of the battery connector
+        where: &w_usb { ref: matrix_extra_home, shift: [9.44 - 0.6 - 2.48, 11.9] }
         params: &usb { side: back }
-      swd:              # J3: programming pads
+      # between ~ `'s socket and } ]: the battery plug, on the inner edge, opening toward it
+      battery:          # J2: + on pad 1, the Adafruit/SparkFun convention
+        what: ogre_battery
+        where: &w_battery { ref: matrix_extra_top, shift: [9.44 - 1 - 4.37, 11.5], rotate: 90 }   # its mounting pads reach 0.26 past the courtyard
+        params: &battery { side: back, plus: 1 }
+      # between T's socket and G: the programming pads, between T's side pins
+      swd:              # J3
         what: ogre_swd
-        where: &w_swd { ref: matrix_inner_home, shift: [-8.75, 14.8] }
+        where: &w_swd { ref: matrix_inner_home, shift: [0, 12.5] }
         params: &swd { side: back }
-      # between { ['s socket and } ]: reset
+      # between % 5's socket and T: reset, between % 5's side pins
       reset:            # SW1
         what: ogre_reset
-        where: &w_reset { ref: matrix_extra_top, shift: [-3, 12] }
+        where: &w_reset { ref: matrix_inner_top, shift: [0, 12] }
         params: &reset { side: back, from: GND, to: RESET }
+      power:            # SW2: on the bottom edge below Z, body 0.6 mm in, lever out past it;
+                        # BAT in on the common, VBAT out when on
+        what: ogre_power_switch
+        where: &w_power { ref: matrix_pinky_bottom, shift: [0, -0.5U + 0.6 + 1.4] }
+        params: &power { common: BAT, on: VBAT, side: back }
 
       led_status:       # LED1, LED2: on the front, on the tab below Esc; cathode (flat) at each origin,
                         # anode toward Tab (turned round on the right half, where the tab mirrors)
@@ -477,10 +479,10 @@ pcbs:
       ldo_c_in:       { what: ogre_c0603, where: { <<: *w_ldo_c_in, ref: mirror_matrix_extra_home }, params: *c_10u_vddh }
       ldo_c_out:      { what: ogre_c0603, where: { <<: *w_ldo_c_out, ref: mirror_matrix_extra_home }, params: *c_4u7_vcc }
       ldo_r_ce:       { what: ogre_r0603, where: { <<: *w_ldo_r_ce, ref: mirror_matrix_extra_home }, params: *r_ce }
-      power:          { what: ogre_power_switch, where: { <<: *w_power, ref: mirror_matrix_extra_home }, params: *power }
-      battery:        { what: ogre_battery, where: { <<: *w_battery, ref: mirror_matrix_inner_home }, params: *battery }
-      usb:            { what: ogre_usb, where: { <<: *w_usb, ref: mirror_matrix_inner_home, rotate: -90 }, params: *usb }   # mirrored, ergogen turns it the other way; -90 lands on 90, opening up
+      usb:            { what: ogre_usb, where: { <<: *w_usb, ref: mirror_matrix_extra_home, rotate: 180 }, params: *usb }   # turned round: its opening is a matter of x, which the mirror doesn't flip for the footprint
+      battery:        { what: ogre_battery, where: { <<: *w_battery, ref: mirror_matrix_extra_top }, params: *battery }
       swd:            { what: ogre_swd, where: { <<: *w_swd, ref: mirror_matrix_inner_home }, params: *swd }
-      reset:          { what: ogre_reset, where: { <<: *w_reset, ref: mirror_matrix_extra_top }, params: *reset }
+      reset:          { what: ogre_reset, where: { <<: *w_reset, ref: mirror_matrix_inner_top }, params: *reset }
+      power:          { what: ogre_power_switch, where: { <<: *w_power, ref: mirror_matrix_pinky_bottom }, params: *power }
       led_status:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-8.6, -0.5U - 3.3], rotate: 180 }, params: *led_status }
       led_charge:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-2.7, -0.5U - 3.3], rotate: 180 }, params: *led_charge }

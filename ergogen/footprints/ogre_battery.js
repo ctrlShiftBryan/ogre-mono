@@ -20,8 +20,9 @@ module.exports = {
   body: p => {
     const [n1, n2] = p.plus === 2 ? [p.neg, p.pos] : [p.pos, p.neg]
     const x = p.plus === 2 ? 1 : -1
-    const mark = `\n\t(fp_text user "+" (at ${x} 5.3 ${p.r}) (layer F.SilkS) (effects (font (size 1 1) (thickness 0.2))))`   // at the plug's side, in front of the + contact
+    const mark = `\n\t(fp_text user "+" (at ${x} -5.6 ${p.r}) (layer F.SilkS) (effects (font (size 1 1) (thickness 0.2))))`   // past the + contact's solder tail
     return place('jst_ph_smd', p, { 1: n1, 2: n2 }, { id: 'JST_PH_S2B-PH-SM4', value: 'BAT' })
+      .replace(/([FB])\.SilkS/g, '$1.Fab')   // outline on the fab layer; only the + mark goes on the silkscreen
       .replace(/\n\t\(pad 1 /, `${mark}\n\t(pad 1 `)
   }
 }

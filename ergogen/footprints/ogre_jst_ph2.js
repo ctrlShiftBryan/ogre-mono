@@ -1,7 +1,9 @@
 // JST PH 2-pin side-entry through-hole battery connector (S2B-PH-K), KiCad's
 // stock footprint (Connector_JST: JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal). The
-// plug enters from local +y. JST sets no polarity, and batteries differ, so
-// `plus` says which pad takes the battery's + lead; the silkscreen marks it.
+// plug enters from local +y. JST sets no polarity; pad 1 = + follows Adafruit and
+// SparkFun (plug's mating face toward you, polarizing bump up: red on the right)
+// and the community wireless Corne. About half of generic LiPos are wired the
+// other way, so `plus` can move + to pad 2; the silkscreen marks it.
 // Nets
 //    pos: battery + (the nice!nano's B+, through the power switch)
 //    neg: battery - (GND)

@@ -81,9 +81,12 @@ rework (`ogre.2024.pretty`):
   sockets: pads 8–12 = its five rows (row0–4 left, row5–9 right); pads 20→14 =
   col0–col6; 22 = RESET; 24 (RAW, the nice!nano's B+) = BAT.
 - **Battery connector per half** (J1): a JST PH 2-pin side-entry through-hole
-  connector (S2B-PH-K) on the back, + on BAT and − on GND. JST sets no polarity
-  and batteries differ, so its `plus` param says which pad takes the + lead
-  (pad 1 for now; set it to match the battery), and the silkscreen marks it.
+  connector (S2B-PH-K) on the back, + on BAT and − on GND. JST sets no polarity.
+  Pad 1 is +, the Adafruit and SparkFun convention (the battery plug's mating
+  face toward you, polarizing bump up: red on the right), which the community
+  wireless Corne also uses; the silkscreen marks it. About half of generic
+  LiPos come wired the other way: check a new battery against that picture (or
+  a multimeter) and swap its crimps, or set the connector's `plus` to 2.
   No power switch yet: it goes in series on BAT once one is chosen.
 - **Each half:** its nice!nano up the back of the inner column, under `` ` ~ ``
   and `} ]` (PgUp and `{ [` on the right), USB-C flush with the top of the

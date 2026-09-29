@@ -299,7 +299,7 @@ pcbs:
           pad23: GND
           pad24: BAT
 
-      battery:          # J1: on the back below 5, clear of the sockets; + on pad 1 until the battery is chosen
+      battery:          # J1: on the back below 5, clear of the sockets; + on pad 1, the Adafruit/SparkFun convention
         what: ogre_jst_ph2
         where: { ref: matrix_inner_num, shift: [3.92, -5.043] }
         params: &battery { pos: BAT, neg: GND, plus: 1, side: back }

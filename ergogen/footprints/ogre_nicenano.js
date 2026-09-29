@@ -4,8 +4,6 @@
 // pads' mask open on the back only, and USB-C toward local -y.
 //   pads 1-12:  TX0(D3) RX1(D2) GND GND D1 D0 D4 C6 D7 E6 B4 B5
 //   pads 13-24: B6 B2 B3 B1 F7 F6 F5 F4 VCC RST GND RAW (B+ on a nice!nano)
-// The Ogre 68 wires pads 7-12 to its six rows and pads 20 down to 13 to its
-// eight columns (config.yaml, pcbs.left.footprints.mcu).
 // Params
 //    pad1..pad24: net on each pad ('' leaves it unconnected)
 //    side: 'front' (as drawn) or 'back', the whole footprint mirrored onto the

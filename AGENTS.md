@@ -13,7 +13,11 @@ Conventional commits (`feat(ergogen): …`, `docs: …`, `test: …`), one per c
 made as the change is made rather than batched at the end of a session.
 
 Trunk based development: commit directly to `main`. Work in this repo lands on
-`main`; branches and pull requests are not part of its workflow.
+`main`; branches and pull requests are not part of its workflow. The one
+exception is `surface-mount`, the branch (worktree
+`../ogre-mono-worktrees/surface-mount`) where the board grew its own nRF52840
+module and power section for JLCPCB assembly while `main` kept the nice!nano
+board; commit there while that design is in flight.
 
 ## ergogen/
 
@@ -22,8 +26,16 @@ are build output that `npm run build` overwrites, so changes belong in the
 config, and routing belongs in a copy of the PCB.
 
 The values that shape the board — column staggers, the thumb fan, the half
-separation — live by name in the config's `units` block. Change the design
-there, not by editing numbers inside the zones.
+separation, the controller module's spot — live by name in the config's `units` block.
+Change the design there, not by editing numbers inside the zones.
+
+`footprints/jlc/*.kicad_mod` are JLCPCB's own footprints, pulled with
+easyeda2kicad and kept verbatim (only the 3D model line removed) so their pads
+and orientation match JLC's assembly line. Don't edit their pads; a wrapper
+in `footprints/ogre_*.js` names the pins, and `jlc.js` does the rest. When
+the wrapper's frame differs from JLC's drawing, turn the whole footprint
+(`rotate` in `jlc.place`), never the pads in the file, or the placement file's
+rotation goes wrong.
 
 `npm run snapshot` is the geometry gate: it fails on any key that moved, appeared
 or went since the baseline in `points.snapshot.json`. When the move was
@@ -42,7 +54,10 @@ build reproduces it:
 2. Diff its footprints against a build written to the scratchpad, and encode
    each move as an offset from its key. A diode takes its key's
    `diode: [x, y, r]` in the zones (`mirror.diode` on the right half): mm in
-   the key's frame, y up, and degrees.
+   the key's frame, y up, and degrees. A controller or power part takes its
+   `where` shift from the key it sits under (`mcu_x` / `mcu_y` for the module
+   itself, from the extra column's home key), which the right half reuses from
+   the mirrored key.
 3. Done when a scratch build puts every footprint where the saved board has it.
    Then build, and the user reverts the board in KiCad.
 

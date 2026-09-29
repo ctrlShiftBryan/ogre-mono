@@ -13,7 +13,8 @@ use `npm run serve` below.
 | File | What it is |
 |---|---|
 | `config.yaml` | Layout, outline and PCB |
-| `footprints/` | Hotswap switch, its diode, nice!nano, nice!view, battery connector, power and reset switches on the board; the 2019 PCB-mount switch, diode, Pro Micro and TRRS jack, and a JST PH battery connector, available but not placed |
+| `footprints/` | The switch, its socket and diode, the nRF52840 module, charger, LDO, passives, crystal, connectors, switches, LEDs and SWD pads on the board (`ogre_*.js`); the 2019 PCB-mount switch, diode, Pro Micro and TRRS jack, the nice!nano and the through-hole JST PH connector, available but not placed |
+| `footprints/jlc/` | Footprints pulled verbatim from JLCPCB's parts library with easyeda2kicad, one per assembled part, each carrying its LCSC number; `jlc.js` turns them into ergogen footprints |
 | `serve.js` | Live viewer: watches the config, rebuilds and shows every view |
 | `bundle.js` | Packs the config and footprints into an archive the web UI can open |
 | `points.snapshot.json` | Baseline geometry for `npm run snapshot` |
@@ -55,69 +56,128 @@ a space: `'! 1'` is the key with `!` over `1`. Anything else (`Esc`,
 ## The PCB
 
 Two boards, always split, one per half: `left` and `right`, each its own KiCad
-PCB with its own nets. Wireless only: nice!nano controllers, no TRRS. The matrix
-and the controller pad map come from the 2019 Ogre Ergo, where they were
-fabricated and worked; the switch and nice!nano footprints come from the 2024
-rework (`ogre.2024.pretty`):
+PCB with its own nets. Wireless only, with the controller on the board itself:
+an nRF52840 module and the nice!nano v2's power section, all surface mount on
+the back, for JLCPCB assembly. The matrix comes from the 2019 Ogre Ergo, where
+it was fabricated and worked; the switch footprint from the 2024 rework
+(`ogre.2024.pretty`); everything JLC places uses JLC's own footprint
+(`footprints/jlc/`), so the pads and orientation match their line.
 
 - **Key numbers.** Each half numbers its keys 1–34 in points order: up each
   column from the outer edge inward, then the thumbs. Key *n* on a half is that
-  board's switch MX*n* and diode D*n*. The keycap render (`ogre-ergo.keycaps.svg`,
-  and the viewer's Keycaps tab) prints each key's number as L*n* or R*n*, and
-  `npm run check` fails if a switch or diode is numbered out of step with its key.
-- **One 12×8 matrix, one hotswap switch and one diode per key** (Kailh MX
-  socket and SOD-123 or through-hole diode, both on the back, COL2ROW). The
-  2.25U thumb keys add stabilizer holes (a key's `stab`), and a key's `turn`
-  would turn its switch (no key uses it now). The 2024 footprint had the diode built
-  in; here it's a part of its own (`ogre_socket_diode`) so it can be moved
-  clear of traces. A key's `diode: [x, y, r]` in the zones places its diode
-  (mm from the key, in its frame, y up; `mirror.diode` for the right half);
-  without one it sits at the switch's right edge, where the built-in one was.
-  Diodes number in key order, so moving one never renumbers the rest.
-  The grid follows the board: one column net per physical column, col0 the
-  far Esc column through col7 the extra column, and one row net per physical
-  row, num (row0) down to the arrows' mod row (row4), with the thumbs a row of
-  their own (row5) on col4–col7 in order of their x (Cmd, Shift, Alt, Home). The
-  right half is the same grid on rows 6–11. Each half is its own PCB with its
-  own nets, so the numbering across both is a convention, not a wire.
-- **One nice!nano per half**, MCU1 on each board, on the back on Mill-Max
-  sockets: pad 1 = CS and pads 5 / 6 = MOSI / SCK for the nice!view (D1, D2, D3:
-  its defaults); pads 7–12 = its six rows (row0–5 left, row6–11 right); pads
-  20→13 = col0–col7; 22 = RESET; 24 (RAW, the nice!nano's B+) = RAW, from the
-  power switch. Pad 2 (D0) is the one GPIO left free.
-- **nice!view per half** (DISP1): the 5-pin header, MOSI, SCK, VCC, GND, CS from
-  pin 1 (the nice!view's own KiCad library), on the front of the controller bay
-  just past the nice!nano's far end, the 14 × 36 mm display lying over it, where
-  a Corne puts its OLED. Its first four pins are the Corne's 4-pin OLED header
-  in the same order, CS added past GND. The holes are the nice!nano's Mill-Max
-  size, so the display can sit on sockets. Firmware: ZMK's `nice_view` shield,
-  no adapter, since CS is on its default pin.
-- **Battery connector per half** (J1): a JST PH 2-pin side-entry through-hole
-  connector (S2B-PH-K) on the back, + on BAT and − on GND. JST sets no polarity.
-  Pad 1 is +, the Adafruit and SparkFun convention (the battery plug's mating
-  face toward you, polarizing bump up: red on the right), which the community
-  wireless Corne also uses; the silkscreen marks it. About half of generic
-  LiPos come wired the other way: check a new battery against that picture (or
-  a multimeter) and swap its crimps, or set the connector's `plus` to 2.
-- **Power switch per half** (SW2): a Shouhan MSK-12C02 side-actuated SPDT slide
-  switch (pin-compatible with the Alps SSSS811101 the community wireless Corne
-  uses), KiCad's stock footprint, on the back at the top edge over `5` / `6`:
-  body 0.6 mm in from the edge, lever out past it. BAT comes in on the common
-  pin 2, RAW goes out on pin 1 when on (the silkscreen marks that end ON), and
-  pin 3 is left open, as on the Corne.
-- **Each half:** its nice!nano in a bay of its own beside the inner column, as
-  on a Corne, on the back with USB-C flush with the bay's top edge. Its place
-  is `mcu_x` / `mcu_y` in the config's `units`, from the inner column's top key,
-  as placed in KiCad; the right half mirrors it. A 6 mm reset switch (SW1) sits
-  on the back below Tab (`| \` on the right).
+  board's switch MX*n*, socket S*n* and diode D*n*. The keycap render
+  (`ogre-ergo.keycaps.svg`, and the viewer's Keycaps tab) prints each key's
+  number as L*n* or R*n*, and `npm run check` fails if a part is numbered out
+  of step with its key.
+- **One 12×8 matrix, one hotswap socket and one diode per key**, COL2ROW. The
+  switch (`ogre_hotswap`) is holes, cap outline and legend; its copper is the
+  socket (`ogre_socket`, a Kailh-compatible MX socket, JLC's clone) and the
+  1N4148W diode in SOD-123F (`ogre_socket_diode`), each a part of its own on
+  the back so it can be moved clear of traces. The socket places itself over
+  the switch's pins; a key's `diode: [x, y, r]` in the zones places its diode
+  (mm from the key, in its frame, y up; `mirror.diode` for the right half),
+  and without one it sits at the switch's right edge, where the 2024 footprint
+  had it built in. The 2.25U thumb keys add stabilizer holes (a key's `stab`),
+  and a key's `turn` would turn its switch and socket together (no key uses it
+  now). The grid follows the board: one column net per physical column, col0
+  the far Esc column through col7 the extra column, and one row net per
+  physical row, num (row0) down to the arrows' mod row (row4), with the thumbs
+  a row of their own (row5) on col4–col7 in order of their x (Cmd, Shift, Alt,
+  Home). The right half is the same grid on rows 6–11. Each half is its own
+  PCB with its own nets, so the numbering across both is a convention, not a
+  wire.
+- **The controller** (MCU1): an Ebyte E73-2G4M08S1C, an nRF52840 module with
+  its antenna, matching and crystals inside, lying sideways on the back below
+  the extra column's home key (PgDn / `" '`), where that column has no bottom
+  key, with its ceramic antenna end just inside the half's inner edge. Keep
+  copper off that end on both layers; the diodes of the two keys beside it are
+  moved out of its way in the zones. Its pin map is in `footprints/ogre_e73.js`: the eight
+  columns on P1.11 P1.10 P0.03 P0.28 P1.13 P0.02 P0.29 P0.31 (module pins
+  1–9), the half's six rows on P0.30 P0.26 P0.06 P0.05 P0.08 P1.09 (pins
+  10–17), and the nice!nano's roles kept on the
+  nice!nano's pins, so ZMK's `nice_nano_v2` configuration carries over with
+  the matrix pins renamed: P0.13 cuts the LDO (`PWR_EN`), P0.15 drives the
+  status LED (`BLED`), P0.18 is reset, battery voltage is read from VDDH.
+- **Power, as on the nice!nano v2.** The battery (BAT) goes through the slide
+  switch (VBAT) into a TI BQ24075 charger and power path (IC1): USB on IN,
+  the battery on BAT, and OUT (VDDH) feeds the module in high-voltage mode,
+  from USB when it's plugged in and the battery otherwise. 500 mA from USB
+  (EN1 high, EN2 low), charging whenever USB is there (CE low, SYSOFF low),
+  charge current set by the 10k on ISET (about 100 mA; a smaller resistor
+  raises it), the thermistor faked with 10k on TS. The module's own regulator
+  puts 3.3 V out on DCCH, which L1 (10 µH) carries to VDD. A Torex XC6220 LDO
+  (IC2) makes VCC from VDDH for anything the board powers besides the module
+  (LED strips, one day); its CE is pulled up to VDDH through 10 MΩ and driven
+  by P0.13 (`PWR_EN`), so firmware can cut it. A 32.768 kHz crystal (Y1, FC-135)
+  with 12 pF caps is the low-frequency clock. Nets and values are checked by
+  `npm run check`.
+- **USB** comes over a one-to-one 4-pin cable from a Unified Daughterboard S1
+  ([unified-daughterboard.github.io](https://unified-daughterboard.github.io/))
+  mounted in the case, which carries the USB-C port, its fuse and ESD
+  protection. The board's end is a Molex Pico-EZmate (J2, 78171-0004) with the
+  daughterboard's pinout, 1 VBUS 2 D− 3 D+ 4 GND, below S (L on the right),
+  opening toward the index column.
+- **Battery connector** (J2): a JST PH 2-pin side-entry surface-mount connector
+  (S2B-PH-SM4-TB) below Q (P on the right), the plug entering from the outer
+  edge's side, + on BAT and − on GND. JST sets no polarity. Pad 1 is +, the Adafruit and
+  SparkFun convention (the battery plug's mating face toward you, polarizing
+  bump up: red on the right), which the community wireless Corne also uses;
+  the silkscreen marks it. About half of generic LiPos come wired the other
+  way: check a new battery against that picture (or a multimeter) and swap its
+  crimps, or set the connector's `plus` to 2.
+- **Power switch** (SW2): a Shouhan MSK-12C02 side-actuated SPDT slide switch
+  (pin-compatible with the Alps SSSS811101 the community wireless Corne uses),
+  on the half's inner edge below `~ \`` (PgUp on the right), lever out past
+  it. BAT comes in on the common pin 2, VBAT goes out on pin 1
+  when on (the silkscreen marks that end ON), and pin 3 is left open, as on
+  the Corne.
+- **Reset** (SW1): a 5.1 mm surface-mount tactile switch (TS-1187A) below
+  `~ \`` (PgUp on the right), beside that key's diode, wired across its
+  diagonal pads so it works whichever way its pin pairs run.
+- **SWD** (J3): six bare pads and three locating holes for a Tag-Connect
+  TC2030-NL cable, under T / Y. The module arrives blank; this is how the UF2
+  bootloader gets on once (any SWD probe; a Raspberry Pi Pico running
+  debugprobe will do).
+- **LEDs**: two 3 mm through-hole LEDs on the front, soldered by hand, on a tab
+  below Esc (Del on the right) so they shine up through a hole in the case
+  just below that key, one above the other: LED2 the charge LED (VDDH through
+  1k, sinking into the charger's CHG, orange) and, below it, LED1 the status
+  LED (P0.15 through 1k, blue). Each stands with its two pads in a line down
+  the tab, the flat side (cathode) at the footprint's origin and the anode
+  above it, so a bent-over LED shines sideways.
+- **Where the rest sits.** Nothing juts out of the outline for the controller:
+  the parts hide on the back in the 10 mm strips between one key's socket and
+  the next key's switch pins. The module's inductor, capacitors and the crystal
+  are in the strip between G and B, next to the module's pad end; the charger
+  and LDO with their passives in the strip between `} ]` and PgDn; the SWD
+  pads under T, between that switch's side pins; the USB connector below S,
+  the battery connector below Q, and reset and the power switch below `~ \``,
+  the switch on the inner edge, as placed in KiCad. Each is placed from a nearby key in
+  the config (`mcu_x` / `mcu_y` for the module) and the right half reuses the
+  same placement from the mirrored key. The config's numbers are a working
+  first layout, not a final one: move parts in KiCad and carry them back (see
+  `AGENTS.md`).
 - **Outline:** keycap edges with 1 mm corners, thumbs included. The thumb
   cluster joins the matrix by filling only the gaps between neighboring keys
   (`thumb_web`), and one pocket per half is cut out over Cmd, as on the 2019
   board. Each half's inner edge runs straight up just inside its inner column,
-  and the controller bay (`mcu_bay`) juts out from it. The `left` and `right`
-  outlines are the halves; `board` is both together, for viewing.
+  and the LED tab (`led_tab_w`, `led_tab_h`) hangs below Esc / Del. The `left`
+  and `right` outlines are the halves; `board` is both together, for viewing.
 - **No underglow LEDs**, no alternate-size switch footprints, and no mounting
   holes yet (see below).
+
+### Ordering from JLCPCB
+
+Every part JLC places carries its LCSC number as a footprint property
+(`LCSC Part`), read from the footprint file in `footprints/jlc/` or set per
+part in the config (the passives). The three hand-soldered footprints, the
+switch outline, the LEDs and the SWD pads, carry none, and `npm run check`
+holds that line. The bill of materials and placement files come out of the
+routed board with KiCad's Fabrication Toolkit plugin (or Bouni's
+kicad-jlcpcb-tools), which reads that property; the sockets and diodes sit on
+the back with everything else, so assembly is single-sided. The module needs
+JLC's Standard assembly tier and X-ray inspection. Stock on the module is the
+one thing that can hold an order up: buy it into the JLC parts library early.
 
 Both boards sit on KiCad's page at their `pcbs.<half>.params.origin` in the
 config: after ergogen runs, `build.js` moves each finished PCB there as a whole
@@ -194,23 +254,28 @@ made in the web editor don't come back to these files, so re-run `npm run
 bundle` after changing the config.
 
 `npm run check` reads the generated PCB and fails unless every key has one
-hotswap switch and one diode wired column → switch → diode → row, no two keys
-share a matrix position, every nice!nano pad carries the net listed above, and
-the reset switches are wired to their own half. If `kicad-cli` is
-installed it also runs KiCad's DRC (overlapping parts, hole and edge
-clearances) and fails on any violation other than the unrouted connections.
+switch, one socket and one diode wired column → socket → diode → row, no two
+keys share a matrix position, the module's pads carry the nets listed above,
+the charger, LDO, crystal, passives, connectors, switches and LEDs are wired
+as described, and every assembled part carries its LCSC number. If
+`kicad-cli` is installed it also runs KiCad's DRC (overlapping parts, hole and
+edge clearances) and fails on any violation other than the unrouted
+connections and the switch pins that pass through their sockets' courtyards.
 
 ## Firmware notes
 
-The matrix no longer matches the ZMK `ogre_ergo` shield in
-`ctrlShiftBryan/zmk-config2` (`boards/shields/ogre_ergo/`) or QMK's
-`ogre/ergo_split`: the 2019 board's 5×7 grid packed eight physical columns
-into seven nets and borrowed matrix spots for the thumbs, and this one is the
-board as drawn. A new shield wants:
+With the nRF52840 on the board, ZMK wants a board definition of its own rather
+than a shield on `nice_nano_v2`. Start from ZMK's `nice_nano_v2` board files
+(the same charger, regulator cut-off on P0.13, battery read from VDDH, status
+LED on P0.15, external 32 kHz crystal). The matrix no longer matches the ZMK
+`ogre_ergo` shield in `ctrlShiftBryan/zmk-config2` (`boards/shields/ogre_ergo/`)
+or QMK's `ogre/ergo_split`: the 2019 board's 5×7 grid packed eight physical
+columns into seven nets and borrowed matrix spots for the thumbs, and this
+one is the board as drawn.
 
-- **kscan per half:** six rows on D4, D5, D6, D7, D8, D9 (pads 7–12) and eight
-  columns on D21, D20, D19, D18, D15, D14, D16, D10 (pads 20→13), COL2ROW, so
-  `diode-direction = "col2row"`.
+- **kscan per half:** six rows on P0.30 P0.26 P0.06 P0.05 P0.08 P1.09 and
+  eight columns on P1.11 P1.10 P0.03 P0.28 P1.13 P0.02 P0.29 P0.31, COL2ROW,
+  so `diode-direction = "col2row"`.
 - **Transform:** 6 rows × 16 columns, `col-offset = <8>` for the right half.
   Row 0 is the number row, row 4 the arrows, row 5 the thumbs; column 0 is Esc,
   columns 1–7 outer through extra, and the thumbs sit on columns 4–7 of row 5

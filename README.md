@@ -3,7 +3,8 @@
 A 68-key ergonomic keyboard, written by hand for
 [ergogen](https://ergogen.xyz): key layout, board outline and a KiCad PCB, all
 generated from one `ergogen/config.yaml`. It is a wireless split: one PCB per
-half, each with a nice!nano.
+half, each with its own nRF52840 module and power section on the board, laid
+out for JLCPCB assembly.
 
 34 keys a half: four staggered rows, a three-key inner column, a lone Esc
 outboard of the number row, two arrow keys, and a four-key thumb cluster fanned
@@ -13,17 +14,16 @@ column, 1.25U and 2.25U thumbs. `ergogen/README.md` describes the design;
 
 ## Where it stands
 
-- Layout, outline and PCBs all generate from the config: 68 keys on a 10x7
-  matrix, hotswap sockets with one diode per key, and a nice!nano per half.
+- Layout, outline and PCBs all generate from the config: 68 keys on a 6x8
+  matrix per half that follows the physical rows and columns, hotswap sockets
+  with one diode per key, and an Ebyte E73 nRF52840 module with the nice!nano
+  v2's power section on each half, all surface mount from JLC's parts library.
 - The design's own values — column staggers, thumb fan, half separation — are
   named in the config's `units` block, so the board is tuned in one place.
 - `npm run snapshot` holds the geometry against a committed baseline, so a key
   that moves without you meaning it fails.
-- `npm run check` passes its wiring checks and fails only on KiCad DRC
-  silkscreen warnings: the socket outline over its own holes, the nice!nano's
-  small pin labels, and labels overlapping under the controller. That wants a
-  decision (clean up the silkscreen, or let the check ignore it) before DRC can
-  serve as a gate.
+- `npm run check` passes: wiring, every controller and power pin on its net,
+  and KiCad DRC with no violations beyond the unrouted connections.
 - **Next:** routing: a routed board as the copper master, with the build syncing
   placement into it. Mounting holes wait on the case.
 

@@ -13,11 +13,9 @@ Conventional commits (`feat(ergogen): …`, `docs: …`, `test: …`), one per c
 made as the change is made rather than batched at the end of a session.
 
 Trunk based development: commit directly to `main`. Work in this repo lands on
-`main`; branches and pull requests are not part of its workflow. The one
-exception is `surface-mount`, the branch (worktree
-`../ogre-mono-worktrees/surface-mount`) where the board grew its own nRF52840
-module and power section for JLCPCB assembly while `main` kept the nice!nano
-board; commit there while that design is in flight.
+`main`; branches and pull requests are not part of its workflow. The
+socketed-nice!nano board that came before the onboard controller is in
+history, before the `surface-mount` merge, if it's ever wanted again.
 
 ## ergogen/
 

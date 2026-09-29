@@ -75,14 +75,14 @@ points:
     # Two-part legends are "shifted base", e.g. '! 1'.
     matrix:
       columns:
-        far:            # lone key left of the number row
+        far:            # lone key left of the number row, on the outer column's net and the mod row's
           key.skip: true
           key.stagger: stagger_far
           key.col_net: col0
           rows:
-            num: { skip: false, legend: 'Esc', mirror.legend: 'Del' }
+            num: { skip: false, legend: 'Esc', mirror.legend: 'Del', row_net: row4, mirror.row_net: row10 }
         outer:          # wide caps right-aligned to the pinky column
-          key.col_net: col1
+          key.col_net: col0
           rows:
             mod.skip: true
             bottom: { width: 1.25U-1, adjust.shift: [-0.125U, 0], legend: 'Ctrl',      mirror.legend: 'Ctrl' }
@@ -91,7 +91,7 @@ points:
             num:    { legend: '+ =', mirror.legend: '_ -' }
         pinky:
           key.stagger: stagger_pinky
-          key.col_net: col2
+          key.col_net: col1
           rows:
             mod.skip: true
             bottom: { legend: 'Z',   mirror.legend: '? /' }
@@ -100,7 +100,7 @@ points:
             num:    { legend: '! 1', mirror.legend: ') 0' }
         ring:
           key.stagger: stagger_ring
-          key.col_net: col3
+          key.col_net: col2
           rows:
             mod:    { legend: '←',   mirror.legend: '↑' }
             bottom: { legend: 'X',   mirror.legend: '> .' }
@@ -109,7 +109,7 @@ points:
             num:    { legend: '@ 2', mirror.legend: '( 9' }
         middle:
           key.stagger: stagger_middle
-          key.col_net: col4
+          key.col_net: col3
           rows:
             mod:    { legend: '→',   mirror.legend: '↓' }
             bottom: { legend: 'C',   mirror.legend: '< ,' }
@@ -118,7 +118,7 @@ points:
             num:    { legend: '# 3', mirror.legend: '* 8' }
         index:
           key.stagger: stagger_index
-          key.col_net: col5
+          key.col_net: col4
           rows:
             mod.skip: true
             bottom: { legend: 'V',   mirror.legend: 'M' }
@@ -127,7 +127,7 @@ points:
             num:    { legend: '$ 4', mirror.legend: '& 7' }
         inner:
           key.stagger: stagger_inner
-          key.col_net: col6
+          key.col_net: col5
           rows:
             mod.skip: true
             bottom: { legend: 'B',   mirror.legend: 'N', diode: [0, -6, 90], mirror.diode: [0, -6, 90] }   # below the socket: the controller module's pad end is at this key's right edge
@@ -136,7 +136,7 @@ points:
             num:    { legend: '% 5', mirror.legend: '^ 6' }
         extra:          # inner 1u column (num, top, home only)
           key.stagger: stagger_extra
-          key.col_net: col7
+          key.col_net: col6
           rows:
             mod.skip: true
             bottom.skip: true
@@ -151,7 +151,7 @@ points:
         num:    { row_net: row0, mirror.row_net: row6 }
 
     thumb:              # 1.25u, 2.25u, then a 1.25u + 1u stack, fanned 30°; its own matrix
-                        # row, the keys on col4-col7 in order of their x
+                        # row, the keys on col3-col6 in order of their x
       anchor:
         ref: matrix_middle_mod
         shift: [thumb_offset_x, thumb_offset_y]
@@ -159,7 +159,7 @@ points:
       columns:
         near:
           key.width: 1.25U-1
-          key.col_net: col4
+          key.col_net: col3
           rows:
             cluster: { legend: 'Cmd', mirror.legend: 'Fn' }
             upper.skip: true
@@ -169,13 +169,13 @@ points:
           key.width: 2.25U-1
           key.adjust.rotate: 90   # a wide cap turned 90°, so switch and stabilizer footprints face the right way
           key.stab: true          # 2.25U: stabilizer holes
-          key.col_net: col5
+          key.col_net: col4
           rows:
             cluster: { legend: 'Shift', mirror.legend: 'Enter' }
             upper.skip: true
         far:            # 1.25u Alt with a 1u Home above it
           key.stagger: thumb_stagger_far
-          key.col_net: col6
+          key.col_net: col5
           rows:
             cluster:
               width: 1.25U-1
@@ -185,7 +185,7 @@ points:
               mirror.legend: 'Alt'
             upper:
               adjust.rotate: 90   # turned 90° like the 1.25u/2.25u thumb caps (mirror flips it to -90)
-              col_net: col7
+              col_net: col6
               legend: 'Home'
               mirror.legend: 'End'
       rows:
@@ -262,11 +262,11 @@ outlines:
 # PCB: two boards, always split, wireless only: `left` and `right`, each a half
 # with its own nRF52840 module and power section on the back, all surface mount
 # for JLCPCB assembly (footprints from JLC's library, each with its LCSC number).
-# 12x8 matrix, COL2ROW diodes, one hotswap socket and one diode per key: one
-# column net per physical column (col0 the far Esc column through col7 the extra
-# column) and one row net per physical row, the thumbs a row of their own. Rows
-# 0-5 are the left half, 6-11 the right; columns 0-7 on both. Pin map in
-# footprints/ogre_e73.js.
+# 12x7 matrix, COL2ROW diodes, one hotswap socket and one diode per key: one
+# column net per physical column (col0 the outer column through col6 the extra
+# column) and one row net per physical row, the thumbs a row of their own; the
+# lone Esc / Del joins the outer column on the mod row. Rows 0-5 are the left
+# half, 6-11 the right; columns 0-6 on both. Pin map in footprints/ogre_e73.js.
 # Power, as on the nice!nano v2: the battery (JST PH, + BAT) through a slide
 # switch (VBAT) into a BQ24075 charger/power path, whose OUT (VDDH) feeds the
 # module in high-voltage mode and an XC6220 LDO (VCC, cut off by P0.13) for
@@ -319,7 +319,6 @@ pcbs:
           col_4: col4
           col_5: col5
           col_6: col6
-          col_7: col7
           row_0: row0
           row_1: row1
           row_2: row2

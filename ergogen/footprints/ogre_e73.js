@@ -13,7 +13,8 @@
 //   31 D+  32 P0.20  33 P0.13  34 P0.22  35 P0.24  36 P1.00  37 SWDIO  38 P1.02
 //   39 SWDCLK  40 P1.04  41 P0.09/NFC1  42 P1.06  43 P0.10/NFC2
 // Nets (all optional but the matrix; '' leaves a pad unconnected)
-//   col_0..col_7: the half's eight columns, on P1.11 P1.10 P0.03 P0.28 P1.13 P0.02 P0.29 P0.31
+//   col_0..col_6: the half's seven columns, on P1.10 P0.03 P0.28 P1.13 P0.02 P0.29 P0.31
+//     (P1.11, pad 1, is free)
 //   row_0..row_5: the half's six rows, on P0.30 P0.26 P0.06 P0.05 P0.08 P1.09
 //   vddh: high-voltage supply in (battery or USB, from the charger's OUT)
 //   dcch: regulator out, to the inductor;  vdd: 3.3 V, from the inductor
@@ -29,7 +30,7 @@ const { place } = require('../jlc')
 
 const net = value => ({ type: 'net', value })
 const params = { designator: 'MCU', side: 'front' }   // not 'U': ergogen reads that as the 19.05 mm unit
-for (let c = 0; c <= 7; c++) params[`col_${c}`] = net('')
+for (let c = 0; c <= 6; c++) params[`col_${c}`] = net('')
 for (let r = 0; r <= 5; r++) params[`row_${r}`] = net('')
 Object.assign(params, {
   gnd: net('GND'), vddh: net('VDDH'), dcch: net('DCCH'), vdd: net('VDD'),
@@ -39,7 +40,7 @@ Object.assign(params, {
 })
 
 const PADS = {
-  col_0: 1, col_1: 2, col_2: 3, col_3: 4, col_4: 6, col_5: 7, col_6: 8, col_7: 9,
+  col_0: 2, col_1: 3, col_2: 4, col_3: 6, col_4: 7, col_5: 8, col_6: 9,
   row_0: 10, row_1: 12, row_2: 14, row_3: 15, row_4: 16, row_5: 17,
   xl1: 11, xl2: 13, vdd: 19, vddh: 23, dcch: 25, reset: 26, vbus: 27, led: 28,
   dm: 29, dp: 31, vcc_ctl: 33, swdio: 37, swdclk: 39

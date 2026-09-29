@@ -69,7 +69,7 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   (`ogre-ergo.keycaps.svg`, and the viewer's Keycaps tab) prints each key's
   number as L*n* or R*n*, and `npm run check` fails if a part is numbered out
   of step with its key.
-- **One 12×8 matrix, one hotswap socket and one diode per key**, COL2ROW. The
+- **One 12×7 matrix, one hotswap socket and one diode per key**, COL2ROW. The
   switch (`ogre_hotswap`) is holes, cap outline and legend; its copper is the
   socket (`ogre_socket`, a Kailh-compatible MX socket, JLC's clone) and the
   1N4148W diode in SOD-123F (`ogre_socket_diode`), each a part of its own on
@@ -80,10 +80,12 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   had it built in. The 2.25U thumb keys add stabilizer holes (a key's `stab`),
   and a key's `turn` would turn its switch and socket together (no key uses it
   now). The grid follows the board: one column net per physical column, col0
-  the far Esc column through col7 the extra column, and one row net per
+  the outer column through col6 the extra column, and one row net per
   physical row, num (row0) down to the arrows' mod row (row4), with the thumbs
-  a row of their own (row5) on col4–col7 in order of their x (Cmd, Shift, Alt,
-  Home). The right half is the same grid on rows 6–11. Each half is its own
+  a row of their own (row5) on col3–col6 in order of their x (Cmd, Shift, Alt,
+  Home). The lone Esc (Del) is the exception: it joins the outer column's net
+  on the mod row (row4/col0), which has no key of its own there, rather than
+  take a column for one key. The right half is the same grid on rows 6–11. Each half is its own
   PCB with its own nets, so the numbering across both is a convention, not a
   wire.
 - **The controller** (MCU1): an Ebyte E73-2G4M08S1C, an nRF52840 module with
@@ -91,9 +93,9 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   the extra column's home key (PgDn / `" '`), where that column has no bottom
   key, with its ceramic antenna end just inside the half's inner edge. Keep
   copper off that end on both layers; the diodes of the two keys beside it are
-  moved out of its way in the zones. Its pin map is in `footprints/ogre_e73.js`: the eight
-  columns on P1.11 P1.10 P0.03 P0.28 P1.13 P0.02 P0.29 P0.31 (module pins
-  1–9), the half's six rows on P0.30 P0.26 P0.06 P0.05 P0.08 P1.09 (pins
+  moved out of its way in the zones. Its pin map is in `footprints/ogre_e73.js`: the seven
+  columns on P1.10 P0.03 P0.28 P1.13 P0.02 P0.29 P0.31 (module pins
+  2–9; P1.11 on pin 1 is free), the half's six rows on P0.30 P0.26 P0.06 P0.05 P0.08 P1.09 (pins
   10–17), and the nice!nano's roles kept on the
   nice!nano's pins, so ZMK's `nice_nano_v2` configuration carries over with
   the matrix pins renamed: P0.13 cuts the LDO (`PWR_EN`), P0.15 drives the
@@ -274,12 +276,13 @@ columns into seven nets and borrowed matrix spots for the thumbs, and this
 one is the board as drawn.
 
 - **kscan per half:** six rows on P0.30 P0.26 P0.06 P0.05 P0.08 P1.09 and
-  eight columns on P1.11 P1.10 P0.03 P0.28 P1.13 P0.02 P0.29 P0.31, COL2ROW,
+  seven columns on P1.10 P0.03 P0.28 P1.13 P0.02 P0.29 P0.31, COL2ROW,
   so `diode-direction = "col2row"`.
-- **Transform:** 6 rows × 16 columns, `col-offset = <8>` for the right half.
-  Row 0 is the number row, row 4 the arrows, row 5 the thumbs; column 0 is Esc,
-  columns 1–7 outer through extra, and the thumbs sit on columns 4–7 of row 5
-  as Cmd, Shift, Alt, Home (mirrored on the right: Fn, Enter, Alt, End). 68
+- **Transform:** 6 rows × 14 columns, `col-offset = <7>` for the right half.
+  Row 0 is the number row, row 4 the arrows, row 5 the thumbs; columns 0–6
+  are outer through extra, Esc (Del) is RC(4,0), and the thumbs sit on
+  columns 3–6 of row 5 as Cmd, Shift, Alt, Home (mirrored on the right: Fn,
+  Enter, Alt, End). 68
   entries, in the same key order as the keycap render.
 - **Bindings** carry over key by key; only their `RC` positions change.
 

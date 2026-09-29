@@ -3,7 +3,7 @@
 //   - one switch, one hotswap socket and one diode per key, wired
 //     col -> socket -> diode -> row, and the half's key n (points order, L/Rn on
 //     the keycap render) is MXn, Sn and Dn
-//   - the 12x8 matrix has no duplicate positions, and each row is on its own half
+//   - the 12x7 matrix has no duplicate positions, and each row is on its own half
 //   - the controller module's pads carry their nets, and the charger, LDO, crystal,
 //     passives, connectors, switches and LEDs are wired as the README describes
 //   - every assembled part carries its LCSC number for the JLCPCB BOM
@@ -42,7 +42,7 @@ const expectedMcu = rows => {
   const want = {}
   for (let pad = 1; pad <= 43; pad++) want[pad] = ''
   Object.assign(want, { 5: 'GND', 21: 'GND', 24: 'GND', 11: 'XL1', 13: 'XL2', 19: 'VDD', 23: 'VDDH', 25: 'DCCH', 26: 'RESET', 27: 'VBUS', 28: 'BLED', 29: 'D-', 31: 'D+', 33: 'PWR_EN', 37: 'SWDIO', 39: 'SWDCLK' })
-  ;[1, 2, 3, 4, 6, 7, 8, 9].forEach((pad, c) => { want[pad] = `col${c}` })
+  ;[2, 3, 4, 6, 7, 8, 9].forEach((pad, c) => { want[pad] = `col${c}` })
   ;[10, 12, 14, 15, 16, 17].forEach((pad, i) => { want[pad] = `row${rows[i]}` })
   return want
 }

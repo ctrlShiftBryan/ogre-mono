@@ -9,7 +9,8 @@
 //    stab: add Cherry/Costar PCB-mount stabilizer holes (2U and up; key's `stab` via '{{stab}}')
 //    turn: degrees the switch turns on its key (key's `turn` via '{{turn}}'), so one
 //      footprint entry serves every key and designators stay in key order
-//    cap_w, cap_h: keycap size in mm, drawn on Dwgs.User
+//    cap_w, cap_h: keycap size in mm, drawn on Dwgs.User and both fab layers, with
+//      the size in U printed beside the legend
 
 const esc = s => String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')
 
@@ -25,6 +26,16 @@ module.exports = {
   body: p => {
     const r = p.r + Number(p.turn || 0)
     const w = p.cap_w / 2, h = p.cap_h / 2
+    // the keycap: its outline on User.Drawings and on both fab layers, so it shows
+    // from either side, with its size (1U, 1.25U…) beside the legend on the front
+    const u = Math.round((p.cap_w + 1) / 19.05 * 100) / 100
+    const cap = ['Dwgs.User', 'F.Fab', 'B.Fab'].map(l => `
+      (fp_line (start ${-w} ${-h}) (end ${w} ${-h}) (layer ${l}) (width 0.15))
+      (fp_line (start ${w} ${-h}) (end ${w} ${h}) (layer ${l}) (width 0.15))
+      (fp_line (start ${w} ${h}) (end ${-w} ${h}) (layer ${l}) (width 0.15))
+      (fp_line (start ${-w} ${h}) (end ${-w} ${-h}) (layer ${l}) (width 0.15))`).join('') + `
+      (fp_text user "${u}U" (at 0 -6.6 ${r}) (layer F.Fab) (effects (font (size 0.8 0.8) (thickness 0.12))))
+      (fp_text user "${u}U" (at 0 6.6 ${r}) (layer B.Fab) (effects (font (size 0.8 0.8) (thickness 0.12)) (justify mirror)))`
     const legend = p.legend ? `
       (fp_text user "${esc(p.legend)}" (at 0 4.6 ${r}) (layer F.SilkS) (effects (font (size 1 1) (thickness 0.15))))
       (fp_text user "${esc(p.legend)}" (at 0 -8.2 ${r}) (layer B.SilkS) (effects (font (size 1 1) (thickness 0.15)) (justify mirror)))` : ''
@@ -41,10 +52,7 @@ module.exports = {
       ${legend}
 
 
-      (fp_line (start ${-w} ${-h}) (end ${w} ${-h}) (layer Dwgs.User) (width 0.15))
-      (fp_line (start ${w} ${-h}) (end ${w} ${h}) (layer Dwgs.User) (width 0.15))
-      (fp_line (start ${w} ${h}) (end ${-w} ${h}) (layer Dwgs.User) (width 0.15))
-      (fp_line (start ${-w} ${h}) (end ${-w} ${-h}) (layer Dwgs.User) (width 0.15))
+      ${cap}
       (fp_line (start -7 -7) (end -6 -7) (layer Dwgs.User) (width 0.15))
       (fp_line (start -7 -6) (end -7 -7) (layer Dwgs.User) (width 0.15))
       (fp_line (start -7 6) (end -7 7) (layer Dwgs.User) (width 0.15))

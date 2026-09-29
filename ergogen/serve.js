@@ -13,7 +13,8 @@ const { OUT } = require('./build')
 
 const here = __dirname
 const PORT = +(process.env.PORT || 5174)
-const PCB = path.join(OUT, 'pcbs/ogre.kicad_pcb')
+const HALVES = ['left', 'right']
+const PCB = half => path.join(OUT, `pcbs/${half}.kicad_pcb`)
 const LAYERS = {
   all: 'Edge.Cuts,F.Cu,B.Cu,F.SilkS,B.SilkS',
   front: 'Edge.Cuts,F.Cu,F.SilkS',
@@ -58,12 +59,18 @@ const keycaps = () => derive('keycaps', () => {
   execFileSync('python3', [path.join(here, 'render_keycaps.py'), path.join(OUT, 'points/points.yaml'), out, 'Ogre Ergo'])
   return fs.readFileSync(out)
 })
+// both halves, each plotted on KiCad's page (they share its coordinates, as placed
+// there), then laid one over the other so the preview shows the whole keyboard
 const pcbSvg = which => derive(`pcb:${which}`, () => {
   if (!kicad) throw new Error('kicad-cli not found — PCB preview needs KiCad installed')
-  const out = path.join(OUT, `pcb-${which}.svg`)
-  execFileSync(kicad, ['pcb', 'export', 'svg', '--mode-single', '--exclude-drawing-sheet',
-    '--page-size-mode', '2', '--fit-page-to-board', '-l', LAYERS[which] || LAYERS.all, '-o', out, PCB], { stdio: 'ignore' })
-  return fs.readFileSync(out)
+  const [first, ...rest] = HALVES.map(half => {
+    const out = path.join(OUT, `pcb-${which}-${half}.svg`)
+    execFileSync(kicad, ['pcb', 'export', 'svg', '--mode-single', '--exclude-drawing-sheet',
+      '--page-size-mode', '1', '-l', LAYERS[which] || LAYERS.all, '-o', out, PCB(half)], { stdio: 'ignore' })
+    return String(fs.readFileSync(out))
+  })
+  const inner = svg => svg.slice(svg.indexOf('>', svg.indexOf('<svg')) + 1, svg.lastIndexOf('</svg>'))
+  return Buffer.from(first.slice(0, first.lastIndexOf('</svg>')) + rest.map(inner).join('') + '</svg>')
 })
 
 // ergogen draws black on transparent, which disappears on a dark page:
@@ -106,7 +113,7 @@ const server = http.createServer(async (req, res) => {
   if (p === '/svg/points') return svg(res, () => tint(fs.readFileSync(path.join(OUT, 'points/demo.svg'))))
   if (p.startsWith('/svg/outline/')) return svg(res, () => tint(fs.readFileSync(path.join(OUT, 'outlines', `${path.basename(p)}.svg`))))
   if (p.startsWith('/svg/pcb/')) return svg(res, () => pcbSvg(path.basename(p)))
-  if (p === '/file/pcb') return send(res, 200, 'text/plain; charset=utf-8', fs.readFileSync(PCB))
+  if (p.startsWith('/file/pcb/') && HALVES.includes(path.basename(p))) return send(res, 200, 'text/plain; charset=utf-8', fs.readFileSync(PCB(path.basename(p))))
   send(res, 404, 'text/plain', 'not found')
 })
 

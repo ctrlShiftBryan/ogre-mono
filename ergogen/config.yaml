@@ -184,11 +184,8 @@ points:
     distance: half_spread
 
 # ---------------------------------------------------------------------------
-# Board outline. One PCB that builds as a single keyboard, or snaps along two
-# break lines into left half, center piece and right half (the Ogre's trick).
-# Break-line geometry (cuts, slots, bridges) is measured from each half's
-# `extra` column (~ ` key) and mirrored for the right side. The sizes are the
-# ones that snapped cleanly on the 2019 board. All numbers are mm, ergogen y up.
+# Board outline: two halves, always split, each its own PCB (`left`, `right`).
+# `board` is both together, for viewing. All numbers are mm, ergogen y up.
 # ---------------------------------------------------------------------------
 outlines:
   _thumb_keys:          # the thumb cluster and the matrix keys around it, at pitch size
@@ -229,70 +226,57 @@ outlines:
     halves: { what: outline, name: _halves }
     pockets:            # the cutout over each Cmd key
       { operation: subtract, what: outline, name: _pockets }
-    keepout:            # nothing from the halves inside the center zone, except the thumbs below it
+    inner_edge:         # each half stops just inside its inner column's edge, above the thumbs
       operation: subtract
       what: rectangle
       asym: both
       where: { ref: matrix_extra_num, shift: [(9.44 + 2.125U) / 2, 0] }
-      size: [2.125U - 9.44, 102]    # from the break line to the mirror axis, down to 2 mm below the center piece
-    center:             # center piece: holds MCU3 (single-board controller) and its reset switch
-      what: rectangle
-      where: { ref: matrix_extra_num, shift: [2.125U, -19.69] }   # centered on the mirror axis
-      size: [4.25U - 2 * 9.4, 58.62]
-    jack_tab:           # raises the top edge over the extra column, where each half's nice!nano has its USB (the 2019 board's TRRS jack sat here)
+      size: [2.125U - 9.44, 102]    # to the mirror axis, down to just above the thumb cluster
+    usb_tab:            # raises the top edge over the inner column, where each half's nice!nano has its USB-C
       what: rectangle
       asym: both
-      where: { ref: matrix_extra_num, shift: [1.8375, 0.375U] }   # from 2 mm into the inner column (covers its corner) to x = 15.2
-      size: [26.725, 0.75U]
-    cut_a:              # break line: slot down beside the jack tab ...
-      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [16.185, 12.66] }, size: [1.97, 24.68] }
-    cut_b:              # ... across under the tab ...
-      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [13.305, 1.065] }, size: [7.73, 1.49] }
-    cut_c:              # ... and down to the first bridge
-      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.47, -6.235] }, size: [2.06, 16.09], corner: 0.5 }
-    slot_1:             # routed slots between the four ~2 mm bridges, ends round as a router bit cuts them
-      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.475, -20.255] }, size: [1.71, 8.05], corner: 1.71 / 2 }
-    slot_2:
-      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.475, -30.44] }, size: [1.71, 8.05], corner: 1.71 / 2 }
-    slot_3:
-      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.475, -40.62] }, size: [1.71, 8.05], corner: 1.71 / 2 }
-    notch:              # bottom notch up to the last bridge
-      { operation: subtract, what: rectangle, asym: both, where: { ref: matrix_extra_num, shift: [10.525, -49.05] }, size: [1.95, 4.9], corner: 0.5 }
+      where: { ref: matrix_extra_num, shift: [(9.44 - 11.525) / 2, 0.375U] }   # from 2 mm into the next column (covers its corner) to the inner edge
+      size: [9.44 + 11.525, 0.75U]
+  left:                 # the left half's PCB outline: everything left of the mirror axis
+    - { what: outline, name: board }
+    - { operation: intersect, what: rectangle, where: { ref: matrix_extra_num, shift: [2.125U - 250, 0] }, size: [500, 500] }
+  right:
+    - { what: outline, name: board }
+    - { operation: intersect, what: rectangle, where: { ref: matrix_extra_num, shift: [2.125U + 250, 0] }, size: [500, 500] }
 
 # ---------------------------------------------------------------------------
-# PCB. 10x7 matrix, COL2ROW diodes, one hotswap switch and one diode per key.
-# Wireless only: nice!nanos on the back, no TRRS. MCU1/MCU2 (left/right half) and
-# MCU3 (center, single-board build) all sit on the same row/column nets; solder
-# MCU3 alone, or MCU1 + MCU2. Pad map in footprints/ogre_nicenano.js.
+# PCB: two boards, always split, wireless only: `left` and `right`, each a half
+# with its own nice!nano on the back, reset switch and nets. 10x7 matrix, COL2ROW
+# diodes, one hotswap switch and one diode per key. Rows 0-4 are the left half,
+# 5-9 the right; columns 0-6 on both. Pad map in footprints/ogre_nicenano.js.
+# Each board numbers its own parts in key order: MX1-MX34 and D1-D34.
 # ---------------------------------------------------------------------------
 pcbs:
-  ogre:
+  left:
     template: kicad8
     params:
       origin: [38.78015, 145.53875]   # where build.js moves the board on KiCad's page (mm, y down), as placed in KiCad
     outlines:
-      edge: { outline: board }
+      edge: { outline: left }
     footprints:
-      switch:           # one per key; a key's `stab` adds stabilizer holes, its `turn` turns the switch
+      switch: &switch   # one per key; a key's `stab` adds stabilizer holes, its `turn` turns the switch
         what: ogre_hotswap
-        where: true
+        where: '-/^mirror_/'
         params: { from: '{{col_net}}', to: '{{name}}', legend: '{{legend}}', cap_w: '{{width}}', cap_h: '{{height}}', stab: '{{stab}}', turn: '{{turn}}' }
 
-      # One diode per key, a part of its own so it can be moved clear of traces.
-      # Each starts at the switch's right edge, where the 2024 footprint drew it
-      # built in: (8.15, 0.63) in the switch's frame. resist keeps the right half's
-      # diodes on that same side, since the switch footprint isn't mirrored.
-      diode:            # one per key, at the key's `diode` ([x, y, r] from the key; see the zones)
-                        # or, without one, at the switch's right edge
+      # One diode per key, a part of its own so it can be moved clear of traces: at
+      # the key's `diode` ([x, y, r] from the key; see the zones) or, without one, at
+      # the switch's right edge, where the 2024 footprint drew it built in.
+      diode: &diode
         what: ogre_socket_diode
-        where: true
+        where: '-/^mirror_/'
         params: { from: '{{name}}', to: '{{row_net}}', place: '{{diode}}' }
 
-      mcu_left:         # MCU1: up the back of the inner column under ~ and } ], USB flush with the
-                        # top of the jack tab; its pad rows clear the turned switches' strip by ~0.9 mm
+      mcu:              # up the back of the inner column under ~ and } ], USB flush with the
+                        # top of the USB tab; its pad rows clear the turned switches' strip by ~0.9 mm
         what: ogre_nicenano
         where: { ref: matrix_extra_num, shift: [-0.845, 0.375U + 0.375U - 18.3] }
-        params: &half_mcu
+        params: &mcu
           side: back
           pad3: GND
           pad4: GND
@@ -309,53 +293,34 @@ pcbs:
           pad19: col1
           pad20: col0
           pad21: VCC
-          pad22: RESET1
+          pad22: RESET
           pad23: GND
-      mcu_right:        # MCU2: the same under PgUp and { [
+
+      reset:            # on the back, below Tab, clear of Tab's diode and Caps Lock's socket
+        what: ogre_reset
+        where: { ref: matrix_outer_top, shift: [0, -8.5] }
+        params: { from: GND, to: RESET }
+
+  right:
+    template: kicad8
+    params:
+      origin: [38.78015, 145.53875]
+    outlines:
+      edge: { outline: right }
+    footprints:
+      switch: { <<: *switch, where: /^mirror_/ }
+      diode: { <<: *diode, where: /^mirror_/ }
+      mcu:              # the same under PgUp and { [
         what: ogre_nicenano
         where: { ref: mirror_matrix_extra_num, shift: [-0.845, 0.375U + 0.375U - 18.3] }
         params:
-          <<: *half_mcu
+          <<: *mcu
           pad8: row5
           pad9: row6
           pad10: row7
           pad11: row8
           pad12: row9
-          pad22: RESET2
-      mcu_center:       # MCU3: single-board build, all ten rows
-        what: ogre_nicenano
-        where: { ref: matrix_extra_num, shift: [2.125U, -8.818] }   # USB flush with the top edge
-        params:
-          side: back
-          pad1: row0
-          pad2: row1
-          pad3: GND
-          pad4: GND
-          pad5: row2
-          pad6: row3
-          pad7: row4
-          pad8: row5
-          pad9: row6
-          pad10: row7
-          pad11: row8
-          pad12: row9
-          pad14: col6
-          pad15: col5
-          pad16: col4
-          pad17: col3
-          pad18: col2
-          pad19: col1
-          pad20: col0
-          pad21: VCC
-          pad22: RESET0
-          pad23: GND
-
-      reset_halves:     # SW1/SW2: on the back, below Tab, clear of Tab's diode and Caps Lock's socket
+      reset:            # below | \
         what: ogre_reset
-        asym: both
-        where: { ref: matrix_outer_top, shift: [0, -8.5] }
-        params: { from: GND, to: RESET1, mirror.to: RESET2 }
-      reset_center:     # SW3: below MCU3
-        what: ogre_reset
-        where: { ref: matrix_extra_num, shift: [2.125U, -34.65] }
-        params: { from: GND, to: RESET0 }
+        where: { ref: mirror_matrix_outer_top, shift: [0, -8.5] }
+        params: { from: GND, to: RESET }

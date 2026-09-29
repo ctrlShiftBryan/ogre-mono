@@ -2,9 +2,8 @@
 
 A 68-key ergonomic keyboard, written by hand for
 [ergogen](https://ergogen.xyz): key layout, board outline and a KiCad PCB, all
-generated from one `ergogen/config.yaml`. It is a single PCB that either builds
-as one keyboard or snaps along two break lines into a split with a spare center
-piece.
+generated from one `ergogen/config.yaml`. It is a wireless split: one PCB per
+half, each with a nice!nano.
 
 34 keys a half: four staggered rows, a three-key inner column, a lone Esc
 outboard of the number row, two arrow keys, and a four-key thumb cluster fanned
@@ -14,19 +13,20 @@ column, 1.25U and 2.25U thumbs. `ergogen/README.md` describes the design;
 
 ## Where it stands
 
-- Layout, outline and PCB all generate from the config: 68 keys on a 10x7
-  matrix, one diode per key, three Pro Micro footprints (center for the single
-  build, left and right for the split).
+- Layout, outline and PCBs all generate from the config: 68 keys on a 10x7
+  matrix, hotswap sockets with one diode per key, and a nice!nano per half.
 - The design's own values — column staggers, thumb fan, half separation — are
   named in the config's `units` block, so the board is tuned in one place.
 - `npm run snapshot` holds the geometry against a committed baseline, so a key
   that moves without you meaning it fails.
-- `npm run check` fails on one known thing: KiCad DRC courtyard overlaps where
-  each half's Pro Micro sits under its middle-column keys, which is deliberate.
-  That wants a decision — allowlist those four footprint pairs, or move the
-  controllers — before it can serve as a gate.
-- **Next:** settle that DRC policy, then route in KiCad. Mounting holes wait on
-  the case, since the new staggers moved most of the old M2 positions.
+- `npm run check` passes its wiring checks and fails only on KiCad DRC
+  silkscreen warnings: the socket outline over its own holes, the nice!nano's
+  small pin labels, and labels overlapping under the controller. That wants a
+  decision (clean up the silkscreen, or let the check ignore it) before DRC can
+  serve as a gate.
+- **Next:** the battery connector (JST PH 2-pin) and a power switch per half,
+  then routing: a routed board as the copper master, with the build syncing
+  placement into it. Mounting holes wait on the case.
 
 ## Working on it
 

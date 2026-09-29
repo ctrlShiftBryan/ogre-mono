@@ -54,17 +54,17 @@ a space: `'! 1'` is the key with `!` over `1`. Anything else (`Esc`,
 
 ## The PCB
 
-One board that builds either as a single keyboard or, snapped along two break
-lines, as a split with a spare center piece. Wireless only: nice!nano
-controllers, no TRRS. The matrix, the controller pad map and the break-line
-dimensions come from the 2019 Ogre Ergo, where they were fabricated and worked;
-the switch and nice!nano footprints come from the 2024 rework (`ogre.2024.pretty`):
+Two boards, always split, one per half: `left` and `right`, each its own KiCad
+PCB with its own nets. Wireless only: nice!nano controllers, no TRRS. The matrix
+and the controller pad map come from the 2019 Ogre Ergo, where they were
+fabricated and worked; the switch and nice!nano footprints come from the 2024
+rework (`ogre.2024.pretty`):
 
-- **Key numbers.** Key *n* is switch MX*n* and diode D*n*, numbered in points
-  order: up each column from the outer edge inward, then the thumbs, left half
-  (1–34) before the right (35–68). The keycap render (`ogre-ergo.keycaps.svg`,
-  and the viewer's Keycaps tab) prints each key's number, and `npm run check`
-  fails if a switch or diode is numbered out of step with its key.
+- **Key numbers.** Each half numbers its keys 1–34 in points order: up each
+  column from the outer edge inward, then the thumbs. Key *n* on a half is that
+  board's switch MX*n* and diode D*n*. The keycap render (`ogre-ergo.keycaps.svg`,
+  and the viewer's Keycaps tab) prints each key's number as L*n* or R*n*, and
+  `npm run check` fails if a switch or diode is numbered out of step with its key.
 - **One 10×7 matrix, one hotswap switch and one diode per key** (Kailh MX
   socket and SOD-123 or through-hole diode, both on the back, COL2ROW). The
   2.25U thumb keys add stabilizer holes (a key's `stab`), and a key's `turn`
@@ -74,48 +74,40 @@ the switch and nice!nano footprints come from the 2024 rework (`ogre.2024.pretty
   (mm from the key, in its frame, y up; `mirror.diode` for the right half);
   without one it sits at the switch's right edge, where the built-in one was.
   Diodes number in key order, so moving one never renumbers the rest.
-  Rows 0–4 are the left half, rows 5–9 the right; columns 0–6 run across both,
-  numbered from the outer edge inward on each half. The thumb Home/End keys
-  take row4/col1 and row9/col1; row4/col0 and row9/col0 stay unused.
-- **Three nice!nano footprints on the same nets**, all on the back on Mill-Max
-  sockets. Solder MCU3 alone for the single board, or MCU1 + MCU2 for the split:
-  - MCU3 (center): pads 1, 2, 5–12 = row0–row9; pads 20→14 = col0–col6; 22 = RESET0.
-  - MCU1 (left): pads 8–12 = row0–row4; 20→14 = col0–col6; 22 = RESET1.
-  - MCU2 (right): pads 8–12 = row5–row9; same columns; 22 = RESET2.
-  - Pad 24 (RAW) is the nice!nano's B+. No battery connector or power switch
-    is placed yet.
-- **Break lines** beside each half's innermost column: a cut down from the
-  top edge (jogging around the raised tab), three 1.7 × 8 mm slots and a
-  bottom notch, leaving four ~2 mm bridges. Every row and column net, plus VCC
-  and GND, has to cross at those bridges. Sizes and spacing are measured from
-  the innermost column.
-- **Center piece:** MCU3 with its USB at the top edge, and reset switch SW3.
+  Rows 0–4 are the left half, rows 5–9 the right; columns 0–6 on each,
+  numbered from the outer edge inward. The thumb Home/End keys take row4/col1
+  and row9/col1; row4/col0 and row9/col0 stay unused.
+- **One nice!nano per half**, MCU1 on each board, on the back on Mill-Max
+  sockets: pads 8–12 = its five rows (row0–4 left, row5–9 right); pads 20→14 =
+  col0–col6; 22 = RESET. Pad 24 (RAW) is the nice!nano's B+. No battery
+  connector or power switch is placed yet.
 - **Each half:** its nice!nano up the back of the inner column, under `` ` ~ ``
   and `} ]` (PgUp and `{ [` on the right), USB-C flush with the top of the
   raised tab over that column. Those two keys' switches are turned 90°, so their
   sockets and diodes stand in a strip up the column and the controller's pad
-  rows pass either side, about 0.9 mm clear. A 6 mm reset switch sits on the
-  back below Tab (`| \` on the right).
+  rows pass either side, about 0.9 mm clear. A 6 mm reset switch (SW1) sits on
+  the back below Tab (`| \` on the right).
 - **Outline:** keycap edges with 1 mm corners, thumbs included. The thumb
   cluster joins the matrix by filling only the gaps between neighboring keys
   (`thumb_web`), and one pocket per half is cut out over Cmd, as on the 2019
-  board. Nothing from the halves enters the center zone above the thumbs,
-  leaving a 2 mm gap under the center piece.
+  board. Each half's inner edge runs straight up just inside its inner column,
+  with a tab raised over that column for the USB-C. The `left` and `right`
+  outlines are the halves; `board` is both together, for viewing.
 - **No underglow LEDs**, no alternate-size switch footprints, and no mounting
   holes yet (see below).
 
-The board sits on KiCad's page at `pcbs.ogre.params.origin` in the config: after
-ergogen runs, `build.js` moves the finished PCB there as a whole and puts KiCad's
-drill origin at the same spot. Ergogen's own coordinates (the points, the
-snapshot, the reference DXF) stay where they were.
+Both boards sit on KiCad's page at their `pcbs.<half>.params.origin` in the
+config: after ergogen runs, `build.js` moves each finished PCB there as a whole
+and puts KiCad's drill origin at the same spot. Ergogen's own coordinates (the
+points, the snapshot, the reference DXFs) stay where they were.
 
-Routing is left for KiCad. The PCB is build output, not a committed file:
-`npm run build` writes it to `output/pcbs/ogre.kicad_pcb`, with an
-`ogre.kicad_pro` beside it so KiCad opens it as a project. Every build rewrites
-the board in place (never deleting it, so KiCad can keep it open) and leaves the
-project file and KiCad's other files alone; anything done to the board in KiCad
-is replaced, so route in a copy. The project has no schematic; the board and its
-nets are the whole design.
+Routing is left for KiCad. The PCBs are build output, not committed files:
+`npm run build` writes `output/pcbs/left.kicad_pcb` and `right.kicad_pcb`, each
+with a `.kicad_pro` beside it so KiCad opens it as a project. Every build
+rewrites the boards in place (never deleting them, so KiCad can keep one open)
+and leaves the project files and KiCad's other files alone; anything done to a
+board in KiCad is replaced, so route in a copy. The projects have no schematic;
+the board and its nets are the whole design.
 
 ## Commands
 
@@ -127,21 +119,22 @@ npm run snapshot # fail on geometry that changed since the last baseline
 npm run check    # check the generated PCB's parts, nets and KiCad DRC
 npm run serve    # live viewer on http://localhost:5174
 npm run bundle   # pack config + footprints into output/ogre-ergo.ekb for the web UI
-npm run reference # output/reference.dxf, the board to draw a new outline over
-npm run kicad    # build, then open the KiCad project
+npm run reference # output/reference-left.dxf / -right.dxf, to draw a new outline over
+npm run kicad    # build, then open a half's KiCad project (npm run kicad right)
 ```
 
-`npm run kicad` opens `output/pcbs/ogre.kicad_pro` in KiCad, to look the board
-over, run DRC or place parts. Placements made there come back by hand into
+`npm run kicad` opens `output/pcbs/left.kicad_pro` in KiCad (`npm run kicad
+right` for the other half), to look the board over, run DRC or place parts. Placements made there come back by hand into
 `config.yaml` (see `AGENTS.md`); everything else on the board is replaced by the
 next build. After a rebuild (`npm run serve` rebuilds on every save), **File >
 Revert** in the PCB editor loads the new board.
 
-`npm run reference` plots the built PCB to a DXF for a vector editor: board
+`npm run reference` plots each built half to a DXF for a vector editor: board
 edge on `Edge.Cuts`, keycaps on `User.Drawings`, and the courtyards of the
 switches and reset switches on `F.Courtyard`
 and `B.Courtyard`. Units are mm and the coordinates are ergogen's own, y up, so
-a drawing that keeps them lines up with the config. It needs `kicad-cli`.
+a drawing that keeps them lines up with the config, and the two halves line up
+with each other. It needs `kicad-cli`.
 
 `build.js` runs ergogen with the footprints in `footprints/`. The ergogen CLI
 only loads custom footprints from a folder, and this folder also holds
@@ -200,8 +193,7 @@ In ZMK terms, `RC(r, c)` is PCB column `r`, PCB row `c`.
 - **Everything else** keeps its matrix position, including the resized and
   moved keys. The transform goes from 70 to 68 entries.
 
-The single-board build (MCU3) matches QMK's `ogre/ergo_single` pins, and the
-halves match `ogre/ergo_split`.
+The halves match QMK's `ogre/ergo_split` pins.
 
 ## Not done yet
 

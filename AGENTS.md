@@ -33,11 +33,12 @@ anything that moves a key or touches the PCB.
 
 ### Placing parts in KiCad
 
-The user places parts by hand in KiCad, in `output/pcbs/ogre.kicad_pcb`, and
-the agent carries each move into `config.yaml` so the build reproduces it:
+The user places parts by hand in KiCad, in `output/pcbs/left.kicad_pcb` or
+`right.kicad_pcb`, and the agent carries each move into `config.yaml` so the
+build reproduces it:
 
 1. Copy that board to the scratchpad before touching the config: the build and
-   `npm run serve`'s watcher both overwrite `output/`.
+   `npm run serve`'s watcher both rewrite the boards in `output/pcbs/`.
 2. Diff its footprints against a build written to the scratchpad, and encode
    each move as an offset from its key. A diode takes its key's
    `diode: [x, y, r]` in the zones (`mirror.diode` on the right half): mm in

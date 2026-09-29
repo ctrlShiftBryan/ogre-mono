@@ -77,9 +77,8 @@ def fix_dsn(board, dsn):
       keepout goes over at its absolute spot instead, drill + hole clearance"""
     text = open(dsn).read()
     structure = text.index('(structure')
-    for opening in ('(boundary', '(keepout "" (polygon'):
-        while (at := text.find(opening, structure, text.index('(placement'))) != -1:
-            text = text[:at] + text[block(text, at):]
+    at = text.index('(boundary', structure)   # the pocket's coarse keepout stays: the grown one covers it
+    text = text[:at] + text[block(text, at):]
     text = re.sub(r'\n\s*\(keepout "" \(circle [FB]\.Cu [^()]*\)\)', '', text)
 
     settings, rounding = board.GetDesignSettings(), pcbnew.FromMM(0.1)

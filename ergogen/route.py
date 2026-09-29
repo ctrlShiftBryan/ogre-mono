@@ -1,6 +1,7 @@
 # Autoroutes one section of the routed board (routing/left.kicad_pcb) with
 # Freerouting, leaving every trace already on the board where it is.
 #   python3 route.py <section> [passes]
+#   python3 route.py rip [section]      deletes a section's traces, or every trace
 # A section names the parts it routes between and the nets it routes. Every
 # other pad is left unconnected for the run, the board's traces are locked
 # (the DSN marks them protected, so Freerouting keeps them), and the board goes
@@ -146,6 +147,24 @@ def route(name, passes):
     report(name, section, tmp)
 
 
+def rip(name=None):
+    """Delete the section's traces and vias (every one, without a section), as
+    text: removing them through KiCad 10's bindings isn't safe."""
+    nets = re.compile(SECTIONS[name]['nets'] if name else '')
+    text, kept, at, ripped = open(BOARD).read(), [], 0, 0
+    for item in re.finditer(r'\n\t\((segment|via|arc)\b', text):
+        if item.start() < at:
+            continue
+        end = block(text, item.start() + 2)
+        net = re.search(r'\(net "([^"]*)"\)', text[item.start():end])
+        if net and nets.match(net.group(1)):
+            kept.append(text[at:item.start()])
+            at, ripped = end, ripped + 1
+    kept.append(text[at:])
+    open(BOARD, 'w').write(''.join(kept))
+    print(f'ripped {ripped} traces and vias' + (f' on {name}' if name else ''))
+
+
 def report(name, section, tmp):
     drc = os.path.join(tmp, 'drc.json')
     subprocess.run(['kicad-cli', 'pcb', 'drc', '--format', 'json', '--severity-all', '-o', drc, BOARD],
@@ -169,6 +188,8 @@ def report(name, section, tmp):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] == 'rip' and (len(sys.argv) == 2 or sys.argv[2] in SECTIONS):
+        sys.exit(rip(*sys.argv[2:3]))
     if len(sys.argv) < 2 or sys.argv[1] not in SECTIONS:
-        sys.exit(f'usage: route.py <{"|".join(SECTIONS)}> [passes]')
+        sys.exit(f'usage: route.py <{"|".join(SECTIONS)}> [passes] | rip [section]')
     route(sys.argv[1], int(sys.argv[2]) if len(sys.argv) > 2 else 20)

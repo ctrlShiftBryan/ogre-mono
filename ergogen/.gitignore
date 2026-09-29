@@ -8,3 +8,4 @@ routing/*.kicad_prl
 routing/~*.lck
 routing/*-backups/
 routing/fp-info-cache
+routing/.history/

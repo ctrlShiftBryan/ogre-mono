@@ -137,9 +137,9 @@ it was fabricated and worked; the switch footprint from the 2024 rework
   below Esc (Del on the right) so they shine up through a hole in the case
   just below that key, one above the other: LED2 the charge LED (VDDH through
   1k, sinking into the charger's CHG, orange) and, below it, LED1 the status
-  LED (P0.15 through 1k, blue).
-  Their flat side (cathode) is at each footprint's origin; the anode points
-  toward Tab.
+  LED (P0.15 through 1k, blue). Each stands with its two pads in a line down
+  the tab, the flat side (cathode) at the footprint's origin and the anode
+  above it, so a bent-over LED shines sideways.
 - **Where the rest sits.** Nothing juts out of the outline for the controller:
   the parts hide on the back in the 10 mm strips between one key's socket and
   the next key's switch pins. The module's inductor, capacitors and the crystal

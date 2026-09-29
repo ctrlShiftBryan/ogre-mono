@@ -426,14 +426,15 @@ pcbs:
         where: &w_power { ref: matrix_extra_num, shift: [7.47, -5.78], rotate: 90 }   # 0.4 mm in from where KiCad had it: its mounting pad needs 0.5 mm to the edge
         params: &power { common: BAT, on: VBAT, side: back }
 
-      led_status:       # LED1, LED2: on the front, one above the other on the tab below Esc; cathode
-                        # (flat) at each origin, anode toward Tab (turned round on the right half, where the tab mirrors)
+      led_status:       # LED1, LED2: on the front, one above the other on the tab below Esc, each with
+                        # its pads in a line down the tab, cathode (flat) at the origin and anode above it,
+                        # for LEDs bent over to shine sideways
         what: ogre_led
-        where: { ref: matrix_far_num, shift: [-4.78, -0.5U - 8.875] }
+        where: { ref: matrix_far_num, shift: [-4.78, -0.5U - 8.875], rotate: 90 }
         params: &led_status { anode: LED_S, cathode: GND, value: STATUS, color: blue }
       led_charge:       # above the status LED
         what: ogre_led
-        where: { ref: matrix_far_num, shift: [-4.78, -0.5U - 3.3] }
+        where: { ref: matrix_far_num, shift: [-4.78, -0.5U - 3.3], rotate: 90 }
         params: &led_charge { anode: LED_C, cathode: CHG, value: CHARGE, color: orange }
 
   right:
@@ -482,5 +483,5 @@ pcbs:
       swd:            { what: ogre_swd, where: { <<: *w_swd, ref: mirror_matrix_inner_home }, params: *swd }
       reset:          { what: ogre_reset, where: { <<: *w_reset, ref: mirror_matrix_index_top }, params: *reset }
       power:          { what: ogre_power_switch, where: { <<: *w_power, ref: mirror_matrix_extra_num }, params: *power }
-      led_status:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-4.78, -0.5U - 8.875], rotate: 180 }, params: *led_status }
-      led_charge:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-4.78, -0.5U - 3.3], rotate: 180 }, params: *led_charge }
+      led_status:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-4.78, -0.5U - 8.875], rotate: -90 }, params: *led_status }   # mirrored, ergogen turns it the other way; -90 lands on 90, anode up
+      led_charge:  { what: ogre_led, where: { ref: mirror_matrix_far_num, shift: [-4.78, -0.5U - 3.3], rotate: -90 }, params: *led_charge }

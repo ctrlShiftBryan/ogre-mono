@@ -24,8 +24,8 @@ column, 1.25U and 2.25U thumbs. `ergogen/README.md` describes the design;
   small pin labels, and labels overlapping under the controller. That wants a
   decision (clean up the silkscreen, or let the check ignore it) before DRC can
   serve as a gate.
-- **Next:** the battery connector (JST PH 2-pin) and a power switch per half,
-  then routing: a routed board as the copper master, with the build syncing
+- **Next:** pick the battery (to set the connector's polarity) and a power
+  switch per half, then routing: a routed board as the copper master, with the build syncing
   placement into it. Mounting holes wait on the case.
 
 ## Working on it
